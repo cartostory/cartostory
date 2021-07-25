@@ -1,0 +1,53 @@
+version: '3.7'
+
+volumes:
+    db-data:
+
+services:
+    nginx:
+        image: nginx:1.21.1
+        ports:
+            - "8080:80"
+        volumes:
+            - ./etc/nginx/conf.d/backend.conf:/etc/nginx/conf.d/default.conf
+            - ../frontend/build:/usr/share/nginx/cartostory
+    backend:
+        build:
+          context: ../backend
+          target: ${NODE_ENV}
+        image: node:16-slim
+        volumes:
+            - ../backend:/src
+        deploy:
+          restart_policy:
+            condition: on-failure
+        environment:
+            - POSTGRES_DB=${POSTGRES_DB}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASS=${POSTGRES_PASS}
+    database:
+        image: kartoza/postgis:13.0
+        ports:
+          - "15432:5432"
+        environment:
+            - POSTGRES_DB=${POSTGRES_DB}
+            - POSTGRES_USER=${POSTGRES_USER}
+            - POSTGRES_PASS=${POSTGRES_PASS}
+            - ALLOW_IP_RANGE=${ALLOW_IP_RANGE}
+            - POSTGRES_MULTIPLE_EXTENSIONS=${POSTGRES_MULTIPLE_EXTENSIONS}
+        volumes:
+            - db-data:${PGDATA}
+        deploy:
+          restart_policy:
+            condition: on-failure
+    flyway:
+        image: flyway/flyway:7
+        command: -connectRetries=3 migrate
+        environment:
+          - FLYWAY_PASSWORD=${POSTGRES_PASS}
+          - FLYWAY_SCHEMAS=cartostory
+          - FLYWAY_URL=jdbc:postgresql://database:5432/cartostory
+          - FLYWAY_USER=${POSTGRES_USER}
+          - FLYWAY_EDITION=community
+        volumes:
+          - ../backend/db/migrations:/flyway/sql
