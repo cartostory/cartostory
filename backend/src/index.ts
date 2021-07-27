@@ -1,35 +1,41 @@
 import fastify from 'fastify';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 import fastifyPostgres from 'fastify-postgres';
+import fastifyJwt from 'fastify-jwt';
+import activate from './routes/auth/activate';
+import refreshToken from './routes/auth/refresh-token';
+import signIn from './routes/auth/sign-in';
+import signUp from './routes/auth/sign-up';
 
-const { POSTGRES_DB, POSTGRES_PASS, POSTGRES_USER } = process.env;
+const {
+  POSTGRES_DB, POSTGRES_PASS, POSTGRES_USER, NODE_JWT_SECRET,
+} = process.env;
 
 const server = fastify({
   logger: true,
 });
 
-server.register(fastifyPostgres, {
-  connectionString: `postgres://${POSTGRES_USER}:${POSTGRES_PASS}@database/${POSTGRES_DB}`,
+server.register(fastifyPostgres, { connectionString: `postgres://${POSTGRES_USER}:${POSTGRES_PASS}@database/${POSTGRES_DB}` });
+server.register(fastifyJwt, { secret: NODE_JWT_SECRET! });
+
+server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+    await request.jwtVerify();
+  } catch (err) {
+    reply.send(err);
+  }
 });
+
+// routes
+server.register(activate);
+server.register(refreshToken);
+server.register(signIn);
+server.register(signUp);
 
 // Declare a route
-server.get('/', (_request, reply) => {
+// @ts-ignore
+server.get('/hello', { preValidation: [server.authenticate] }, async (_request, reply) => {
   reply.send({ hello: 'world' });
-});
-
-server.get('/pg', (_request, reply) => {
-  // @ts-ignore
-  function onConnect(err, client, release) {
-    if (err) {
-      return reply.send(err);
-    }
-
-    // @ts-ignore
-    client.query('SELECT 2', (_err, result) => {
-      release();
-      reply.send(err || result);
-    });
-  }
-  server.pg.connect(onConnect);
 });
 
 server.listen(3000, '0.0.0.0', (err, address) => {
