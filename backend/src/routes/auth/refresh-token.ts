@@ -34,7 +34,8 @@ const refreshToken = async (fastify: FastifyInstance) => {
       preValidation: [fastify.authenticate],
     },
     async (request, reply) => {
-      const { exp, iat, ...oldAccessTokenDecoded } = fastify.jwt.decode(request.headers.authorization.replace('Bearer ', ''));
+      // @ts-ignore
+      const { exp, iat, ...oldAccessTokenDecoded } = request.user;
 
       if (oldAccessTokenDecoded) {
         return reply.send({

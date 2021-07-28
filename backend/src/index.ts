@@ -2,6 +2,8 @@ import fastify from 'fastify';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import fastifyPostgres from 'fastify-postgres';
 import fastifyJwt from 'fastify-jwt';
+
+import { getStories, getStory } from './routes/stories';
 import activate from './routes/auth/activate';
 import refreshToken from './routes/auth/refresh-token';
 import signIn from './routes/auth/sign-in';
@@ -31,6 +33,8 @@ server.register(activate);
 server.register(refreshToken);
 server.register(signIn);
 server.register(signUp);
+server.register(getStories);
+server.register(getStory);
 
 // Declare a route
 // @ts-ignore
