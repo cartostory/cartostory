@@ -37,6 +37,7 @@
     "eslint": "^7.31.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jest": "^24.4.0",
     "husky": "^7.0.1",
     "jest": "^27.0.6",
     "lint-staged": "^11.1.1",
@@ -46,7 +47,7 @@
     "typescript": "^4.3.5"
   },
   "lint-staged": {
-    "*.{ts}": [
+    "*.ts": [
       "npm run lint"
     ]
   }

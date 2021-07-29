@@ -2,8 +2,8 @@
   "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
       "outDir": "dist",
-      "target": "ES2019"
+      "target": "ES2019",
   },
   "compileOnSave": true,
-  "include": ["./"]
+  "include": ["./", "./global.d.ts"],
 }
