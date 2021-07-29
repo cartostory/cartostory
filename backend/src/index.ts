@@ -3,7 +3,9 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
 import fastifyPostgres from 'fastify-postgres';
 import fastifyJwt from 'fastify-jwt';
 
-import { getStories, getStory } from './routes/stories';
+import { getStories, getStory } from './routes/stories/read';
+import { createStory } from './routes/stories/create';
+import { updateStory } from './routes/stories/update';
 import activate from './routes/auth/activate';
 import refreshToken from './routes/auth/refresh-token';
 import signIn from './routes/auth/sign-in';
@@ -24,23 +26,22 @@ server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyRe
   try {
     await request.jwtVerify();
   } catch (err) {
+    request.log.error(err);
     reply.send(err);
   }
 });
 
 // routes
+// auth
 server.register(activate);
 server.register(refreshToken);
 server.register(signIn);
 server.register(signUp);
+// stories
 server.register(getStories);
 server.register(getStory);
-
-// Declare a route
-// @ts-ignore
-server.get('/hello', { preValidation: [server.authenticate] }, async (_request, reply) => {
-  reply.send({ hello: 'world' });
-});
+server.register(createStory);
+server.register(updateStory);
 
 server.listen(3000, '0.0.0.0', (err, address) => {
   if (err) {

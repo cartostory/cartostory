@@ -6,7 +6,6 @@ const opts = {
   },
   schema: {
     headers: {
-      additionalProperties: false,
       required: ['authorization'],
       type: 'object',
       properties: {
