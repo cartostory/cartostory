@@ -28,8 +28,7 @@ const signUp = async (fastify: FastifyInstance) => {
       const { email, password } = request.body;
 
       if (!isValidEmail(email)) {
-        reply.code(400);
-        throw new Error('E-mail is not valid.');
+        return reply.code(400).send({ status: 'error', message: 'e-mail is not valid' });
       }
 
       const hash = await generateHash(password);
@@ -44,14 +43,11 @@ const signUp = async (fastify: FastifyInstance) => {
           await client.query('INSERT INTO cartostory.user_activation_code (user_id, activation_code) VALUES ($1, $2)', [userId, activationCode]);
           fastify.log.info({ userId }, 'New activation code created');
 
-          return { status: 'success', data: { userId, activationCode } };
+          return reply.code(200).send({ status: 'success', data: { userId, activationCode } });
         } catch (e) {
           request.log.error(e);
-          /**
-           * Do not let anyone know an e-mail is already taken.
-           */
-          reply.code(200);
-          return { email };
+          // Do not let anyone know an e-mail is already taken.
+          return reply.code(200).send({ status: 'success', message: 'user succesfully registered' });
         }
       });
     },

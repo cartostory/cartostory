@@ -28,8 +28,7 @@ const signIn = async (fastify: FastifyInstance) => {
       const { email, password } = request.body;
 
       if (!isValidEmail(email)) {
-        reply.code(400);
-        throw new Error('E-mail is not valid.');
+        return reply.code(400).send({ status: 'error', message: 'e-mail is not valid' });
       }
 
       try {

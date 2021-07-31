@@ -1,8 +1,5 @@
 version: '3.7'
 
-volumes:
-    db-data:
-
 services:
     nginx:
         image: nginx:1.21.1
@@ -14,13 +11,9 @@ services:
     backend:
         build:
           context: ../backend
-          target: ${NODE_ENV}
         image: node:16-slim
         volumes:
             - ../backend:/src
-        deploy:
-          restart_policy:
-            condition: on-failure
         environment:
             - POSTGRES_DB=${POSTGRES_DB}
             - POSTGRES_USER=${POSTGRES_USER}
@@ -36,19 +29,16 @@ services:
             - POSTGRES_PASS=${POSTGRES_PASS}
             - ALLOW_IP_RANGE=${ALLOW_IP_RANGE}
             - POSTGRES_MULTIPLE_EXTENSIONS=${POSTGRES_MULTIPLE_EXTENSIONS}
-        volumes:
-            - db-data:${PGDATA}
-        deploy:
-          restart_policy:
-            condition: on-failure
     flyway:
         image: flyway/flyway:7
         command: -connectRetries=3 migrate
         environment:
           - FLYWAY_PASSWORD=${POSTGRES_PASS}
           - FLYWAY_SCHEMAS=cartostory
-          - FLYWAY_URL=jdbc:postgresql://database:5432/cartostory
+          - FLYWAY_URL=jdbc:postgresql://database:5432/${POSTGRES_DB}
           - FLYWAY_USER=${POSTGRES_USER}
           - FLYWAY_EDITION=community
         volumes:
           - ../backend/db/migrations:/flyway/sql
+        depends_on:
+          - database

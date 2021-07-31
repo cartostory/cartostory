@@ -8,7 +8,7 @@
     "prod": "node dist/index.js",
     "dev": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
     "lint": "npx eslint . --ext .ts",
-    "test": "npx jest",
+    "test": "npx jest --detectOpenHandles",
     "prepare": "cd .. && husky install ./backend/.husky"
   },
   "author": "Michal Zimmermann <zimmicz@gmail.com>",

@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  backend:
+    depends_on:
+      - database
+      - flyway
+    build:
+      target: development
+    command: npm run test
+
