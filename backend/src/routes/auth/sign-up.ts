@@ -43,7 +43,7 @@ const signUp = async (fastify: FastifyInstance) => {
           await client.query('INSERT INTO cartostory.user_activation_code (user_id, activation_code) VALUES ($1, $2)', [userId, activationCode]);
           fastify.log.info({ userId }, 'New activation code created');
 
-          return reply.code(200).send({ status: 'success', data: { userId, activationCode } });
+          return reply.code(200).send({ status: 'success', message: 'user succesfully registered' });
         } catch (e) {
           request.log.error(e);
           // Do not let anyone know an e-mail is already taken.
