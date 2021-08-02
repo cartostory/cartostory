@@ -12,8 +12,9 @@ const query = async (sql: string, params: any[]) => {
 
   try {
     await client.query('BEGIN');
-    await client.query(sql, params);
+    const result = await client.query(sql, params);
     await client.query('COMMIT');
+    return result;
   } catch (e) {
     await client.query('ROLLBACK');
     throw e;
