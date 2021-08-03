@@ -3,9 +3,9 @@ on: [push]
 jobs:
   ci:
     runs-on: ubuntu-latest
-      steps:
-        - name: Check out repository code
-          uses: actions/checkout@v2
-        - name: Run tests
-          run: |
-            make run-test
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: |
+          make run-test
