@@ -11,7 +11,7 @@ const opts = {
 
 // curl http://0.0.0.0:8080/backend/auth/activate/7ec88dff-6be5-4112-825e-2f5dfac645d3/af2f8285ad0dfbd7c2d33712330de97ad519325c -H 'Content-Type: application/json'
 const activate = async (fastify: FastifyInstance) => {
-  fastify.get<{ Params: { userId: string; activationCode: string }}>(
+  fastify.get<{ Params: { userId: string; activationCode: string } }>(
     '/auth/activate/:userId/:activationCode',
     opts,
     async (request, reply) => {
@@ -23,7 +23,7 @@ const activate = async (fastify: FastifyInstance) => {
 
           if (!rows || rows.length !== 1) {
             reply.code(400);
-            return reply.send({ status: 'error', message: 'user cannot be activated' });
+            return await reply.send({ status: 'error', message: 'user cannot be activated' });
           }
 
           const now = new Date();
@@ -32,7 +32,7 @@ const activate = async (fastify: FastifyInstance) => {
           await client.query('UPDATE cartostory.user_activation_code SET used_date = now() WHERE user_id = $1 AND activation_code = $2', [userId, activationCode]);
 
           reply.code(200);
-          return reply.send({ status: 'success', message: 'user activated' });
+          return await reply.send({ status: 'success', message: 'user activated' });
         } catch (e) {
           request.log.error(e);
           reply.code(400);

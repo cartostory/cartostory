@@ -21,7 +21,7 @@ const opts = {
 
 // curl -X POST -d '{"email": "hello@world.xyz", "password": "password"}' 'http://0.0.0.0:8080/backend/auth/sign-in' -H 'Content-Type: application/json'
 const signIn = async (fastify: FastifyInstance) => {
-  fastify.post<{ Body: { email: string; password: string }}>(
+  fastify.post<{ Body: { email: string; password: string } }>(
     '/auth/sign-in',
     opts,
     async (request, reply) => {
@@ -35,7 +35,7 @@ const signIn = async (fastify: FastifyInstance) => {
         const { rows } = await fastify.pg.query('SELECT * FROM cartostory."user" WHERE email = $1', [email]);
         if (!rows || rows.length !== 1) {
           reply.code(400);
-          return reply.send({ status: 'error', message: 'user cannot log in' });
+          return await reply.send({ status: 'error', message: 'user cannot log in' });
         }
 
         const {
@@ -46,10 +46,10 @@ const signIn = async (fastify: FastifyInstance) => {
 
         if (!rightPassword) {
           reply.code(401);
-          return reply.send({ status: 'error', message: 'wrong password' });
+          return await reply.send({ status: 'error', message: 'wrong password' });
         }
 
-        return reply.send({
+        return await reply.send({
           status: 'success',
           data: {
             accessToken: fastify.jwt.sign(user, { expiresIn: '15m' }),

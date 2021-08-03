@@ -6,7 +6,7 @@
   },
   "ignorePatterns": ["dist/**/*.js"],
   "extends": [
-    "airbnb-base",
+    "airbnb-typescript/base",
     "plugin:import/typescript"
   ],
   "parser": "@typescript-eslint/parser",

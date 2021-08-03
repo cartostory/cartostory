@@ -50,7 +50,7 @@ const handler = async ({ user, ...request }: FastifyRequest, reply: FastifyReply
 };
 
 const getStories = async (fastify: FastifyInstance) => {
-  fastify.get<{ Headers: { authorization: string }}>(
+  fastify.get<{ Headers: { authorization: string } }>(
     '/stories',
     {
       ...opts,
@@ -62,7 +62,7 @@ const getStories = async (fastify: FastifyInstance) => {
 };
 
 const getStory = async (fastify: FastifyInstance) => {
-  fastify.get<{ Headers: { authorization: string }}>(
+  fastify.get<{ Headers: { authorization: string } }>(
     '/stories/:id',
     {
       ...opts,

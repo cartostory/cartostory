@@ -26,7 +26,7 @@ const opts = {
 };
 
 const refreshToken = async (fastify: FastifyInstance) => {
-  fastify.post<{ Headers: { authorization: string }; Body: { refreshToken: string }}>(
+  fastify.post<{ Headers: { authorization: string }; Body: { refreshToken: string } }>(
     '/auth/refresh-token',
     {
       ...opts,

@@ -31,7 +31,7 @@ const opts = {
 };
 
 export const createStory = async (fastify: FastifyInstance) => {
-  fastify.post<{ Headers: { authorization: string }, Body: { slug: string; story: object }}>(
+  fastify.post<{ Headers: { authorization: string }, Body: { slug: string; story: object } }>(
     '/stories',
     {
       ...opts,
@@ -45,7 +45,7 @@ export const createStory = async (fastify: FastifyInstance) => {
         const { rows } = await fastify.pg.query('INSERT INTO cartostory.story (slug, user_id, story) VALUES ($1, $2, $3) RETURNING id, slug', params);
         const { id, slug } = rows[0];
 
-        return reply.code(200).send({ status: 'success', data: { id, slug } });
+        return await reply.code(200).send({ status: 'success', data: { id, slug } });
       } catch (e) {
         request.log.error(e);
 
