@@ -11,7 +11,7 @@ services:
     backend:
         build:
           context: ../backend
-        image: node:16-slim
+        image: node:16-alpine
         volumes:
             - ../backend:/src
         environment:

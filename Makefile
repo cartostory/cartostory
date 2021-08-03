@@ -13,5 +13,13 @@ run-test:
 	docker-compose kill database; \
 	exit $$EXIT_CODE
 
+run-ci:
+	@cd ./docker; \
+	docker-compose -f docker-compose.yml -f docker-compose.ci.yml up --build --exit-code-from backend --renew-anon-volumes backend; \
+	EXIT_CODE=$$?; \
+	docker-compose kill database; \
+	exit $$EXIT_CODE
+
+
 stop:
 	cd ./docker && docker-compose stop
