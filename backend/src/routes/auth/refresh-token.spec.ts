@@ -1,9 +1,8 @@
 import superagent from 'superagent';
 import { advanceBy } from 'jest-date-mock';
 import { server } from '../../app';
-import query from '../../../scripts/query';
-import { generateHash } from './components/utils';
 import truncate from '../../../scripts/truncate-tables';
+import { createUser } from '../../../scripts/create-user';
 
 describe('refresh-token', () => {
   beforeEach(async () => {
@@ -27,9 +26,9 @@ describe('refresh-token', () => {
 
   it('refreshes valid token and denies to refresh expired token', async () => {
     const email = 'hello@localhost.world';
-    const hash = await generateHash('world');
+    const password = 'world';
+    await createUser(email, password);
 
-    await query('INSERT INTO "user" (email, display_name, password) VALUES ($1, $1, $2)', [email, hash]);
     let refreshToken: string = 'Bearer ';
     let accessToken: string = 'Bearer ';
 

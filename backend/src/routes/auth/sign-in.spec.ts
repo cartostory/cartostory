@@ -1,8 +1,9 @@
 import { server } from '../../app';
-import query from '../../../scripts/query';
 import truncate from '../../../scripts/truncate-tables';
-import { generateHash } from './components/utils';
+import { createUser } from '../../../scripts/create-user';
 
+const email = 'hello@localhost.world';
+const password = 'world';
 const inject = async (payload: object): Promise<ReturnType<typeof server.inject>> => server.inject({
   method: 'POST',
   url: '/auth/sign-in',
@@ -39,13 +40,10 @@ describe('sign-in', () => {
   });
 
   test('does not log in when passwords do not match', async () => {
-    const email = 'hello@localhost.world';
-    const hash = await generateHash('world');
-
-    await query('INSERT INTO "user" (email, display_name, password) VALUES ($1, $1, $2)', [email, hash]);
+    await createUser(email, password);
 
     const response = await inject({
-      email: 'hello@localhost.world',
+      email,
       password: 'foo',
     });
 
@@ -56,14 +54,11 @@ describe('sign-in', () => {
   });
 
   test('logs in', async () => {
-    const email = 'hello@localhost.world';
-    const hash = await generateHash('world');
-
-    await query('INSERT INTO "user" (email, display_name, password) VALUES ($1, $1, $2)', [email, hash]);
+    await createUser(email, password);
 
     const response = await inject({
-      email: 'hello@localhost.world',
-      password: 'world',
+      email,
+      password,
     });
 
     const json = JSON.parse(response.payload);
