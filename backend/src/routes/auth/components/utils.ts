@@ -1,5 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
 import { isEmail } from '@rearguard/is-email';
-import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
 export const generateHash = async (password: string): Promise<string> => {
@@ -15,10 +15,8 @@ export const comparePasswordAndHash = async (password: string, hash: string): Pr
   return result;
 };
 
-export const generateActivationCode = (): string => {
-  const buffer = crypto.randomBytes(20);
+export const generateActivationCode = (): string => uuidv4();
 
-  return buffer.toString('hex');
-};
+export const generateRandomCode = (length: number): string => uuidv4().replaceAll('-', '').slice(0, length);
 
 export const isValidEmail = (email: string): boolean => isEmail(email);

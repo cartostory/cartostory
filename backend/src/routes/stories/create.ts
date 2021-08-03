@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import type { FastifyInstance } from 'fastify';
+import { generateRandomCode } from '../auth/components/utils';
 
 const opts = {
   pg: {
@@ -40,7 +41,7 @@ export const createStory = async (fastify: FastifyInstance) => {
     },
     async (request, reply) => {
       // @ts-ignore
-      const params = [request.body.slug, request.user.id, request.body.story];
+      const params = [`${request.body.slug}-${generateRandomCode(6)}`, request.user.id, request.body.story];
       try {
         const { rows } = await fastify.pg.query('INSERT INTO cartostory.story (slug, user_id, story) VALUES ($1, $2, $3) RETURNING id, slug', params);
         const { id, slug } = rows[0];
