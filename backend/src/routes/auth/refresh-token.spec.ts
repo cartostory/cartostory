@@ -6,7 +6,7 @@ import { createUser } from '../../../scripts/create-user';
 
 describe('refresh-token', () => {
   beforeEach(async () => {
-    truncate();
+    await truncate();
   });
 
   it('denies to refresh invalid token', async () => {
