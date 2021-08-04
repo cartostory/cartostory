@@ -6,15 +6,14 @@ ENV HUSKY=0
 ENV CI=true
 ENV NODE_ENV=development
 RUN npm config set prepare ""
-
 WORKDIR /app
 COPY package.json package-lock.json global.d.ts jest.config.ts tsconfig.json ./
 COPY src ./src
 COPY scripts ./scripts
 RUN npm ci
 
-# test
-FROM builder as test
+# ci
+FROM builder as ci
 WORKDIR /app
 COPY --from=builder /app/dist ./
 CMD ["npm", "run", "test"]
