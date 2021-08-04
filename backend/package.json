@@ -9,7 +9,8 @@
     "dev": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
     "lint": "npx eslint . --ext .ts",
     "test": "npx jest --detectOpenHandles --ci",
-    "prepare": "cd .. && husky install ./backend/.husky"
+    "prepare": "cd .. && husky install ./backend/.husky",
+    "check:database": "node dist/scripts/is-database-ready.js"
   },
   "author": "Michal Zimmermann <zimmicz@gmail.com>",
   "license": "UNLICENSED",
