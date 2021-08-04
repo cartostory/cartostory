@@ -4,12 +4,13 @@
   "description": "Cartostory",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build tsconfig.json",
     "prod": "node dist/index.js",
     "dev": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
     "lint": "npx eslint . --ext .ts",
     "test": "npx jest --detectOpenHandles --ci",
-    "prepare": "(cd .. && husky install ./backend/.husky) || exit 0"
+    "prepare": "cd .. && husky install ./backend/.husky",
+    "check:database": "node dist/scripts/is-database-ready.js"
   },
   "author": "Michal Zimmermann <zimmicz@gmail.com>",
   "license": "UNLICENSED",

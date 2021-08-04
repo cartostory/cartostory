@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  backend:
+    depends_on:
+      - database
+      - flyway
+    build:
+      args:
+        - POSTGRES_DB
+        - POSTGRES_PASS
+        - POSTGRES_USER
+      context: ../backend
+      dockerfile: Dockerfile
+      target: ci
+    #command: npm run test -- activate
+    command: >
+      sh -c "npm run check:database && npm run test --activate"

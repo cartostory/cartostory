@@ -8,9 +8,7 @@ server.listen(3000, '0.0.0.0', (err, address) => {
   server.log.info(`server listening on ${address}`);
 });
 
-const closeGracefully = async (signal: string) => {
-  console.log(`*^!@4=> Received signal to terminate: ${signal}`);
-
+const closeGracefully = async () => {
   await server.close();
   process.exit();
 };
