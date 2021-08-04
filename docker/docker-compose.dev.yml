@@ -2,5 +2,6 @@ version: '3.7'
 
 services:
   backend:
+    image: node:16-alpine
     build:
       target: development
