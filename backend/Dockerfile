@@ -40,5 +40,4 @@ CMD ["npm", "run", "test"]
 # development
 FROM base as development
 ENV NODE_ENV=development
-WORKDIR /app
 CMD ["npm", "run", "dev"]
