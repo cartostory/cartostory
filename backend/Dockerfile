@@ -15,17 +15,21 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm ci
-COPY global.d.ts jest.config.ts tsconfig.json ./
+COPY global.d.ts ./
+COPY jest.config.ts ./
+COPY tsconfig.json ./
 COPY src ./src
 COPY scripts ./scripts
 RUN npm run build
 
 # ci
-FROM builder as ci
+FROM base as ci
 ENV CI=true
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=builder /app/dist ./
+COPY --from=builder /app/package.json ./
+RUN find . -path ./node_modules -prune -o -type f -iname "*.ts" -exec rm -f {} \;
 CMD ["npm", "run", "test"]
 
 #WORKDIR /src
