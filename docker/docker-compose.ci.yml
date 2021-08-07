@@ -13,4 +13,4 @@ services:
         - POSTGRES_USER
       target: ci
     command: >
-      sh -c "npm run check:database && npm run test --activate"
+      sh -c "npm run check:database && npm run test"
