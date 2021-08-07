@@ -16,12 +16,9 @@ const opts = {
       },
     },
     body: {
-      required: ['slug', 'story'],
+      required: ['story'],
       type: 'object',
       properties: {
-        slug: {
-          type: 'string',
-        },
         story: {
           type: 'object',
         },
@@ -68,10 +65,10 @@ export const updateStory = async (fastify: FastifyInstance) => {
           return await reply.code(401).send({ status: 'error', message: 'user is not authorized to update the story' });
         }
 
-        const { rows: updated } = await fastify.pg.query('UPDATE cartostory.story SET story = $1 WHERE id = $2 RETURNING id', [request.body.story, request.params.id]);
+        const { rows: updated } = await fastify.pg.query('UPDATE cartostory.story SET story = $1 WHERE slug = $2 RETURNING slug', [request.body.story, request.params.id]);
 
         // @ts-ignore
-        return await reply.code(200).send({ status: 'success', data: { id: updated[0].id } });
+        return await reply.code(200).send({ status: 'success', data: { id: updated[0].slug } });
       } catch (e) {
         request.log.error(e);
 
