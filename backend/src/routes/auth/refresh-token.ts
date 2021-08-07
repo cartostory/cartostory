@@ -30,11 +30,9 @@ const refreshToken = async (fastify: FastifyInstance) => {
     '/auth/refresh-token',
     {
       ...opts,
-      // @ts-ignore
       preValidation: [fastify.authenticate],
     },
     async (request, reply) => {
-      // @ts-ignore
       const { exp, iat, ...oldAccessTokenDecoded } = request.user;
 
       if (oldAccessTokenDecoded) {

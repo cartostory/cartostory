@@ -36,11 +36,9 @@ export const createStory = async (fastify: FastifyInstance) => {
     '/stories',
     {
       ...opts,
-      // @ts-ignore
       preValidation: [fastify.authenticate],
     },
     async (request, reply) => {
-      // @ts-ignore
       const params = [`${request.body.slug}-${generateRandomCode(6)}`, request.user.id, request.body.story];
       try {
         const { rows } = await fastify.pg.query('INSERT INTO cartostory.story (slug, user_id, story) VALUES ($1, $2, $3) RETURNING id, slug', params);

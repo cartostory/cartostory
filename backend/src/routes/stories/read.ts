@@ -17,20 +17,27 @@ const opts = {
   },
 };
 
+const routeParams = {
+  required: ['id'],
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+    },
+  },
+};
+
 const handler = async ({ user, ...request }: FastifyRequest, reply: FastifyReply) => {
   try {
+    const { id: userId } = user;
     // @ts-ignore
-    const userId = user.id;
-    // @ts-ignore
-    const storyId = request.params.id;
+    const { id: storyId } = request.params;
     const params = [userId];
     let query = 'SELECT * FROM cartostory.story WHERE user_id = $1';
 
-    // @ts-ignore
     if (storyId) {
       query += ' AND slug = $2';
-      // @ts-ignore
-      params.push(request.params.id);
+      params.push(storyId);
     }
 
     // @ts-ignore
@@ -49,12 +56,19 @@ const handler = async ({ user, ...request }: FastifyRequest, reply: FastifyReply
   }
 };
 
+const getStoriesOpts = {
+  ...opts,
+  schema: {
+    ...opts.schema,
+    routeParams,
+  },
+};
+
 const getStories = async (fastify: FastifyInstance) => {
   fastify.get<{ Headers: { authorization: string } }>(
     '/stories',
     {
-      ...opts,
-      // @ts-ignore
+      ...getStoriesOpts,
       preValidation: [fastify.authenticate],
     },
     handler,
@@ -62,11 +76,10 @@ const getStories = async (fastify: FastifyInstance) => {
 };
 
 const getStory = async (fastify: FastifyInstance) => {
-  fastify.get<{ Headers: { authorization: string } }>(
+  fastify.get<{ Headers: { authorization: string }; Params: { id: string } }>(
     '/stories/:id',
     {
       ...opts,
-      // @ts-ignore
       preValidation: [fastify.authenticate],
     },
     handler,
