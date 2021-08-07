@@ -56,7 +56,7 @@ export const updateStory = async (fastify: FastifyInstance) => {
     async (request, reply) => {
       try {
         // @ts-ignore
-        const { rows } = await fastify.pg.query('SELECT user_id FROM cartostory.story WHERE id = $1', [request.params.id]);
+        const { rows } = await fastify.pg.query('SELECT user_id FROM cartostory.story WHERE slug = $1', [request.params.id]);
 
         if (!rows || rows.length === 0) {
           return await reply.code(404).send({ status: 'error', message: 'story was not found' });
@@ -68,15 +68,16 @@ export const updateStory = async (fastify: FastifyInstance) => {
           return await reply.code(401).send({ status: 'error', message: 'user is not authorized to update the story' });
         }
 
-        const { rows: updated } = await fastify.pg.query('UPDATE cartostory.story SET story = $1, slug = $2 WHERE id = $3 RETURNING id', [request.body.story, request.body.slug, request.params.id]);
+        const { rows: updated } = await fastify.pg.query('UPDATE cartostory.story SET story = $1 WHERE id = $2 RETURNING id', [request.body.story, request.params.id]);
 
         // @ts-ignore
         return await reply.code(200).send({ status: 'success', data: { id: updated[0].id } });
       } catch (e) {
         request.log.error(e);
 
-        reply.code(400);
-        return reply.send({ status: 'error', message: 'story cannot be saved' });
+        return reply
+          .code(400)
+          .send({ status: 'error', message: 'story cannot be saved' });
       }
     },
   );
