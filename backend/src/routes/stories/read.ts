@@ -28,7 +28,7 @@ const handler = async ({ user, ...request }: FastifyRequest, reply: FastifyReply
 
     // @ts-ignore
     if (storyId) {
-      query += ' AND id = $2';
+      query += ' AND slug = $2';
       // @ts-ignore
       params.push(request.params.id);
     }
