@@ -30,10 +30,11 @@ FROM builder as ci
 WORKDIR /ci
 ENV CI=true
 ENV NODE_ENV=production
+COPY --from=dependencies /app/node_modules ./node_modules
+RUN true
 COPY --from=builder /app/dist ./
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/dist/jest.config.js ./
-COPY --from=dependencies /app/node_modules ./node_modules
 CMD ["npm", "run", "test"]
 
 # development
