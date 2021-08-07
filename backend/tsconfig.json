@@ -5,5 +5,9 @@
       "target": "ES2019",
   },
   "compileOnSave": true,
-  "include": ["./", "./global.d.ts"],
+  "include": [
+    "./",
+    "./typings.d.ts",
+    "./fastify.d.ts"
+  ],
 }
