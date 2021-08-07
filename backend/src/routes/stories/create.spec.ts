@@ -5,7 +5,7 @@ import { server } from '../../app';
 
 describe('create-story', () => {
   beforeEach(async () => {
-    truncate();
+    await truncate();
   });
 
   it('does not accept anonymous request', async () => {
