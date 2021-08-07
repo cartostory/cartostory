@@ -22,6 +22,8 @@
   "rules": {
     "import/extensions": 0,
     "import/prefer-default-export": 0,
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*.spec.ts", "**/scripts/*.ts"]}]
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*.spec.ts", "**/scripts/*.ts"]}],
+    "@typescript-eslint/no-use-before-define": 0,
+    "max-len": 0
   }
 }
