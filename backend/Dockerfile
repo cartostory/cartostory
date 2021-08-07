@@ -12,10 +12,12 @@ ENV POSTGRES_PASS=${POSTGRES_PASS}
 ENV POSTGRES_USER=${POSTGRES_USER}
 RUN npm config set prepare ""
 WORKDIR /app
-COPY package.json package-lock.json global.d.ts jest.config.ts tsconfig.json ./
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm ci
+COPY global.d.ts jest.config.ts tsconfig.json ./
 COPY src ./src
 COPY scripts ./scripts
-RUN npm ci
 RUN npm run build
 
 # ci
