@@ -9,16 +9,15 @@ import activate from './routes/auth/activate';
 import refreshToken from './routes/auth/refresh-token';
 import signIn from './routes/auth/sign-in';
 import signUp from './routes/auth/sign-up';
+import { connectionString } from './services/database';
 
-const {
-  POSTGRES_DB, POSTGRES_PASS, POSTGRES_USER, NODE_JWT_SECRET,
-} = process.env;
+const { NODE_JWT_SECRET } = process.env;
 
 export const server = fastify({
   logger: true,
 });
 
-server.register(fastifyPostgres, { connectionString: `postgres://${POSTGRES_USER}:${POSTGRES_PASS}@database/${POSTGRES_DB}` });
+server.register(fastifyPostgres, { connectionString });
 server.register(fastifyJwt, { secret: NODE_JWT_SECRET! });
 
 server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {

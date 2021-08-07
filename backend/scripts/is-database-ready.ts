@@ -1,7 +1,7 @@
 import query from './query';
 
 const check = async (): Promise<void> => {
-  console.log('checking flyway migration status...');
+  process.stdout.write('checking flyway migration status... \n');
   try {
     const result = await query('SELECT 1 FROM pg_tables WHERE tablename = $1', ['flyway_migration_in_progress']);
 
