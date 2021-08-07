@@ -6,13 +6,11 @@ services:
       - database
       - flyway
     build:
+      context: ../backend
       args:
         - POSTGRES_DB
         - POSTGRES_PASS
         - POSTGRES_USER
-      context: ../backend
-      dockerfile: Dockerfile
       target: ci
-    #command: npm run test -- activate
     command: >
       sh -c "npm run check:database && npm run test --activate"
