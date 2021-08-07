@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc --build tsconfig.json",
     "prod": "node dist/index.js",
-    "dev": "concurrently \"tsc -w\" \"nodemon dist/index.js\"",
+    "dev": "concurrently \"tsc -w\" \"nodemon dist/src/index.js\"",
     "lint": "npx eslint . --ext .ts",
     "test": "FORCE_COLOR=true npx jest --runInBand --detectOpenHandles --ci",
     "prepare": "cd .. && husky install ./backend/.husky",
