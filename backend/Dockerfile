@@ -15,8 +15,7 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json ./
 RUN npm ci
-COPY typings.d.ts ./
-COPY fastify.d.ts ./
+COPY @types ./
 COPY jest.config.ts ./
 COPY tsconfig.json ./
 COPY src ./src

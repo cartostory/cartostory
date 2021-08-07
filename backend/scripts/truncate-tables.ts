@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import pg from 'pg';
+import { connectionString } from '../src/services/database';
 
-const { POSTGRES_DB, POSTGRES_PASS, POSTGRES_USER } = process.env;
 const TABLES = [
   '"user"',
   'user_activation_code',
@@ -10,7 +10,7 @@ const TABLES = [
 
 const truncate = async () => {
   const pool = new pg.Pool({
-    connectionString: `postgres://${POSTGRES_USER}:${POSTGRES_PASS}@database/${POSTGRES_DB}`,
+    connectionString,
   });
 
   const client = await pool.connect();
