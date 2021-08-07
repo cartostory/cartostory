@@ -19,7 +19,7 @@ const activate = async (fastify: FastifyInstance) => {
 
       return fastify.pg.transact(async (client) => {
         try {
-          const { rows } = await client.query('SELECT 1 FROM cartostory.user_activation_code uac JOIN cartostory."user" u ON (uac.user_id = u.id) WHERE uac.user_id = $1 AND uac.activation_code = $2 AND u.status = \'registered\' AND uac.valid_until_date >= now() AND uac.used_date IS NULL', [userId, activationCode]);
+          const { rows } = await client.query(SELECT_USER_ACTIVATION_CODE, [userId, activationCode]);
 
           if (!rows || rows.length !== 1) {
             reply.code(400);
@@ -28,8 +28,8 @@ const activate = async (fastify: FastifyInstance) => {
 
           const now = new Date();
 
-          await client.query('UPDATE cartostory."user" SET status = \'verified\', activation_date = $1 WHERE id = $2', [now, userId]);
-          await client.query('UPDATE cartostory.user_activation_code SET used_date = now() WHERE user_id = $1 AND activation_code = $2', [userId, activationCode]);
+          await client.query(UPDATE_USER, [now, userId]);
+          await client.query(UPDATE_USER_ACTIVATION_CODE, [userId, activationCode]);
 
           reply.code(200);
           return await reply.send({ status: 'success', message: 'user activated' });
@@ -42,5 +42,32 @@ const activate = async (fastify: FastifyInstance) => {
     },
   );
 };
+
+const SELECT_USER_ACTIVATION_CODE = `
+SELECT 1
+FROM cartostory.user_activation_code uac
+JOIN cartostory."user" u ON (uac.user_id = u.id)
+WHERE uac.user_id = $1
+  AND uac.activation_code = $2
+  AND u.status = 'registered'
+  AND uac.valid_until_date >= now()
+  AND uac.used_date IS NULL
+`;
+
+const UPDATE_USER = `
+UPDATE cartostory."user"
+SET
+  status = 'verified',
+  activation_date = $1
+WHERE id = $2
+`;
+
+const UPDATE_USER_ACTIVATION_CODE = `
+UPDATE cartostory.user_activation_code
+SET
+  used_date = now()
+WHERE user_id = $1
+  AND activation_code = $2
+`;
 
 export default activate;
