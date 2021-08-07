@@ -1,21 +1,24 @@
-FROM node:16-alpine as base
-
 # builder
-FROM base as builder
+FROM node:16-alpine as base
 ARG POSTGRES_DB
 ARG POSTGRES_PASS
 ARG POSTGRES_USER
-ENV HUSKY=0
 ENV NODE_ENV=development
 ENV POSTGRES_DB=${POSTGRES_DB}
 ENV POSTGRES_PASS=${POSTGRES_PASS}
 ENV POSTGRES_USER=${POSTGRES_USER}
-RUN npm config set prepare ""
 WORKDIR /app
 COPY package.json ./
+RUN sed -i '/prepare/d' ./package.json
 COPY package-lock.json ./
+
+FROM base as dependencies
+RUN npm ci --only=production
+RUN cp -R node_modules prod_node_modules
 RUN npm ci
-COPY @types ./
+
+FROM dependencies as builder
+COPY @types ./@types
 COPY jest.config.ts ./
 COPY tsconfig.json ./
 COPY src ./src
@@ -23,13 +26,14 @@ COPY scripts ./scripts
 RUN npm run build
 
 # ci
-FROM base as ci
+FROM builder as ci
+WORKDIR /ci
 ENV CI=true
 ENV NODE_ENV=production
-WORKDIR /app
 COPY --from=builder /app/dist ./
 COPY --from=builder /app/package.json ./
-RUN find . -path ./node_modules -prune -o -type f -iname "*.ts" -exec rm -f {} \;
+COPY --from=builder /app/dist/jest.config.js ./
+COPY --from=dependencies /app/node_modules ./node_modules
 CMD ["npm", "run", "test"]
 
 # development
