@@ -15,6 +15,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "amqplib": "^0.8.0",
+    "handlebars": "^4.7.7",
     "sib-api-v3-sdk": "^8.2.1"
   },
   "devDependencies": {

@@ -21,15 +21,15 @@ const setup = async () => {
 
       try {
         const content = JSON.parse(msg.content.toString());
+        const { type, userId, email, activationCode } = content;
 
-        switch (content.type) {
+        switch (type) {
           case 'sign-up': {
-            const { email, activationCode } = content;
-            sendSignUp('Welcome to Cartostory', ['zimmicz@gmail.com']);
+            sendSignUp({ activation_code: activationCode, user_id: userId })([email]);
           }
         }
       } catch (e) {
-        console.error('e-mail failed', e);
+        console.error('failed to send e-mail', e);
       }
     }, {
       noAck: true

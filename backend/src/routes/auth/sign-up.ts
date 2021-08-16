@@ -50,7 +50,9 @@ const signUp = async (fastify: FastifyInstance) => {
             durable: true,
           });
 
-          channel.sendToQueue(queue, Buffer.from(JSON.stringify({ email, activationCode, type: 'sign-up' })));
+          channel.sendToQueue(queue, Buffer.from(JSON.stringify({
+            userId, email, activationCode, type: 'sign-up',
+          })));
 
           return await reply.code(200).send({ status: 'success', message: 'user succesfully registered' });
         } catch (e) {
