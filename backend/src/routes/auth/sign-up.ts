@@ -43,6 +43,15 @@ const signUp = async (fastify: FastifyInstance) => {
           await client.query('INSERT INTO cartostory.user_activation_code (user_id, activation_code) VALUES ($1, $2)', [userId, activationCode]);
           fastify.log.info({ userId }, 'New activation code created');
 
+          const { channel } = fastify.amqp;
+          const queue = 'mailer';
+
+          channel.assertQueue(queue, {
+            durable: true,
+          });
+
+          channel.sendToQueue(queue, Buffer.from(JSON.stringify({ email, activationCode, type: 'sign-up' })));
+
           return await reply.code(200).send({ status: 'success', message: 'user succesfully registered' });
         } catch (e) {
           request.log.error(e);

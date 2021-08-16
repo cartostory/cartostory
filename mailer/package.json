@@ -1,0 +1,29 @@
+{
+  "name": "mailer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --build tsconfig.json",
+    "prod": "node dist/index.js",
+    "dev": "concurrently \"tsc -w\" \"nodemon dist/src/index.js\"",
+    "lint": "npx eslint . --ext .ts",
+    "prepare": "cd .. && husky install ./backend/.husky",
+    "test": "FORCE_COLOR=true npx jest --runInBand --detectOpenHandles --ci"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "amqplib": "^0.8.0",
+    "sib-api-v3-sdk": "^8.2.1"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.2",
+    "@types/amqplib": "^0.8.1",
+    "@types/jest": "^26.0.24",
+    "concurrently": "^6.2.1",
+    "jest": "^27.0.6",
+    "nodemon": "^2.0.12",
+    "ts-jest": "^27.0.4"
+  }
+}

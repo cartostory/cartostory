@@ -13,8 +13,15 @@ services:
     depends_on:
       - database
       - flyway
+      - rabbitmq
     command: >
       sh -c "cd /app && npm run dev"
+  mailer:
+    build:
+      context: ../mailer
+      target: development
+    volumes:
+      - ../mailer:/app
   database:
     deploy:
       restart_policy:
