@@ -5,6 +5,7 @@ services:
     depends_on:
       - database
       - flyway
+      - rabbitmq
     build:
       context: ../backend
       args:
