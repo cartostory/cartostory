@@ -1,5 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { comparePasswordAndHash, isValidEmail } from './components/utils';
+import { auth } from '../../services/database/index';
+import { UserNotFoundError } from '../../services/database/auth/sign-in';
 
 const opts = {
   schema: {
@@ -32,24 +34,18 @@ const signIn = async (fastify: FastifyInstance) => {
       }
 
       try {
-        const { rows } = await fastify.pg.query('SELECT * FROM cartostory."user" WHERE email = $1', [email]);
-        if (!rows || rows.length !== 1) {
-          reply.code(400);
-          return await reply.send({ status: 'error', message: 'user cannot log in' });
-        }
-
+        const found = await auth.getUser(email);
         const {
           password: hash,
           ...user
-        } = rows[0];
+        } = found;
         const rightPassword = await comparePasswordAndHash(password, hash);
 
         if (!rightPassword) {
-          reply.code(401);
-          return await reply.send({ status: 'error', message: 'wrong password' });
+          await reply.code(401).send({ status: 'error', message: 'wrong password' });
         }
 
-        return await reply.send({
+        await reply.send({
           status: 'success',
           data: {
             accessToken: fastify.jwt.sign(user, { expiresIn: '15m' }),
@@ -58,8 +54,12 @@ const signIn = async (fastify: FastifyInstance) => {
         });
       } catch (e) {
         request.log.error(e);
-        reply.code(400);
-        return reply.send({ status: 'error', message: 'sign in failed' });
+
+        if (e instanceof UserNotFoundError) {
+          return reply.code(400).send({ status: 'error', message: 'user cannot log in' });
+        }
+
+        return reply.code(400).send({ status: 'error', message: 'sign in failed' });
       }
     },
   );

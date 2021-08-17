@@ -27,15 +27,15 @@ declare module 'fastify-jwt' {
        */
       exp?: number;
       /**
-       * toekn issued date in ms
+       * token issued date in ms
        */
       iat?: number;
       id: string;
       email: string;
       display_name: string;
-      signup_date: string;
-      activation_date: string | null;
-      last_login_date: string | null;
+      signup_date: Date;
+      activation_date: Date | null;
+      last_login_date: Date | null;
       status: 'registered' | 'verified' | 'deleted';
     }
   }
