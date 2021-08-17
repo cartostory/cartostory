@@ -1,11 +1,14 @@
 #SHELL := /bin/bash
 
+# POSTGRES
 PGDATA ?= /var/lib/postgresql/cartostory
 POSTGRES_DB ?= cartostory
 POSTGRES_USER ?= cartostory
 POSTGRES_PASS ?= cartostory
 ALLOW_IP_RANGE ?= 0.0.0.0/0
 POSTGRES_MULTIPLE_EXTENSIONS ?= postgis
+
+# NODE
 NODE_ENV ?= development
 NODE_JWT_SECRET ?= secret
 

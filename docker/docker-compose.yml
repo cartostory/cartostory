@@ -37,3 +37,8 @@ services:
           - ../backend/db/migrations:/flyway/sql
         depends_on:
           - database
+    rabbitmq:
+        image: rabbitmq:3.9-management-alpine
+        container_name: rabbitmq
+        ports:
+            - 15672:15672

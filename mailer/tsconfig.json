@@ -1,0 +1,15 @@
+{
+  "extends": "@tsconfig/node16/tsconfig.json",
+  "compilerOptions": {
+      "resolveJsonModule": true,
+      "outDir": "dist",
+      "target": "ES2019",
+  },
+  "compileOnSave": true,
+  "exclude": ["prod_node_modules"],
+  "include": [
+    "./",
+    "./@types/fastify.d.ts",
+    "./@types/typings.d.ts"
+  ],
+}
