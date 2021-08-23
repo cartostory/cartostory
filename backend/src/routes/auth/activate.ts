@@ -21,15 +21,21 @@ const activate = async (fastify: FastifyInstance) => {
 
       try {
         await auth.activate(userId, activationCode);
-        await reply.code(200).send({ status: 'success', message: 'user activated' });
+        return await reply
+          .code(200)
+          .send({ status: 'success', message: 'user activated' });
       } catch (e) {
         request.log.error(e);
 
         if (e instanceof ActivationCodeNotFoundError) {
-          return reply.code(400).send({ status: 'error', message: 'user cannot be activated' });
+          return reply
+            .code(400)
+            .send({ status: 'error', message: 'user cannot be activated' });
         }
 
-        return reply.code(400).send({ status: 'error', message: 'user activation failed' });
+        return reply
+          .code(400)
+          .send({ status: 'error', message: 'user activation failed' });
       }
     },
   );

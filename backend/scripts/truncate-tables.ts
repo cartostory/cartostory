@@ -8,11 +8,11 @@ const TABLES = [
   'story',
 ];
 
-const truncate = async () => {
-  const pool = new pg.Pool({
-    connectionString,
-  });
+const pool = new pg.Pool({
+  connectionString,
+});
 
+const truncate = async () => {
   const client = await pool.connect();
 
   try {
@@ -25,7 +25,6 @@ const truncate = async () => {
     throw e;
   } finally {
     client.release();
-    await pool.end();
   }
 };
 

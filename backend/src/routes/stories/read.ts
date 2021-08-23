@@ -1,9 +1,8 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { story } from '../../services/database/index';
+import { Story } from '../../services/database/types';
 
 const opts = {
-  pg: {
-    transact: true,
-  },
   schema: {
     headers: {
       required: ['authorization'],
@@ -32,22 +31,17 @@ const handler = async ({ user, ...request }: FastifyRequest, reply: FastifyReply
     const { id: userId } = user;
     // @ts-ignore
     const { id: storyId } = request.params;
-    const params = [userId];
-    let query = 'SELECT * FROM cartostory.story WHERE user_id = $1';
+    let result: Story | Array<Story>;
 
     if (storyId) {
-      query += ' AND slug = $2';
-      params.push(storyId);
+      result = await story.readOne(userId, storyId);
+
+      return { status: 'success', data: { story: result } };
     }
 
-    // @ts-ignore
-    const { rows: stories } = await request.pg.query(query, params);
+    result = await story.readAll(userId);
 
-    if (storyId) {
-      return { status: 'success', data: { story: stories[0] } };
-    }
-
-    return { status: 'success', data: { stories } };
+    return { status: 'success', data: { stories: result } };
   } catch (e) {
     request.log.error(e);
 

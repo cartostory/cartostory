@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import type { FastifyInstance } from 'fastify';
+import { story } from '../../services/database/index';
 
 const opts = {
   schema: {
@@ -38,21 +39,27 @@ export const deleteStory = async (fastify: FastifyInstance) => {
     },
     async (request, reply) => {
       try {
-        const { rows } = await fastify.pg.query('SELECT user_id FROM cartostory.story WHERE slug = $1', [request.params.id]);
+        const slug = request.params.id;
+        const found = await story.getUserId(slug);
 
-        if (!rows || rows.length === 0) {
-          return await reply.code(404).send({ status: 'error', message: 'story was not found' });
+        if (!found || found.length !== 1) {
+          return await reply
+            .code(404)
+            .send({ status: 'error', message: 'story was not found' });
         }
 
-        if (rows[0].user_id !== request.user.id) {
-          return await reply.code(401).send({ status: 'error', message: 'user is not authorized to delete the story' });
+        if (found[0].user_id !== request.user.id) {
+          return await reply
+            .code(401)
+            .send({ status: 'error', message: 'user is not authorized to delete the story' });
         }
 
-        await fastify.pg.query('DELETE FROM cartostory.story WHERE slug = $1', [request.params.id]);
+        await story.delete(slug);
 
-        return await reply.code(200).send({ status: 'success', message: 'story was deleted' });
+        return await reply
+          .code(200)
+          .send({ status: 'success', message: 'story was deleted' });
       } catch (e) {
-        console.log('******', e);
         request.log.error(e);
 
         return reply

@@ -54,11 +54,15 @@ const signUp = async (fastify: FastifyInstance) => {
           userId, email, activationCode, type: 'sign-up',
         })));
 
-        await reply.code(200).send({ status: 'success', message: 'user succesfully registered' });
+        return await reply
+          .code(200)
+          .send({ status: 'success', message: 'user succesfully registered' });
       } catch (e) {
         request.log.error(e);
         // Do not let anyone know an e-mail is already taken.
-        return reply.code(200).send({ status: 'success', message: 'user succesfully registered' });
+        return reply
+          .code(200)
+          .send({ status: 'success', message: 'user succesfully registered' });
       }
     },
   );

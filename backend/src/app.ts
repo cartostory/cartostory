@@ -1,7 +1,6 @@
 import fastify from 'fastify';
 import fastifyAmqp from 'fastify-amqp';
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import fastifyPostgres from 'fastify-postgres';
 import fastifyJwt from 'fastify-jwt';
 import { getStories, getStory } from './routes/stories/read';
 import { createStory } from './routes/stories/create';
@@ -11,7 +10,6 @@ import activate from './routes/auth/activate';
 import refreshToken from './routes/auth/refresh-token';
 import signIn from './routes/auth/sign-in';
 import signUp from './routes/auth/sign-up';
-import { db, connectionString } from './services/database';
 
 const { NODE_JWT_SECRET } = process.env;
 
@@ -19,7 +17,6 @@ export const server = fastify({
   logger: true,
 });
 
-server.register(fastifyPostgres, { connectionString });
 server.register(fastifyJwt, { secret: NODE_JWT_SECRET! });
 
 server.register(fastifyAmqp, {

@@ -1,10 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import type { FastifyInstance } from 'fastify';
+import { story } from '../../services/database/index';
 
 const opts = {
-  pg: {
-    transact: true,
-  },
   schema: {
     params: {
       required: ['id'],
@@ -51,19 +49,26 @@ export const updateStory = async (fastify: FastifyInstance) => {
     },
     async (request, reply) => {
       try {
-        const { rows } = await fastify.pg.query('SELECT user_id FROM cartostory.story WHERE slug = $1', [request.params.id]);
+        const slug = request.params.id;
+        const found = await story.getUserId(slug);
 
-        if (!rows || rows.length === 0) {
-          return await reply.code(404).send({ status: 'error', message: 'story was not found' });
+        if (!found || found.length !== 1) {
+          return await reply
+            .code(404)
+            .send({ status: 'error', message: 'story was not found' });
         }
 
-        if (rows[0].user_id !== request.user.id) {
-          return await reply.code(401).send({ status: 'error', message: 'user is not authorized to update the story' });
+        if (found[0].user_id !== request.user.id) {
+          return await reply
+            .code(401)
+            .send({ status: 'error', message: 'user is not authorized to update the story' });
         }
 
-        const { rows: updated } = await fastify.pg.query('UPDATE cartostory.story SET story = $1 WHERE slug = $2 RETURNING slug', [request.body.story, request.params.id]);
+        await story.update(slug, request.body.story);
 
-        return await reply.code(200).send({ status: 'success', data: { id: updated[0].slug } });
+        return await reply
+          .code(200)
+          .send({ status: 'success', data: { id: slug } });
       } catch (e) {
         request.log.error(e);
 

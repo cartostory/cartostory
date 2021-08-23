@@ -16,3 +16,11 @@ export type UserActivationCode = {
   valid_until_date: Date;
   used_date: Date;
 };
+
+export type Story = {
+  id: string;
+  slug: string;
+  user_id: string;
+  story: object;
+  created_date: Date;
+};

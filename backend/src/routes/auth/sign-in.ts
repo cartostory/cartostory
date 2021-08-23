@@ -45,7 +45,7 @@ const signIn = async (fastify: FastifyInstance) => {
           await reply.code(401).send({ status: 'error', message: 'wrong password' });
         }
 
-        await reply.send({
+        return await reply.send({
           status: 'success',
           data: {
             accessToken: fastify.jwt.sign(user, { expiresIn: '15m' }),
