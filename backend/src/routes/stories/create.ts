@@ -1,11 +1,9 @@
 /* eslint-disable import/prefer-default-export */
 import type { FastifyInstance } from 'fastify';
 import { generateRandomCode } from '../auth/components/utils';
+import { story } from '../../services/database/index';
 
 const opts = {
-  pg: {
-    transact: true,
-  },
   schema: {
     body: {
       required: ['slug', 'story'],
@@ -39,12 +37,12 @@ export const createStory = async (fastify: FastifyInstance) => {
       preValidation: [fastify.authenticate],
     },
     async (request, reply) => {
-      const params = [`${request.body.slug}-${generateRandomCode(6)}`, request.user.id, request.body.story];
       try {
-        const { rows } = await fastify.pg.query('INSERT INTO cartostory.story (slug, user_id, story) VALUES ($1, $2, $3) RETURNING id, slug', params);
-        const { id, slug } = rows[0];
+        const randomSlug = `${request.body.slug}-${generateRandomCode(6)}`;
+        const result = await story.create(request.user.id, randomSlug, request.body.story);
+        const id = result[0];
 
-        return await reply.code(200).send({ status: 'success', data: { id, slug } });
+        return await reply.code(200).send({ status: 'success', data: { id, slug: randomSlug } });
       } catch (e) {
         request.log.error(e);
 

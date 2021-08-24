@@ -1,4 +1,6 @@
 import type { FastifyInstance } from 'fastify';
+import { ActivationCodeNotFoundError } from '../../services/database/auth/activate';
+import { auth } from '../../services/database/index';
 
 const opts = {
   schema: {
@@ -17,57 +19,26 @@ const activate = async (fastify: FastifyInstance) => {
     async (request, reply) => {
       const { userId, activationCode } = request.params;
 
-      return fastify.pg.transact(async (client) => {
-        try {
-          const { rows } = await client.query(SELECT_USER_ACTIVATION_CODE, [userId, activationCode]);
+      try {
+        await auth.activate(userId, activationCode);
+        return await reply
+          .code(200)
+          .send({ status: 'success', message: 'user activated' });
+      } catch (e) {
+        request.log.error(e);
 
-          if (!rows || rows.length !== 1) {
-            reply.code(400);
-            return await reply.send({ status: 'error', message: 'user cannot be activated' });
-          }
-
-          const now = new Date();
-
-          await client.query(UPDATE_USER, [now, userId]);
-          await client.query(UPDATE_USER_ACTIVATION_CODE, [userId, activationCode]);
-
-          reply.code(200);
-          return await reply.send({ status: 'success', message: 'user activated' });
-        } catch (e) {
-          request.log.error(e);
-          reply.code(400);
-          return reply.send({ status: 'error', message: 'user activation failed' });
+        if (e instanceof ActivationCodeNotFoundError) {
+          return reply
+            .code(400)
+            .send({ status: 'error', message: 'user cannot be activated' });
         }
-      });
+
+        return reply
+          .code(400)
+          .send({ status: 'error', message: 'user activation failed' });
+      }
     },
   );
 };
-
-const SELECT_USER_ACTIVATION_CODE = `
-SELECT 1
-FROM cartostory.user_activation_code uac
-JOIN cartostory."user" u ON (uac.user_id = u.id)
-WHERE uac.user_id = $1
-  AND uac.activation_code = $2
-  AND u.status = 'registered'
-  AND uac.valid_until_date >= now()
-  AND uac.used_date IS NULL
-`;
-
-const UPDATE_USER = `
-UPDATE cartostory."user"
-SET
-  status = 'verified',
-  activation_date = $1
-WHERE id = $2
-`;
-
-const UPDATE_USER_ACTIVATION_CODE = `
-UPDATE cartostory.user_activation_code
-SET
-  used_date = now()
-WHERE user_id = $1
-  AND activation_code = $2
-`;
 
 export default activate;

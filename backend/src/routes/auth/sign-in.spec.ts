@@ -1,5 +1,6 @@
 import { server } from '../../app';
 import truncate from '../../../scripts/truncate-tables';
+import { shutdown } from '../../../scripts/query';
 import { createUser } from '../../../scripts/create-user';
 
 const email = 'hello@localhost.world';
@@ -11,9 +12,9 @@ const inject = async (payload: object): Promise<ReturnType<typeof server.inject>
 });
 
 describe('sign-in', () => {
-  beforeEach(async () => {
-    await truncate();
-  });
+  beforeEach(truncate);
+
+  afterAll(shutdown);
 
   test('does not accept invalid e-mail address', async () => {
     const response = await inject({

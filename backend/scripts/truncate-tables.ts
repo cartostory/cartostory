@@ -1,6 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import pg from 'pg';
-import { connectionString } from '../src/services/database';
+import query from './query';
 
 const TABLES = [
   '"user"',
@@ -9,24 +8,8 @@ const TABLES = [
 ];
 
 const truncate = async () => {
-  const pool = new pg.Pool({
-    connectionString,
-  });
-
-  const client = await pool.connect();
-
-  try {
-    await client.query('BEGIN');
-    const promises = TABLES.map((table) => client.query(`TRUNCATE ${table} CASCADE`));
-    await Promise.all(promises);
-    await client.query('COMMIT');
-  } catch (e) {
-    await client.query('ROLLBACK');
-    throw e;
-  } finally {
-    client.release();
-    await pool.end();
-  }
+  const promises = TABLES.map((table) => query(`TRUNCATE ${table} CASCADE`));
+  await Promise.all(promises);
 };
 
 export default truncate;

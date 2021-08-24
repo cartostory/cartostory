@@ -42,6 +42,8 @@ run-ci:
 	docker-compose kill database; \
 	exit $$EXIT_CODE
 
+stop-dev:
+	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml stop
 
-stop:
-	cd ./docker && docker-compose stop
+stop-ci:
+	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.ci.yml stop

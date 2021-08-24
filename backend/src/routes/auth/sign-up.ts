@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 import { generateActivationCode, generateHash, isValidEmail } from './components/utils';
+import { auth } from '../../services/database/index';
 
 const opts = {
   schema: {
@@ -32,35 +33,37 @@ const signUp = async (fastify: FastifyInstance) => {
       }
 
       const hash = await generateHash(password);
+      const activationCode = generateActivationCode();
+      const user = {
+        email,
+        displayName: email,
+        hash,
+      };
 
-      return fastify.pg.transact(async (client) => {
-        try {
-          const { rows } = await client.query('INSERT INTO cartostory.user (email, display_name, password, signup_date) VALUES ($1, $1, $2, now()) RETURNING id;', [email, hash]);
-          const userId = rows[0].id;
-          fastify.log.info({ userId }, 'New user registered');
+      try {
+        const userId = await auth.signUp(user, activationCode);
 
-          const activationCode = generateActivationCode();
-          await client.query('INSERT INTO cartostory.user_activation_code (user_id, activation_code) VALUES ($1, $2)', [userId, activationCode]);
-          fastify.log.info({ userId }, 'New activation code created');
+        const { channel } = fastify.amqp;
+        const queue = 'mailer';
 
-          const { channel } = fastify.amqp;
-          const queue = 'mailer';
+        channel.assertQueue(queue, {
+          durable: true,
+        });
 
-          channel.assertQueue(queue, {
-            durable: true,
-          });
+        channel.sendToQueue(queue, Buffer.from(JSON.stringify({
+          userId, email, activationCode, type: 'sign-up',
+        })));
 
-          channel.sendToQueue(queue, Buffer.from(JSON.stringify({
-            userId, email, activationCode, type: 'sign-up',
-          })));
-
-          return await reply.code(200).send({ status: 'success', message: 'user succesfully registered' });
-        } catch (e) {
-          request.log.error(e);
-          // Do not let anyone know an e-mail is already taken.
-          return reply.code(200).send({ status: 'success', message: 'user succesfully registered' });
-        }
-      });
+        return await reply
+          .code(200)
+          .send({ status: 'success', message: 'user succesfully registered' });
+      } catch (e) {
+        request.log.error(e);
+        // Do not let anyone know an e-mail is already taken.
+        return reply
+          .code(200)
+          .send({ status: 'success', message: 'user succesfully registered' });
+      }
     },
   );
 };
