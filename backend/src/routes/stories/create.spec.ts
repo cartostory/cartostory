@@ -1,12 +1,13 @@
 import { createUser } from '../../../scripts/create-user';
 import { getToken } from '../../../scripts/get-token';
 import truncate from '../../../scripts/truncate-tables';
+import { shutdown } from '../../../scripts/query';
 import { server } from '../../app';
 
 describe('create-story', () => {
-  beforeEach(async () => {
-    await truncate();
-  });
+  beforeEach(truncate);
+
+  afterAll(shutdown);
 
   it('does not accept anonymous request', async () => {
     const response = await server.inject({

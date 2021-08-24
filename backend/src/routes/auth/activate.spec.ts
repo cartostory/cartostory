@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { server } from '../../app';
-import query from '../../../scripts/query';
+import query, { shutdown } from '../../../scripts/query';
 import { generateHash } from './components/utils';
 import truncate from '../../../scripts/truncate-tables';
 
@@ -9,9 +9,9 @@ const email = 'hello@localhost.world';
 const hash = async () => generateHash('world');
 
 describe('activate', () => {
-  beforeEach(async () => {
-    await truncate();
-  });
+  beforeEach(truncate);
+
+  afterAll(shutdown);
 
   it('does not activate user when invalid userId uuid is sent', async () => {
     const response = await server.inject({

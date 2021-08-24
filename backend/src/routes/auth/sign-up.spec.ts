@@ -1,10 +1,11 @@
 import { server } from '../../app';
 import truncate from '../../../scripts/truncate-tables';
+import { shutdown } from '../../../scripts/query';
 
 describe('sign-up', () => {
-  beforeEach(async () => {
-    await truncate();
-  });
+  beforeEach(truncate);
+
+  afterAll(shutdown);
 
   test('does not accept invalid e-mail address', async () => {
     const response = await server.inject({

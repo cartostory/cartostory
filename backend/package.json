@@ -8,7 +8,7 @@
     "prod": "node dist/index.js",
     "dev": "concurrently \"tsc -w\" \"nodemon dist/src/index.js\"",
     "lint": "npx eslint . --ext .ts",
-    "test": "FORCE_COLOR=true npx jest --runInBand --detectOpenHandles --ci",
+    "test": "CI=true FORCE_COLOR=true jest --forceExit --runInBand --detectOpenHandles --ci",
     "prepare": "cd .. && husky install ./backend/.husky",
     "check:database": "node scripts/is-database-ready.js"
   },

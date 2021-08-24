@@ -2,6 +2,7 @@ import { createUser } from '../../../scripts/create-user';
 import { createStory } from '../../../scripts/create-story';
 import { getToken } from '../../../scripts/get-token';
 import { server } from '../../app';
+import { shutdown } from '../../../scripts/query';
 import truncate from '../../../scripts/truncate-tables';
 
 describe('update-story', () => {
@@ -13,6 +14,7 @@ describe('update-story', () => {
   });
 
   afterAll(async () => {
+    await shutdown();
     await server.close();
   });
 

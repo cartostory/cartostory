@@ -1,13 +1,13 @@
 import superagent from 'superagent';
 import { advanceBy } from 'jest-date-mock';
 import { server } from '../../app';
+import { shutdown } from '../../../scripts/query';
 import truncate from '../../../scripts/truncate-tables';
 import { createUser } from '../../../scripts/create-user';
 
 describe('refresh-token', () => {
-  beforeEach(async () => {
-    await truncate();
-  });
+  beforeEach(truncate);
+  afterAll(shutdown);
 
   it('denies to refresh invalid token', async () => {
     const response = await server.inject({

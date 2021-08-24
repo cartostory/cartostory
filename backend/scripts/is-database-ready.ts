@@ -1,4 +1,4 @@
-import query from './query';
+import query, { shutdown } from './query';
 
 const check = async (): Promise<void> => {
   process.stdout.write('checking flyway migration status... \n');
@@ -8,6 +8,7 @@ const check = async (): Promise<void> => {
     if (result.rowCount === 1) {
       setTimeout(() => check(), 1000);
     } else {
+      await shutdown();
       process.exit(0);
     }
   } catch (e) {
