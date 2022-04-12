@@ -7,7 +7,7 @@ services:
             - "8080:80"
         volumes:
             - ./etc/nginx/conf.d/backend.conf:/etc/nginx/conf.d/default.conf
-            - ../frontend/build:/usr/share/nginx/cartostory
+            - ../frontend/dist:/usr/share/nginx/cartostory
     backend:
         environment:
             - POSTGRES_DB=${POSTGRES_DB}
