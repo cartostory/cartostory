@@ -57,5 +57,42 @@
     "*.ts": [
       "npm run lint"
     ]
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2021": true,
+      "jest/globals": true
+    },
+    "ignorePatterns": ["dist/**/*.js"],
+    "extends": [
+      "airbnb-typescript/base",
+      "plugin:import/typescript"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "./tsconfig.json",
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint",
+      "jest"
+    ],
+    "rules": {
+      "import/extensions": 0,
+      "import/prefer-default-export": 0,
+      "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*.spec.ts", "**/scripts/*.ts"]}],
+      "@typescript-eslint/no-use-before-define": 0,
+      "max-len": 0
+    }
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ]
   }
 }

@@ -19,7 +19,6 @@ RUN npm ci
 
 FROM dependencies as builder
 COPY @types ./@types
-COPY jest.config.ts ./
 COPY tsconfig.json ./
 COPY src ./src
 COPY scripts ./scripts
@@ -34,7 +33,6 @@ COPY --from=dependencies /app/node_modules ./node_modules
 RUN true
 COPY --from=builder /app/dist ./
 COPY --from=builder /app/package.json ./
-COPY --from=builder /app/dist/jest.config.js ./
 CMD ["npm", "run", "test"]
 
 # development
