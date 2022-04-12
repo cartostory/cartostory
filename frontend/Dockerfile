@@ -2,6 +2,7 @@
 FROM node:16-alpine as base
 WORKDIR /app
 COPY package.json ./
+RUN sed -i '/prepare/d' ./package.json
 COPY package-lock.json ./
 
 FROM base as dependencies
