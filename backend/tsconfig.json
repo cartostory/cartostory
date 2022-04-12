@@ -2,7 +2,7 @@
   "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
       "outDir": "dist",
-      "target": "ES2019",
+      "target": "ES2019"
   },
   "compileOnSave": true,
   "exclude": ["prod_node_modules"],
@@ -10,5 +10,5 @@
     "./",
     "./@types/fastify.d.ts",
     "./@types/typings.d.ts"
-  ],
+  ]
 }
