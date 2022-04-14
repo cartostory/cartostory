@@ -8,13 +8,13 @@ const check = async (): Promise<void> => {
     ]);
 
     if (result.rowCount === 1) {
-      setTimeout(() => check(), 1000);
+      setTimeout(async () => check(), 1000);
     } else {
       await shutdown();
       process.exit(0);
     }
   } catch (e) {
-    setTimeout(() => check(), 1000);
+    setTimeout(async () => check(), 1000);
   }
 };
 

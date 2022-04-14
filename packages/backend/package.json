@@ -8,6 +8,7 @@
     "prod": "node dist/index.js",
     "dev": "concurrently \"tsc -w\" \"nodemon dist/src/index.js\"",
     "lint": "npx eslint . --ext .ts",
+    "lint:fix": "npx eslint . --ext .ts --fix",
     "test": "CI=true FORCE_COLOR=true jest --forceExit --runInBand --detectOpenHandles --ci",
     "check:database": "node scripts/is-database-ready.js"
   },

@@ -1,5 +1,5 @@
 import type Knex from 'knex';
-import { User } from '../types';
+import type { User } from '../types';
 
 export class UserNotFoundError extends Error {
   constructor() {

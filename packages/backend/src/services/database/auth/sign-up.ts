@@ -1,6 +1,6 @@
 import type Knex from 'knex';
 import { TABLE_USER, TABLE_USER_ACTIVATION_CODE } from '../config';
-import { User, UserActivationCode } from '../types';
+import type { User, UserActivationCode } from '../types';
 
 export const signUp =
   (db: Knex) =>

@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { story } from '../../services/database/index';
-import { Story } from '../../services/database/types';
+import type { Story } from '../../services/database/types';
 
 const opts = {
   schema: {
@@ -32,7 +32,7 @@ const handler = async (
 ) => {
   try {
     const { id: userId } = user;
-    // @ts-ignore
+    // @ts-expect-error
     const { id: storyId } = request.params;
     let result: Story | Array<Story>;
 
