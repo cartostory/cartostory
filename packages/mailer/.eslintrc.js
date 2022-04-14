@@ -1,5 +1,5 @@
 // This is a workaround for https://github.com/eslint/eslint/issues/3458
-require('@rushstack/eslint-config/patch/modern-module-resolution');
+require('@rushstack/eslint-config/patch/modern-module-resolution')
 
 module.exports = {
   extends: ['@rushstack/eslint-config/profile/node'],
@@ -48,5 +48,9 @@ module.exports = {
     '@typescript-eslint/return-await': 'error',
     '@typescript-eslint/space-before-function-paren': ['error', 'never'],
     '@typescript-eslint/type-annotation-spacing': 'error',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { ignoreRestSiblings: true },
+    ],
   },
-};
+}

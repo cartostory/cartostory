@@ -1,5 +1,5 @@
 // This is a workaround for https://github.com/eslint/eslint/issues/3458
-require('@rushstack/eslint-config/patch/modern-module-resolution');
+require('@rushstack/eslint-config/patch/modern-module-resolution')
 
 module.exports = {
   extends: ['@rushstack/eslint-config/profile/node'],
@@ -35,10 +35,9 @@ module.exports = {
     ],
     '@typescript-eslint/func-call-spacing': ['error', 'never'],
     '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true }],
-    '@typescript-eslint/object-curly-spacing': 'error',
+    '@typescript-eslint/object-curly-spacing': ['error', 'always'],
     '@typescript-eslint/prefer-nullish-coalescing': 'error',
     '@typescript-eslint/prefer-optional-chain': 'error',
-    '@typescript-eslint/prefer-readonly-parameter-types': 'error',
     '@typescript-eslint/prefer-reduce-type-parameter': 'error',
     '@typescript-eslint/prefer-string-starts-ends-with': 'error',
     '@typescript-eslint/prefer-ts-expect-error': 'error',
@@ -46,7 +45,11 @@ module.exports = {
     '@typescript-eslint/quotes': ['error', 'single'],
     '@typescript-eslint/require-await': 'error',
     '@typescript-eslint/return-await': 'error',
-    '@typescript-eslint/space-before-function-paren': ['error', 'never'],
+    '@typescript-eslint/space-before-function-paren': ['error', 'always'],
     '@typescript-eslint/type-annotation-spacing': 'error',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { ignoreRestSiblings: true },
+    ],
   },
-};
+}

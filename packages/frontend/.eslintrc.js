@@ -1,5 +1,5 @@
 // This is a workaround for https://github.com/eslint/eslint/issues/3458
-require('@rushstack/eslint-config/patch/modern-module-resolution');
+require('@rushstack/eslint-config/patch/modern-module-resolution')
 
 module.exports = {
   extends: [
@@ -20,18 +20,22 @@ module.exports = {
     'brace-style': 'off',
     'comma-dangle': 'off',
     'comma-spacing': 'off',
+    curly: 'error',
+    eqeqeq: 'error',
     indent: 'off',
+    'no-else-return': 'error',
     'no-return-await': 'off',
     'object-curly-spacing': 'off',
     quotes: 'off',
     'require-await': 'off',
     semi: 'off',
     'space-before-function-paren': 'off',
-    '@typescript-eslint/consistent-type-definitions': 0,
-    '@typescript-eslint/naming-convention': 0,
-    '@typescript-eslint/explicit-function-return-type': 0,
-    '@rushstack/typedef-var': 0,
-    '@typescript-eslint/explicit-member-accessibility': 0,
+    'space-in-brackets': ['error', 'always'],
+    '@typescript-eslint/consistent-type-definitions': 'off',
+    '@typescript-eslint/naming-convention': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@rushstack/typedef-var': 'off',
+    '@typescript-eslint/explicit-member-accessibility': 'off',
     '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/semi': ['error', 'never'],
     '@typescript-eslint/brace-style': 'error',
@@ -45,10 +49,13 @@ module.exports = {
     ],
     '@typescript-eslint/func-call-spacing': ['error', 'never'],
     '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true }],
-    '@typescript-eslint/object-curly-spacing': 'error',
+    '@typescript-eslint/object-curly-spacing': [
+      'error',
+      'always',
+      { objectsInObjects: false },
+    ],
     '@typescript-eslint/prefer-nullish-coalescing': 'error',
     '@typescript-eslint/prefer-optional-chain': 'error',
-    '@typescript-eslint/prefer-readonly-parameter-types': 'error',
     '@typescript-eslint/prefer-reduce-type-parameter': 'error',
     '@typescript-eslint/prefer-string-starts-ends-with': 'error',
     '@typescript-eslint/prefer-ts-expect-error': 'error',
@@ -56,9 +63,13 @@ module.exports = {
     '@typescript-eslint/quotes': ['error', 'single'],
     '@typescript-eslint/require-await': 'error',
     '@typescript-eslint/return-await': 'error',
-    '@typescript-eslint/space-before-function-paren': ['error', 'never'],
+    '@typescript-eslint/space-before-function-paren': ['error', 'always'],
     '@typescript-eslint/type-annotation-spacing': 'error',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { ignoreRestSiblings: true },
+    ],
     'react-hooks/exhaustive-deps': 'error',
     'use-encapsulation/prefer-custom-hooks': 'error',
   },
-};
+}
