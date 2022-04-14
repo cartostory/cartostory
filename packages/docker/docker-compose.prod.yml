@@ -1,0 +1,18 @@
+version: '3.7'
+
+volumes:
+  database-data-prod:
+
+services:
+  backend:
+    build:
+      target: production
+    deploy:
+      restart_policy:
+      condition: on-failure
+  database:
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - database-data-prod:${PGDATA}

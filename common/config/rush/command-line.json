@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/command-line.schema.json",
+  "commands": [
+    {
+      "name": "prettier",
+      "commandKind": "global",
+      "summary": "Used by the pre-commit Git hook. This command invokes Prettier to reformat staged changes.",
+      "safeForSimultaneousRushProcesses": true,
+      "autoinstallerName": "rush-prettier",
+      "shellCommand": "pretty-quick --staged"
+    },
+    {
+      "name": "lint-staged",
+      "commandKind": "bulk",
+      "summary": "Run lint-staged on each package",
+      "description": "Iterates through each package in the monorepo and runs the 'lint-staged' script",
+      "enableParallelism": false,
+      "ignoreMissingScript": true,
+      "ignoreDependencyOrder": true,
+      "allowWarningsInSuccessfulBuild": true
+    },
+    {
+      "name": "commitlint",
+      "commandKind": "global",
+      "summary": "Run commitlint",
+      "description": "Used by the pre-commit Git hook. This command invokes commitlint.",
+      "autoinstallerName": "rush-commitlint",
+      "shellCommand": "commitlint"
+    }
+  ],
+  "parameters": [
+    {
+      "parameterKind": "string",
+      "argumentName": "MESSAGE",
+      "longName": "--edit",
+      "description": "",
+      "associatedCommands": ["commitlint"]
+    }
+  ]
+}

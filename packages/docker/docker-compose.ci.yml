@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+  backend:
+    depends_on:
+      - database
+      - flyway
+      - rabbitmq
+    build:
+      context: ../backend
+      args:
+        - POSTGRES_DB
+        - POSTGRES_PASS
+        - POSTGRES_USER
+      target: ci
+    command: >
+      sh -c "npm run check:database && npm run test"

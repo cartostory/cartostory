@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  backend:
+    image: node:16-alpine
+    volumes:
+      - ../backend:/app
+    depends_on:
+      - database
+      - flyway
+      - rabbitmq
+    command: >
+      sh -c "cd /app && npm run test -- --watchAll"

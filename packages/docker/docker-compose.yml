@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx:1.21.1
+    ports:
+      - '8080:80'
+    volumes:
+      - ./etc/nginx/conf.d/backend.conf:/etc/nginx/conf.d/default.conf
+      - ../frontend/dist:/usr/share/nginx/cartostory
+  backend:
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASS=${POSTGRES_PASS}
+      - NODE_JWT_SECRET=${NODE_JWT_SECRET}
+  database:
+    image: kartoza/postgis:13.0
+    ports:
+      - '15432:5432'
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASS=${POSTGRES_PASS}
+      - ALLOW_IP_RANGE=${ALLOW_IP_RANGE}
+      - POSTGRES_MULTIPLE_EXTENSIONS=${POSTGRES_MULTIPLE_EXTENSIONS}
+  flyway:
+    image: flyway/flyway:7
+    command: -connectRetries=3 migrate
+    environment:
+      - FLYWAY_PASSWORD=${POSTGRES_PASS}
+      - FLYWAY_SCHEMAS=cartostory
+      - FLYWAY_URL=jdbc:postgresql://database:5432/${POSTGRES_DB}
+      - FLYWAY_USER=${POSTGRES_USER}
+      - FLYWAY_EDITION=community
+    volumes:
+      - ../backend/db/migrations:/flyway/sql
+    depends_on:
+      - database
+  rabbitmq:
+    image: rabbitmq:3.9-management-alpine
+    container_name: rabbitmq
+    ports:
+      - 15672:15672

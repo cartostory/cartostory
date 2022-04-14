@@ -1,0 +1,43 @@
+version: '3.7'
+
+volumes:
+  database-data-dev:
+
+services:
+  frontend:
+    ports:
+      - '3000:3000'
+    build:
+      context: ../frontend
+      target: development
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    command: >
+      sh -c "cd /app && npm run dev"
+  backend:
+    build:
+      context: ../backend
+      target: development
+    volumes:
+      - ../backend:/app
+      - /app/node_modules
+    depends_on:
+      - database
+      - flyway
+      - rabbitmq
+    command: >
+      sh -c "cd /app && npm run dev"
+  mailer:
+    build:
+      context: ../mailer
+      target: development
+    volumes:
+      - ../mailer:/app
+      - /app/node_modules
+  database:
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - database-data-dev:${PGDATA}
