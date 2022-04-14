@@ -57,7 +57,7 @@ const refreshToken = async (fastify: FastifyInstance) => {
         status: 'error',
         message: 'token refresh failed',
       })
-    }
+    },
   )
 }
 

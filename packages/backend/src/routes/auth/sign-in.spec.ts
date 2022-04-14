@@ -6,7 +6,7 @@ import { createUser } from '../../../scripts/create-user'
 const email = 'hello@localhost.world'
 const password = 'world'
 const inject = async (
-  payload: object
+  payload: object,
 ): Promise<ReturnType<typeof server.inject>> =>
   server.inject({
     method: 'POST',

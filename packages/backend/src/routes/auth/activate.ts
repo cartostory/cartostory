@@ -37,7 +37,7 @@ const activate = async (fastify: FastifyInstance) => {
           .code(400)
           .send({ status: 'error', message: 'user activation failed' })
       }
-    }
+    },
   )
 }
 

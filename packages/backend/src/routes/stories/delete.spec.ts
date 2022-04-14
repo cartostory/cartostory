@@ -28,7 +28,7 @@ describe('delete-story', () => {
     const { data } = await createStory(
       'my-first-story',
       { hello: 'world' },
-      accessToken
+      accessToken,
     )
     slug = data.slug
   })
@@ -64,7 +64,7 @@ describe('delete-story', () => {
     const { data } = await createStory(
       'my-first-story',
       { hello: 'world' },
-      anotherAccessToken
+      anotherAccessToken,
     )
 
     const response = await server.inject({
@@ -78,7 +78,7 @@ describe('delete-story', () => {
     expect(response.statusCode).toEqual(401)
     expect(response.json().status).toEqual('error')
     expect(response.json().message).toEqual(
-      'user is not authorized to delete the story'
+      'user is not authorized to delete the story',
     )
   })
 })

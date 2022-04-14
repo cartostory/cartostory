@@ -10,7 +10,7 @@ const signUp =
   (db: Knex) =>
   async (
     user: { email: string; displayName: string; hash: string },
-    activationCode: string
+    activationCode: string,
   ) => {
     const { email, displayName, hash } = user
     return db.transaction(async trx => {

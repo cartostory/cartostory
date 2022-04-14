@@ -37,7 +37,7 @@ server.decorate(
       request.log.error(err)
       await reply.send(err)
     }
-  }
+  },
 )
 
 // auth

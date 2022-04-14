@@ -28,7 +28,7 @@ const routeParams = {
 
 const handler = async (
   { user, ...request }: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => {
   try {
     const { id: userId } = user
@@ -68,7 +68,7 @@ const getStories = async (fastify: FastifyInstance) => {
       ...getStoriesOpts,
       preValidation: [fastify.authenticate],
     },
-    handler
+    handler,
   )
 }
 
@@ -79,7 +79,7 @@ const getStory = async (fastify: FastifyInstance) => {
       ...opts,
       preValidation: [fastify.authenticate],
     },
-    handler
+    handler,
   )
 }
 

@@ -66,7 +66,7 @@ const signIn = async (fastify: FastifyInstance) => {
           .code(400)
           .send({ status: 'error', message: 'sign in failed' })
       }
-    }
+    },
   )
 }
 

@@ -28,7 +28,7 @@ describe('get-story/get-stories', () => {
     const { data } = await createStory(
       'my-first-story',
       { hello: 'world' },
-      accessToken
+      accessToken,
     )
     slug = data.slug
   })

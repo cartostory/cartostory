@@ -28,7 +28,7 @@ describe('update-story', () => {
     const { data } = await createStory(
       'my-first-story',
       { hello: 'world' },
-      accessToken
+      accessToken,
     )
     slug = data.slug
   })
@@ -74,7 +74,7 @@ describe('update-story', () => {
     const { data } = await createStory(
       'my-first-story',
       { hello: 'world' },
-      anotherAccessToken
+      anotherAccessToken,
     )
 
     const response = await server.inject({
@@ -93,7 +93,7 @@ describe('update-story', () => {
     expect(response.statusCode).toEqual(401)
     expect(response.json().status).toEqual('error')
     expect(response.json().message).toEqual(
-      'user is not authorized to update the story'
+      'user is not authorized to update the story',
     )
   })
 })

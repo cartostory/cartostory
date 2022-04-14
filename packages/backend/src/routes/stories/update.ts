@@ -76,6 +76,6 @@ export const updateStory = async (fastify: FastifyInstance) => {
           .code(400)
           .send({ status: 'error', message: 'story cannot be saved' })
       }
-    }
+    },
   )
 }

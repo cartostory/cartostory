@@ -66,6 +66,6 @@ export const deleteStory = async (fastify: FastifyInstance) => {
           .code(400)
           .send({ status: 'error', message: 'story cannot be deleted' })
       }
-    }
+    },
   )
 }

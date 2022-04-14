@@ -3,7 +3,7 @@ import superagent from 'superagent'
 export const createStory = async (
   slug: string,
   story: object,
-  token: string
+  token: string,
 ) => {
   const response = await superagent
     .post('0.0.0.0:3000/stories')

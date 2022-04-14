@@ -44,7 +44,7 @@ export const createStory = async (fastify: FastifyInstance) => {
         const result = await story.create(
           request.user.id,
           randomSlug,
-          request.body.story
+          request.body.story,
         )
         const id = result[0]
 
@@ -60,6 +60,6 @@ export const createStory = async (fastify: FastifyInstance) => {
           message: 'story cannot be saved',
         })
       }
-    }
+    },
   )
 }

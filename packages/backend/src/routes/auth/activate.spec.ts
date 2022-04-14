@@ -42,12 +42,12 @@ describe('activate', () => {
   it('does not activate already active user', async () => {
     const { rows: users } = await query(
       'INSERT INTO "user" (email, display_name, password, status) VALUES ($1, $1, $2, $3) RETURNING id',
-      [email, await hash(), 'verified']
+      [email, await hash(), 'verified'],
     )
     const { id: userId } = users[0]
     await query(
       'INSERT INTO user_activation_code (user_id, activation_code) VALUES ($1, $2)',
-      [userId, activationCode]
+      [userId, activationCode],
     )
 
     const response = await server.inject({
@@ -64,12 +64,12 @@ describe('activate', () => {
   it('does not activate user with expired activation code', async () => {
     const { rows: users } = await query(
       'INSERT INTO "user" (email, display_name, password, status) VALUES ($1, $1, $2, $3) RETURNING id',
-      [email, await hash(), 'verified']
+      [email, await hash(), 'verified'],
     )
     const { id: userId } = users[0]
     await query(
       'INSERT INTO user_activation_code (user_id, activation_code, valid_until_date) VALUES ($1, $2, $3)',
-      [userId, activationCode, '2015-01-01']
+      [userId, activationCode, '2015-01-01'],
     )
 
     const response = await server.inject({
@@ -86,12 +86,12 @@ describe('activate', () => {
   it('activates user', async () => {
     const { rows: users } = await query(
       'INSERT INTO "user" (email, display_name, password) VALUES ($1, $1, $2) RETURNING id',
-      [email, await hash()]
+      [email, await hash()],
     )
     const { id: userId } = users[0]
     await query(
       'INSERT INTO user_activation_code (user_id, activation_code) VALUES ($1, $2)',
-      [userId, activationCode]
+      [userId, activationCode],
     )
 
     const response = await server.inject({

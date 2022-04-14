@@ -64,8 +64,8 @@ const signUp = async (fastify: FastifyInstance) => {
               email,
               activationCode,
               type: 'sign-up',
-            })
-          )
+            }),
+          ),
         )
 
         return await reply
@@ -78,7 +78,7 @@ const signUp = async (fastify: FastifyInstance) => {
           .code(200)
           .send({ status: 'success', message: 'user succesfully registered' })
       }
-    }
+    },
   )
 }
 
