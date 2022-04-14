@@ -20,11 +20,9 @@ export const send = (
   sendSmtpEmail.to = to
   sendSmtpEmail.htmlContent = message
   sendSmtpEmail.subject = subject
-  // @ts-expect-error
   apiInstance.sendTransacEmail(sendSmtpEmail).then(
     function (data: unknown) {
       console.log('API called successfully. Returned data: ' + data)
-      // @ts-expect-error
     },
     function (error: unknown) {
       console.error(error)
