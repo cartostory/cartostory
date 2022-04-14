@@ -12,5 +12,6 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 0,
     '@rushstack/typedef-var': 0,
     '@typescript-eslint/explicit-member-accessibility': 0,
+    '@typescript-eslint/indent': ['error', 2],
   },
 };
