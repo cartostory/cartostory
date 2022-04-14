@@ -1,6 +1,8 @@
 # builder
 FROM node:16-alpine as base
 WORKDIR /app
+RUN chown -R node:node /app
+USER node:node
 COPY package.json ./
 COPY package-lock.json ./
 
