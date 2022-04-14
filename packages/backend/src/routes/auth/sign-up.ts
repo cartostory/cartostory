@@ -1,10 +1,10 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify'
 import {
   generateActivationCode,
   generateHash,
   isValidEmail,
-} from './components/utils';
-import { auth } from '../../services/database/index';
+} from './components/utils'
+import { auth } from '../../services/database/index'
 
 const opts = {
   schema: {
@@ -22,7 +22,7 @@ const opts = {
       },
     },
   },
-};
+}
 
 // curl -X POST -d '{"email": "hello@world.xyz", "password": "password"}' 'http://0.0.0.0:8080/backend/auth/sign-up' -H 'Content-Type: application/json'
 const signUp = async (fastify: FastifyInstance) => {
@@ -30,31 +30,31 @@ const signUp = async (fastify: FastifyInstance) => {
     '/auth/sign-up',
     opts,
     async (request, reply) => {
-      const { email, password } = request.body;
+      const { email, password } = request.body
 
       if (!isValidEmail(email)) {
         return reply
           .code(400)
-          .send({ status: 'error', message: 'e-mail is not valid' });
+          .send({ status: 'error', message: 'e-mail is not valid' })
       }
 
-      const hash = await generateHash(password);
-      const activationCode = generateActivationCode();
+      const hash = await generateHash(password)
+      const activationCode = generateActivationCode()
       const user = {
         email,
         displayName: email,
         hash,
-      };
+      }
 
       try {
-        const userId = await auth.signUp(user, activationCode);
+        const userId = await auth.signUp(user, activationCode)
 
-        const { channel } = fastify.amqp;
-        const queue = 'mailer';
+        const { channel } = fastify.amqp
+        const queue = 'mailer'
 
         await channel.assertQueue(queue, {
           durable: true,
-        });
+        })
 
         channel.sendToQueue(
           queue,
@@ -66,20 +66,20 @@ const signUp = async (fastify: FastifyInstance) => {
               type: 'sign-up',
             })
           )
-        );
+        )
 
         return await reply
           .code(200)
-          .send({ status: 'success', message: 'user succesfully registered' });
+          .send({ status: 'success', message: 'user succesfully registered' })
       } catch (e) {
-        request.log.error(e);
+        request.log.error(e)
         // Do not let anyone know an e-mail is already taken.
         return reply
           .code(200)
-          .send({ status: 'success', message: 'user succesfully registered' });
+          .send({ status: 'success', message: 'user succesfully registered' })
       }
     }
-  );
-};
+  )
+}
 
-export default signUp;
+export default signUp

@@ -1,13 +1,13 @@
-import superagent from 'superagent';
-import { advanceBy } from 'jest-date-mock';
-import { server } from '../../app';
-import { shutdown } from '../../../scripts/query';
-import truncate from '../../../scripts/truncate-tables';
-import { createUser } from '../../../scripts/create-user';
+import superagent from 'superagent'
+import { advanceBy } from 'jest-date-mock'
+import { server } from '../../app'
+import { shutdown } from '../../../scripts/query'
+import truncate from '../../../scripts/truncate-tables'
+import { createUser } from '../../../scripts/create-user'
 
 describe('refresh-token', () => {
-  beforeEach(truncate);
-  afterAll(shutdown);
+  beforeEach(truncate)
+  afterAll(shutdown)
 
   it('denies to refresh invalid token', async () => {
     const response = await server.inject({
@@ -19,29 +19,29 @@ describe('refresh-token', () => {
       payload: {
         refreshToken: 'Bearer invalid-token',
       },
-    });
+    })
 
-    expect(response.statusCode).toEqual(401);
-  });
+    expect(response.statusCode).toEqual(401)
+  })
 
   it('refreshes valid token and denies to refresh expired token', async () => {
-    const email = 'hello@localhost.world';
-    const password = 'world';
-    await createUser(email, password);
+    const email = 'hello@localhost.world'
+    const password = 'world'
+    await createUser(email, password)
 
-    let refreshToken: string = 'Bearer ';
-    let accessToken: string = 'Bearer ';
+    let refreshToken: string = 'Bearer '
+    let accessToken: string = 'Bearer '
 
     try {
-      await server.listen(3000, '0.0.0.0');
+      await server.listen(3000, '0.0.0.0')
       const {
         body: { data },
       } = await superagent
         .post('0.0.0.0:3000/auth/sign-in')
-        .send({ email, password: 'world' });
+        .send({ email, password: 'world' })
 
-      accessToken += data.accessToken;
-      refreshToken += data.refreshToken;
+      accessToken += data.accessToken
+      refreshToken += data.refreshToken
 
       const response = await server.inject({
         method: 'POST',
@@ -52,17 +52,17 @@ describe('refresh-token', () => {
         payload: {
           refreshToken,
         },
-      });
+      })
 
-      const json = JSON.parse(response.payload);
+      const json = JSON.parse(response.payload)
 
-      expect(response.statusCode).toEqual(200);
+      expect(response.statusCode).toEqual(200)
       expect(json.data).toEqual({
         accessToken: expect.any(String),
         refreshToken: expect.any(String),
-      });
+      })
 
-      advanceBy(7 * 24 * 60 * 60 * 1000);
+      advanceBy(7 * 24 * 60 * 60 * 1000)
 
       const expiredResponse = await server.inject({
         method: 'POST',
@@ -73,14 +73,14 @@ describe('refresh-token', () => {
         payload: {
           refreshToken,
         },
-      });
+      })
 
-      const expiredJson = JSON.parse(expiredResponse.payload);
+      const expiredJson = JSON.parse(expiredResponse.payload)
 
-      expect(expiredResponse.statusCode).toEqual(401);
-      expect(expiredJson.message).toEqual('Authorization token expired');
+      expect(expiredResponse.statusCode).toEqual(401)
+      expect(expiredJson.message).toEqual('Authorization token expired')
     } finally {
-      await server.close();
+      await server.close()
     }
-  });
-});
+  })
+})

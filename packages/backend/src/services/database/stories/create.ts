@@ -1,5 +1,5 @@
-import type Knex from 'knex';
-import type { Story } from '../types';
+import type Knex from 'knex'
+import type { Story } from '../types'
 
 export const create =
   (db: Knex) => async (userId: string, slug: string, story: object) =>
@@ -9,4 +9,4 @@ export const create =
         slug,
         story,
       })
-      .returning('id');
+      .returning('id')

@@ -1,15 +1,15 @@
-import type Knex from 'knex';
-import type { User, UserActivationCode } from '../types';
+import type Knex from 'knex'
+import type { User, UserActivationCode } from '../types'
 
 export class ActivationCodeNotFoundError extends Error {
   constructor() {
-    super();
+    super()
 
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, ActivationCodeNotFoundError);
+      Error.captureStackTrace(this, ActivationCodeNotFoundError)
     }
 
-    this.name = 'ActivationCodeNotFoundError';
+    this.name = 'ActivationCodeNotFoundError'
   }
 }
 
@@ -26,10 +26,10 @@ export const activate =
           'user_activation_code.used_date': null,
         })
         .andWhere('user_activation_code.valid_until_date', '>', new Date())
-        .transacting(trx);
+        .transacting(trx)
 
       if (!found || found.length !== 1) {
-        throw new ActivationCodeNotFoundError();
+        throw new ActivationCodeNotFoundError()
       }
 
       await db<User>('user')
@@ -38,7 +38,7 @@ export const activate =
           status: 'verified',
           activation_date: new Date(),
         })
-        .transacting(trx);
+        .transacting(trx)
 
       await db<UserActivationCode>('user_activation_code')
         .where({
@@ -48,6 +48,6 @@ export const activate =
         .update({
           used_date: new Date(),
         })
-        .transacting(trx);
-    });
-  };
+        .transacting(trx)
+    })
+  }

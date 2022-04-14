@@ -1,4 +1,4 @@
-import superagent from 'superagent';
+import superagent from 'superagent'
 
 export const createStory = async (
   slug: string,
@@ -10,7 +10,7 @@ export const createStory = async (
     .set({
       authorization: token,
     })
-    .send({ slug, story });
+    .send({ slug, story })
 
-  return response.body;
-};
+  return response.body
+}

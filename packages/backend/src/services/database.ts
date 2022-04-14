@@ -1,10 +1,10 @@
-import type Knex from 'knex';
-import knex from 'knex';
+import type Knex from 'knex'
+import knex from 'knex'
 
-const { POSTGRES_DB, POSTGRES_PASS, POSTGRES_USER } = process.env;
+const { POSTGRES_DB, POSTGRES_PASS, POSTGRES_USER } = process.env
 
-const TABLE_USER = 'user';
-const TABLE_USER_ACTIVATION_CODE = 'user_activation_code';
+const TABLE_USER = 'user'
+const TABLE_USER_ACTIVATION_CODE = 'user_activation_code'
 
 const signUp =
   (db: Knex) =>
@@ -12,7 +12,7 @@ const signUp =
     user: { email: string; displayName: string; hash: string },
     activationCode: string
   ) => {
-    const { email, displayName, hash } = user;
+    const { email, displayName, hash } = user
     return db.transaction(async trx => {
       const [userId] = await db(TABLE_USER)
         .returning('id')
@@ -21,24 +21,24 @@ const signUp =
           display_name: displayName,
           password: hash,
         })
-        .transacting(trx);
+        .transacting(trx)
 
       await db(TABLE_USER_ACTIVATION_CODE)
         .insert({
           user_id: userId,
           activation_code: activationCode,
         })
-        .transacting(trx);
+        .transacting(trx)
 
-      return userId;
-    });
-  };
+      return userId
+    })
+  }
 
 export const db = knex({
   client: 'pg',
   connection: `postgres://${POSTGRES_USER}:${POSTGRES_PASS}@database/${POSTGRES_DB}`,
-});
+})
 
-export const persistSignUp = signUp(db);
+export const persistSignUp = signUp(db)
 
-export const connectionString = `postgres://${POSTGRES_USER}:${POSTGRES_PASS}@database/${POSTGRES_DB}`;
+export const connectionString = `postgres://${POSTGRES_USER}:${POSTGRES_PASS}@database/${POSTGRES_DB}`

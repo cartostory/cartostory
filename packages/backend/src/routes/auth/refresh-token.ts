@@ -1,4 +1,4 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify'
 
 const opts = {
   schema: {
@@ -23,12 +23,12 @@ const opts = {
       },
     },
   },
-};
+}
 
 const refreshToken = async (fastify: FastifyInstance) => {
   fastify.post<{
-    Headers: { authorization: string };
-    Body: { refreshToken: string };
+    Headers: { authorization: string }
+    Body: { refreshToken: string }
   }>(
     '/auth/refresh-token',
     {
@@ -36,7 +36,7 @@ const refreshToken = async (fastify: FastifyInstance) => {
       preValidation: [fastify.authenticate],
     },
     async (request, reply) => {
-      const { exp, iat, ...oldAccessTokenDecoded } = request.user;
+      const { exp, iat, ...oldAccessTokenDecoded } = request.user
 
       if (oldAccessTokenDecoded) {
         return reply.send({
@@ -49,16 +49,16 @@ const refreshToken = async (fastify: FastifyInstance) => {
               expiresIn: '24h',
             }),
           },
-        });
+        })
       }
 
-      await reply.code(401);
+      await reply.code(401)
       return reply.send({
         status: 'error',
         message: 'token refresh failed',
-      });
+      })
     }
-  );
-};
+  )
+}
 
-export default refreshToken;
+export default refreshToken

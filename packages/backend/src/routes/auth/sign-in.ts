@@ -1,7 +1,7 @@
-import type { FastifyInstance } from 'fastify';
-import { comparePasswordAndHash, isValidEmail } from './components/utils';
-import { auth } from '../../services/database/index';
-import { UserNotFoundError } from '../../services/database/auth/sign-in';
+import type { FastifyInstance } from 'fastify'
+import { comparePasswordAndHash, isValidEmail } from './components/utils'
+import { auth } from '../../services/database/index'
+import { UserNotFoundError } from '../../services/database/auth/sign-in'
 
 const opts = {
   schema: {
@@ -19,7 +19,7 @@ const opts = {
       },
     },
   },
-};
+}
 
 // curl -X POST -d '{"email": "hello@world.xyz", "password": "password"}' 'http://0.0.0.0:8080/backend/auth/sign-in' -H 'Content-Type: application/json'
 const signIn = async (fastify: FastifyInstance) => {
@@ -27,23 +27,23 @@ const signIn = async (fastify: FastifyInstance) => {
     '/auth/sign-in',
     opts,
     async (request, reply) => {
-      const { email, password } = request.body;
+      const { email, password } = request.body
 
       if (!isValidEmail(email)) {
         return reply
           .code(400)
-          .send({ status: 'error', message: 'e-mail is not valid' });
+          .send({ status: 'error', message: 'e-mail is not valid' })
       }
 
       try {
-        const found = await auth.getUser(email);
-        const { password: hash, ...user } = found;
-        const rightPassword = await comparePasswordAndHash(password, hash);
+        const found = await auth.getUser(email)
+        const { password: hash, ...user } = found
+        const rightPassword = await comparePasswordAndHash(password, hash)
 
         if (!rightPassword) {
           await reply
             .code(401)
-            .send({ status: 'error', message: 'wrong password' });
+            .send({ status: 'error', message: 'wrong password' })
         }
 
         return await reply.send({
@@ -52,22 +52,22 @@ const signIn = async (fastify: FastifyInstance) => {
             accessToken: fastify.jwt.sign(user, { expiresIn: '15m' }),
             refreshToken: fastify.jwt.sign(user, { expiresIn: '24h' }),
           },
-        });
+        })
       } catch (e) {
-        request.log.error(e);
+        request.log.error(e)
 
         if (e instanceof UserNotFoundError) {
           return reply
             .code(400)
-            .send({ status: 'error', message: 'user cannot log in' });
+            .send({ status: 'error', message: 'user cannot log in' })
         }
 
         return reply
           .code(400)
-          .send({ status: 'error', message: 'sign in failed' });
+          .send({ status: 'error', message: 'sign in failed' })
       }
     }
-  );
-};
+  )
+}
 
-export default signIn;
+export default signIn

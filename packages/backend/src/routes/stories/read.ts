@@ -1,6 +1,6 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { story } from '../../services/database/index';
-import type { Story } from '../../services/database/types';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import { story } from '../../services/database/index'
+import type { Story } from '../../services/database/types'
 
 const opts = {
   schema: {
@@ -14,7 +14,7 @@ const opts = {
       },
     },
   },
-};
+}
 
 const routeParams = {
   required: ['id'],
@@ -24,34 +24,34 @@ const routeParams = {
       type: 'string',
     },
   },
-};
+}
 
 const handler = async (
   { user, ...request }: FastifyRequest,
   reply: FastifyReply
 ) => {
   try {
-    const { id: userId } = user;
+    const { id: userId } = user
     // @ts-expect-error
-    const { id: storyId } = request.params;
-    let result: Story | Array<Story>;
+    const { id: storyId } = request.params
+    let result: Story | Array<Story>
 
     if (storyId) {
-      result = await story.readOne(userId, storyId);
+      result = await story.readOne(userId, storyId)
 
-      return { status: 'success', data: { story: result } };
+      return { status: 'success', data: { story: result } }
     }
 
-    result = await story.readAll(userId);
+    result = await story.readAll(userId)
 
-    return { status: 'success', data: { stories: result } };
+    return { status: 'success', data: { stories: result } }
   } catch (e) {
-    request.log.error(e);
+    request.log.error(e)
 
-    await reply.code(400);
-    return { status: 'error', message: 'stories retrieval failed' };
+    await reply.code(400)
+    return { status: 'error', message: 'stories retrieval failed' }
   }
-};
+}
 
 const getStoriesOpts = {
   ...opts,
@@ -59,7 +59,7 @@ const getStoriesOpts = {
     ...opts.schema,
     routeParams,
   },
-};
+}
 
 const getStories = async (fastify: FastifyInstance) => {
   fastify.get<{ Headers: { authorization: string } }>(
@@ -69,8 +69,8 @@ const getStories = async (fastify: FastifyInstance) => {
       preValidation: [fastify.authenticate],
     },
     handler
-  );
-};
+  )
+}
 
 const getStory = async (fastify: FastifyInstance) => {
   fastify.get<{ Headers: { authorization: string }; Params: { id: string } }>(
@@ -80,7 +80,7 @@ const getStory = async (fastify: FastifyInstance) => {
       preValidation: [fastify.authenticate],
     },
     handler
-  );
-};
+  )
+}
 
-export { getStories, getStory };
+export { getStories, getStory }

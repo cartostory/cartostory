@@ -1,5 +1,5 @@
-import type Knex from 'knex';
-import type { Story } from '../types';
+import type Knex from 'knex'
+import type { Story } from '../types'
 
 export const update = (db: Knex) => (slug: string, story: object) =>
   db<Story>('story')
@@ -8,4 +8,4 @@ export const update = (db: Knex) => (slug: string, story: object) =>
     })
     .where({
       slug,
-    });
+    })

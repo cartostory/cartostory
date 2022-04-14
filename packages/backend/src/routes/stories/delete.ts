@@ -1,5 +1,5 @@
-import type { FastifyInstance } from 'fastify';
-import { story } from '../../services/database/index';
+import type { FastifyInstance } from 'fastify'
+import { story } from '../../services/database/index'
 
 const opts = {
   schema: {
@@ -22,12 +22,12 @@ const opts = {
       },
     },
   },
-};
+}
 
 type Shape = {
-  Params: { id: string };
-  Headers: { authorization: string };
-};
+  Params: { id: string }
+  Headers: { authorization: string }
+}
 
 export const deleteStory = async (fastify: FastifyInstance) => {
   fastify.delete<Shape>(
@@ -38,34 +38,34 @@ export const deleteStory = async (fastify: FastifyInstance) => {
     },
     async (request, reply) => {
       try {
-        const slug = request.params.id;
-        const found = await story.getUserId(slug);
+        const slug = request.params.id
+        const found = await story.getUserId(slug)
 
         if (!found || found.length !== 1) {
           return await reply
             .code(404)
-            .send({ status: 'error', message: 'story was not found' });
+            .send({ status: 'error', message: 'story was not found' })
         }
 
         if (found[0].user_id !== request.user.id) {
           return await reply.code(401).send({
             status: 'error',
             message: 'user is not authorized to delete the story',
-          });
+          })
         }
 
-        await story.delete(slug);
+        await story.delete(slug)
 
         return await reply
           .code(200)
-          .send({ status: 'success', message: 'story was deleted' });
+          .send({ status: 'success', message: 'story was deleted' })
       } catch (e) {
-        request.log.error(e);
+        request.log.error(e)
 
         return reply
           .code(400)
-          .send({ status: 'error', message: 'story cannot be deleted' });
+          .send({ status: 'error', message: 'story cannot be deleted' })
       }
     }
-  );
-};
+  )
+}
