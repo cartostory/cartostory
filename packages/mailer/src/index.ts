@@ -1,51 +1,51 @@
 #! /usr/bin/env node
-import amqp from 'amqplib';
-import { sendSignUp } from './services/mailer';
+import amqp from 'amqplib'
+import { sendSignUp } from './services/mailer'
 
-const CONNECTION_STRING = 'amqp://rabbitmq:5672';
-const QUEUE = 'mailer';
+const CONNECTION_STRING = 'amqp://rabbitmq:5672'
+const QUEUE = 'mailer'
 
 const setup = async () => {
   try {
-    const connection = await amqp.connect(CONNECTION_STRING);
-    const channel = await connection.createChannel();
+    const connection = await amqp.connect(CONNECTION_STRING)
+    const channel = await connection.createChannel()
 
     await channel.assertQueue(QUEUE, {
       durable: true,
-    });
+    })
 
     await channel.consume(
       QUEUE,
       async msg => {
         if (!msg) {
-          return;
+          return
         }
 
         try {
-          const content = JSON.parse(msg.content.toString());
-          const { type, userId, email, activationCode } = content;
+          const content = JSON.parse(msg.content.toString())
+          const { type, userId, email, activationCode } = content
 
           switch (type) {
             case 'sign-up': {
               await sendSignUp({
                 activation_code: activationCode,
                 user_id: userId,
-              })([email]);
+              })([email])
             }
           }
         } catch (e) {
-          console.error('failed to send e-mail', e);
+          console.error('failed to send e-mail', e)
         }
       },
       {
         noAck: true,
-      }
-    );
+      },
+    )
   } catch (e) {
     // TODO handle error
   }
-};
+}
 
 setup().catch(() => {
   // TODO handle error
-});
+})

@@ -21,6 +21,7 @@
     "build": "react-scripts build",
     "dev": "concurrently \"tsc -w\" \"nodemon dist/src/index.js\"",
     "lint": "npx eslint . --ext .ts --ext .tsx",
+    "lint:fix": "npx eslint . --ext .ts --ext .tsx --fix",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

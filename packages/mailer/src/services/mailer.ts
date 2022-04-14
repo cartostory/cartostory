@@ -1,15 +1,15 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { send as sendInBlueSend } from './mailer-sendinblue';
-import handlebars from 'handlebars';
+import fs from 'fs/promises'
+import path from 'path'
+import { send as sendInBlueSend } from './mailer-sendinblue'
+import handlebars from 'handlebars'
 
-type Provider = 'sendinblue' | 'filesystem';
+type Provider = 'sendinblue' | 'filesystem'
 
-let provider: Provider = 'sendinblue';
+let provider: Provider = 'sendinblue'
 
 export const useProvider = (newProvider: Provider) => {
-  provider = newProvider;
-};
+  provider = newProvider
+}
 
 const send =
   (subject: string) =>
@@ -17,28 +17,28 @@ const send =
   (params: Record<string, string>) =>
   async (to: Array<string>) => {
     if (provider === 'filesystem') {
-      console.log('******** using filesystem *********');
+      console.log('******** using filesystem *********')
     }
     try {
       const templateFile = await fs.readFile(
         path.resolve(__dirname, `../../templates/${template}.handlebars`),
-        'utf-8'
-      );
-      const templateSpec = handlebars.compile(templateFile);
+        'utf-8',
+      )
+      const templateSpec = handlebars.compile(templateFile)
 
       switch (provider) {
         case 'sendinblue':
           return sendInBlueSend(
             to.map(email => ({ email })),
             subject,
-            templateSpec(params)
-          );
+            templateSpec(params),
+          )
         case 'filesystem':
-          return templateSpec(params);
+          return templateSpec(params)
       }
     } catch (e) {
-      console.error(e);
+      console.error(e)
     }
-  };
+  }
 
-export const sendSignUp = send('Welcome to Cartostory')('sign-up');
+export const sendSignUp = send('Welcome to Cartostory')('sign-up')
