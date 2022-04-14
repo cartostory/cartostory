@@ -2,7 +2,7 @@
 require('@rushstack/eslint-config/patch/modern-module-resolution')
 
 module.exports = {
-  extends: ['@rushstack/eslint-config/profile/node'],
+  extends: ['@rushstack/eslint-config/profile/node', 'prettier'],
   parserOptions: {
     tsconfigRootDir: __dirname,
   },
@@ -10,7 +10,6 @@ module.exports = {
     'brace-style': 'off',
     'comma-dangle': 'off',
     'comma-spacing': 'off',
-    indent: 'off',
     'no-return-await': 'off',
     'object-curly-spacing': 'off',
     quotes: 'off',
@@ -22,7 +21,6 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 0,
     '@rushstack/typedef-var': 0,
     '@typescript-eslint/explicit-member-accessibility': 0,
-    '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/semi': ['error', 'never'],
     '@typescript-eslint/brace-style': 'error',
     '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],

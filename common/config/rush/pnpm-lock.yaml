@@ -19,6 +19,7 @@ importers:
       bcrypt: ^5.0.1
       concurrently: ^7.1.0
       eslint: ~8.13.0
+      eslint-config-prettier: ~8.5.0
       fastify: ^3.19.2
       fastify-amqp: ^1.0.0
       fastify-jwt: ^3.0.0
@@ -55,6 +56,7 @@ importers:
       '@types/uuid': 8.3.4
       concurrently: 7.1.0
       eslint: 8.13.0
+      eslint-config-prettier: 8.5.0_eslint@8.13.0
       jest: 27.5.1_ts-node@10.7.0
       jest-date-mock: 1.0.8
       lint-staged: 12.3.7
@@ -81,6 +83,7 @@ importers:
       autoprefixer: ^10.4.4
       concurrently: ^7.1.0
       eslint: ~8.13.0
+      eslint-config-prettier: ~8.5.0
       eslint-config-react-app: ^7.0.1
       eslint-plugin-react-hooks: ~4.4.0
       eslint-plugin-use-encapsulation: ~1.0.0
@@ -115,6 +118,7 @@ importers:
       autoprefixer: 10.4.4_postcss@8.4.12
       concurrently: 7.1.0
       eslint: 8.13.0
+      eslint-config-prettier: 8.5.0_eslint@8.13.0
       eslint-config-react-app: 7.0.1_784444016745e035648f83ff82d25853
       eslint-plugin-react-hooks: 4.4.0_eslint@8.13.0
       eslint-plugin-use-encapsulation: 1.0.0_eslint@8.13.0
@@ -133,6 +137,7 @@ importers:
       amqplib: ^0.8.0
       concurrently: ^7.1.0
       eslint: ~8.13.0
+      eslint-config-prettier: ~8.5.0
       handlebars: ^4.7.7
       jest: ^27.0.6
       nodemon: ^2.0.15
@@ -150,6 +155,7 @@ importers:
       '@types/jest': 27.4.1
       concurrently: 7.1.0
       eslint: 8.13.0
+      eslint-config-prettier: 8.5.0_eslint@8.13.0
       jest: 27.5.1
       nodemon: 2.0.15
       ts-jest: 27.1.4_9985e1834e803358b7be1e6ce5ca0eea
@@ -6477,6 +6483,18 @@ packages:
       optionator: 0.8.3
     optionalDependencies:
       source-map: 0.6.1
+
+  /eslint-config-prettier/8.5.0_eslint@8.13.0:
+    resolution:
+      {
+        integrity: sha512-obmWKLUNCnhtQRKc+tmnYuQl0pFU1ibYJQ5BGhTVB08bHe9wC8qUeG7c08dj9XX+AuPj1YSGSQIHl1pnDHZR0Q==,
+      }
+    hasBin: true
+    peerDependencies:
+      eslint: '>=7.0.0'
+    dependencies:
+      eslint: 8.13.0
+    dev: true
 
   /eslint-config-react-app/7.0.1_784444016745e035648f83ff82d25853:
     resolution:

@@ -6,6 +6,7 @@ module.exports = {
     '@rushstack/eslint-config/profile/web-app',
     '@rushstack/eslint-config/mixins/react',
     'plugin:react-hooks/recommended',
+    'prettier',
   ],
   plugins: ['use-encapsulation'],
   parserOptions: {
@@ -22,7 +23,6 @@ module.exports = {
     'comma-spacing': 'off',
     curly: 'error',
     eqeqeq: 'error',
-    indent: 'off',
     'no-else-return': 'error',
     'no-return-await': 'off',
     'object-curly-spacing': 'off',
@@ -36,7 +36,6 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@rushstack/typedef-var': 'off',
     '@typescript-eslint/explicit-member-accessibility': 'off',
-    '@typescript-eslint/indent': ['error', 2],
     '@typescript-eslint/semi': ['error', 'never'],
     '@typescript-eslint/brace-style': 'error',
     '@typescript-eslint/comma-dangle': ['error', 'always-multiline'],
