@@ -1,30 +1,34 @@
 import React from 'react'
-//import type { Route } from 'react-router-dom'
+import { Outlet, Route, Routes } from 'react-router-dom'
+import { SignUp } from '../../pages'
 
-//type RouteProps = React.ComponentProps<typeof Route>
-//type RouteConfig = RouteProps & { routes?: Array<RouteProps> }
+const MyRoutes = (): React.ReactElement => (
+  <Routes>
+    <Route path="/" element={<>/</>} />
+    <Route
+      path="/auth"
+      element={
+        <>
+          auth: <Outlet />
+        </>
+      }
+    >
+      <Route path="me" element={<>me</>} />
+      <Route path="sign-up" element={<SignUp />} />
+      <Route path="sign-in" element={<>sign-in</>} />
+    </Route>
+    <Route
+      path="/stories"
+      element={
+        <>
+          stories: <Outlet />
+        </>
+      }
+    >
+      <Route path="write" element={<>write</>} />
+      <Route path=":id" element={<>id</>} />
+    </Route>
+  </Routes>
+)
 
-const Router = () => {
-  return <div>hello myyyyy world</div>
-}
-
-/*
-const routes: Array<RouteConfig> = [
-  {
-    path: '/',
-  },
-  {
-    path: '/auth',
-    routes: [
-      {
-        path: '/sign-up',
-      },
-      {
-        path: '/sign-in',
-      },
-    ],
-  },
-]
- */
-
-export { Router }
+export { MyRoutes }
