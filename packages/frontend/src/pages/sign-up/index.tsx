@@ -1,14 +1,14 @@
 import type { FormEventHandler } from 'react'
 import { useToggle } from '../../hooks'
 
-const useTogglePassword = (): [boolean, () => void] => {
+const useTogglePassword = (): ['password' | 'text', () => void] => {
   const [isPassword, { toggle: togglePassword }] = useToggle()
 
-  return [isPassword, togglePassword]
+  return [isPassword ? 'password' : 'text', togglePassword]
 }
 
 const SignUp = () => {
-  const [isPassword, togglePassword] = useTogglePassword()
+  const [passwordType, togglePassword] = useTogglePassword()
 
   const handleSubmit: FormEventHandler = e => {
     e.preventDefault()
@@ -17,11 +17,7 @@ const SignUp = () => {
   return (
     <form onSubmit={handleSubmit}>
       <input required type="email" placeholder="e-mail address" />
-      <input
-        required
-        type={isPassword ? 'password' : 'text'}
-        placeholder="password"
-      />
+      <input required type={passwordType} placeholder="password" />
       <label>
         show password
         <input onChange={() => togglePassword()} type="checkbox" />

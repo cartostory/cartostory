@@ -23,7 +23,7 @@ NODE_JWT_SECRET ?= secret
 	NODE_JWT_SECRET = $${NODE_JWT_SECRET}
 
 run-dev:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 run-prod:
 	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
