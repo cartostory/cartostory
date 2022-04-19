@@ -1,18 +1,18 @@
 # builder
 FROM node:16-alpine as base
+RUN npm install -g pnpm@next-7
 WORKDIR /app
 COPY package.json ./
-COPY package-lock.json ./
 
 FROM base as dependencies
-RUN npm ci --only=production
+RUN pnpm install --production #--frozen-lockfile
 RUN cp -R node_modules prod_node_modules
-RUN npm ci
+RUN pnpm install #--frozen-lockfile
 
 FROM dependencies as builder
 COPY tsconfig.json ./
 COPY src ./src
-RUN npm run build
+RUN pnpm build
 
 # ci
 FROM builder as ci
@@ -23,10 +23,10 @@ COPY --from=dependencies /app/node_modules ./node_modules
 RUN true
 COPY --from=builder /app/dist ./
 COPY --from=builder /app/package.json ./
-CMD ["npm", "run", "test"]
+CMD ["pnpm", "test"]
 
 # development
 FROM base as development
 ENV NODE_ENV=development
 COPY --from=dependencies /app/node_modules ./node_modules
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "dev"]
