@@ -4,6 +4,7 @@ import { story } from '../../services/database/index'
 
 const opts = {
   schema: {
+    tags: ['stories'],
     body: {
       required: ['slug', 'story'],
       type: 'object',

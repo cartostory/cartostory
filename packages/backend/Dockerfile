@@ -37,5 +37,6 @@ CMD ["pnpm", "test"]
 # development
 FROM base as development
 ENV NODE_ENV=development
-COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
+USER node
 CMD ["pnpm", "dev"]

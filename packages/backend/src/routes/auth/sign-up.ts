@@ -8,6 +8,7 @@ import { auth } from '../../services/database/index'
 
 const opts = {
   schema: {
+    tags: ['auth'],
     body: {
       additionalProperties: false,
       required: ['email', 'password'],

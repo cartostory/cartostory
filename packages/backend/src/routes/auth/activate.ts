@@ -4,6 +4,7 @@ import { auth } from '../../services/database/index'
 
 const opts = {
   schema: {
+    tags: ['auth'],
     params: {
       userId: { type: 'string' },
       activationCode: { type: 'string' },

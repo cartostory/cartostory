@@ -2,6 +2,7 @@ import type { FastifyInstance } from 'fastify'
 
 const opts = {
   schema: {
+    tags: ['auth'],
     headers: {
       additionalProperties: false,
       required: ['authorization'],

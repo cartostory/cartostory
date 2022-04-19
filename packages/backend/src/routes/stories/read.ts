@@ -4,6 +4,7 @@ import type { Story } from '../../services/database/types'
 
 const opts = {
   schema: {
+    tags: ['stories'],
     headers: {
       required: ['authorization'],
       type: 'object',

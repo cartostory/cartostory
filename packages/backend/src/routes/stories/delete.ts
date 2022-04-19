@@ -3,6 +3,7 @@ import { story } from '../../services/database/index'
 
 const opts = {
   schema: {
+    tags: ['stories'],
     params: {
       required: ['id'],
       type: 'object',

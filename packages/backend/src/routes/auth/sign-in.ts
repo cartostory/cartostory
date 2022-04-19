@@ -5,6 +5,7 @@ import { UserNotFoundError } from '../../services/database/auth/sign-in'
 
 const opts = {
   schema: {
+    tags: ['auth'],
     body: {
       additionalProperties: false,
       required: ['email', 'password'],
