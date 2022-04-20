@@ -30,13 +30,12 @@ const signUp = async (fastify: FastifyInstance) => {
   fastify.post<{ Body: { email: string; password: string } }>(
     '/auth/sign-up',
     opts,
-    async (request, reply) => {
+    async request => {
       const { email, password } = request.body
 
       if (!isValidEmail(email)) {
-        return reply
-          .code(400)
-          .send({ status: 'error', message: 'e-mail is not valid' })
+        // eslint-disable-next-line no-throw-literal
+        throw { statusCode: 400, message: 'e-mail is not valid' }
       }
 
       const hash = await generateHash(password)
@@ -69,15 +68,11 @@ const signUp = async (fastify: FastifyInstance) => {
           ),
         )
 
-        return await reply
-          .code(200)
-          .send({ status: 'success', message: 'user succesfully registered' })
+        return { status: 'success', message: 'user succesfully registered' }
       } catch (e) {
         request.log.error(e)
         // Do not let anyone know an e-mail is already taken.
-        return reply
-          .code(200)
-          .send({ status: 'success', message: 'user succesfully registered' })
+        return { status: 'success', message: 'user succesfully registered' }
       }
     },
   )

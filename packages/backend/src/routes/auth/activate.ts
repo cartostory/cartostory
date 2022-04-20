@@ -17,26 +17,30 @@ const activate = async (fastify: FastifyInstance) => {
   fastify.get<{ Params: { userId: string; activationCode: string } }>(
     '/auth/activate/:userId/:activationCode',
     opts,
-    async (request, reply) => {
+    async request => {
       const { userId, activationCode } = request.params
 
       try {
         await auth.activate(userId, activationCode)
-        return await reply
-          .code(200)
-          .send({ status: 'success', message: 'user activated' })
+        return { status: 'success', message: 'user activated' }
       } catch (e) {
         request.log.error(e)
 
         if (e instanceof ActivationCodeNotFoundError) {
-          return reply
-            .code(400)
-            .send({ status: 'error', message: 'user cannot be activated' })
+          // eslint-disable-next-line no-throw-literal
+          throw {
+            statusCode: 400,
+            message: 'user cannot be activated',
+            status: 'error',
+          }
         }
 
-        return reply
-          .code(400)
-          .send({ status: 'error', message: 'user activation failed' })
+        // eslint-disable-next-line no-throw-literal
+        throw {
+          statusCode: 400,
+          message: 'user activation failed',
+          status: 'error',
+        }
       }
     },
   )

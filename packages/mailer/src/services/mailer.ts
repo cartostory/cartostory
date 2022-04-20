@@ -5,7 +5,7 @@ import handlebars from 'handlebars'
 
 type Provider = 'sendinblue' | 'filesystem'
 
-let provider: Provider = 'sendinblue'
+let provider: Provider = 'filesystem'
 
 export const useProvider = (newProvider: Provider) => {
   provider = newProvider
@@ -34,6 +34,7 @@ const send =
             templateSpec(params),
           )
         case 'filesystem':
+          console.log('******', templateSpec(params))
           return templateSpec(params)
       }
     } catch (e) {

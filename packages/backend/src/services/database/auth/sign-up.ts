@@ -10,7 +10,9 @@ export const signUp =
   ) => {
     const { email, displayName, hash } = user
 
-    await db.transaction(async trx => {
+    // otherwise undefined is returned instead of userId
+    // eslint-disable-next-line @typescript-eslint/return-await
+    return await db.transaction(async trx => {
       const [userId] = await db<User, Pick<User, 'id'>>(TABLE_USER)
         .insert({
           email,

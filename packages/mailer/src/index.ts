@@ -25,6 +25,14 @@ const setup = async () => {
           const content = JSON.parse(msg.content.toString())
           const { type, userId, email, activationCode } = content
 
+          if (!userId) {
+            throw new Error('user id is missing')
+          }
+
+          if (!email) {
+            throw new Error('e-mail is missing')
+          }
+
           switch (type) {
             case 'sign-up': {
               await sendSignUp({
