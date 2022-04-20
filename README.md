@@ -1,3 +1,7 @@
+# Swagger
+
+http://localhost:8080/backend/openapi/static/index.html
+
 # Troubleshooting
 
 ## npm dependency is not found
