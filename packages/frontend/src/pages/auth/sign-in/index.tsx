@@ -1,7 +1,8 @@
 import type { FormEventHandler } from 'react'
-import { useToggle } from '../../hooks'
+import { useToggle } from '../../../hooks'
 import { useMutation } from 'react-query'
-import axios from 'axios'
+import { myAxios } from '../../../api'
+import { useAuthContext } from '../../../providers/auth-provider'
 
 type Credentials = {
   email: string
@@ -12,6 +13,11 @@ type FormCredentials = {
   [key in keyof Credentials]: { value: Credentials[key] }
 }
 
+type AuthTokens = {
+  data: Pick<ReturnType<typeof useAuthContext>, 'accessToken' | 'refreshToken'>
+  status: string
+}
+
 const useTogglePassword = (): ['password' | 'text', () => void] => {
   const [isPassword, { toggle: togglePassword }] = useToggle()
 
@@ -19,11 +25,13 @@ const useTogglePassword = (): ['password' | 'text', () => void] => {
 }
 
 const useSignIn = () => {
+  const { login } = useAuthContext()
   const mutation = useMutation(
-    async (data: Credentials) => axios.post('/backend/auth/sign-in', data),
+    async (data: Credentials) =>
+      myAxios.post<AuthTokens>('/auth/sign-in', data),
     {
-      onSuccess: result => {
-        console.log('result', result.data)
+      onSuccess: ({ data }) => {
+        login(data.data)
       },
     },
   )

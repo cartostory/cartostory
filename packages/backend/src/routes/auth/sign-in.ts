@@ -27,13 +27,16 @@ const signIn = async (fastify: FastifyInstance) => {
   fastify.post<{ Body: { email: string; password: string } }>(
     '/auth/sign-in',
     opts,
-    async (request, reply) => {
+    async request => {
       const { email, password } = request.body
 
       if (!isValidEmail(email)) {
-        return reply
-          .code(400)
-          .send({ status: 'error', message: 'e-mail is not valid' })
+        // eslint-disable-next-line no-throw-literal
+        throw {
+          statusCode: 400,
+          status: 'error',
+          message: 'e-mail is not valid',
+        }
       }
 
       try {
@@ -42,30 +45,31 @@ const signIn = async (fastify: FastifyInstance) => {
         const rightPassword = await comparePasswordAndHash(password, hash)
 
         if (!rightPassword) {
-          await reply
-            .code(401)
-            .send({ status: 'error', message: 'wrong password' })
+          // eslint-disable-next-line no-throw-literal
+          throw { statusCode: 401, status: 'error', message: 'wrong password' }
         }
 
-        return await reply.send({
+        return {
           status: 'success',
           data: {
             accessToken: fastify.jwt.sign(user, { expiresIn: '15m' }),
             refreshToken: fastify.jwt.sign(user, { expiresIn: '24h' }),
           },
-        })
+        }
       } catch (e) {
         request.log.error(e)
 
         if (e instanceof UserNotFoundError) {
-          return reply
-            .code(400)
-            .send({ status: 'error', message: 'user cannot log in' })
+          // eslint-disable-next-line no-throw-literal
+          throw {
+            statusCode: 400,
+            status: 'error',
+            message: 'user cannot log in',
+          }
         }
 
-        return reply
-          .code(400)
-          .send({ status: 'error', message: 'sign in failed' })
+        // eslint-disable-next-line no-throw-literal
+        throw { statusCode: 400, status: 'error', message: 'sign in failed' }
       }
     },
   )
