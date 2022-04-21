@@ -19,7 +19,8 @@
     "react-query": "~3.35.0",
     "axios": "~0.26.1",
     "leaflet": "~1.8.0",
-    "react-leaflet": "~4.0.0"
+    "react-leaflet": "~4.0.0",
+    "@react-leaflet/core": "~2.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
