@@ -2,6 +2,7 @@ import L from 'leaflet'
 import React from 'react'
 import { useMap } from 'react-leaflet'
 import Upload from '../../../../../assets/upload.svg'
+import { trackOptions } from '../../../../../config'
 
 const positionClassnames = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -10,33 +11,11 @@ const positionClassnames = {
   topright: 'leaflet-top leaflet-right',
 }
 
-const useUploadTrack = () => {
-  const trackRef = React.useRef<L.GeoJSON<unknown>>()
-  const map = useMap()
-
-  const readFile = React.useCallback(
-    (file: File) => {
-      const reader = new FileReader()
-      reader.addEventListener('load', (e: ProgressEvent<FileReader>) => {
-        const result = e.target?.result
-
-        if (!result) {
-          return
-        }
-
-        if (trackRef.current) {
-          map.removeLayer(trackRef.current)
-        }
-
-        trackRef.current = new L.GeoJSON(JSON.parse(result.toString()))
-        map.addLayer(trackRef.current)
-      })
-
-      reader.readAsText(file)
-    },
-    [map],
-  )
-
+const useSelectFile = (): [
+  File | undefined,
+  React.ChangeEventHandler<HTMLInputElement>,
+] => {
+  const [file, setFile] = React.useState<File | undefined>()
   const handler = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.currentTarget.files
@@ -45,13 +24,58 @@ const useUploadTrack = () => {
         return
       }
 
-      const file = files[0]
-      readFile(file)
+      setFile(files[0])
     },
-    [readFile],
+    [],
   )
 
-  return handler
+  return [file, handler]
+}
+
+const useReadFile = (file?: File) => {
+  const reader = React.useRef(new FileReader())
+  const [content, setContent] = React.useState<string | undefined>()
+
+  React.useEffect(() => {
+    if (!file) {
+      return
+    }
+
+    const readerInstance = reader.current
+
+    const handler = (e: ProgressEvent<FileReader>) => {
+      setContent(e.target?.result?.toString())
+    }
+
+    readerInstance.addEventListener('load', handler)
+    readerInstance.readAsText(file)
+
+    return () => {
+      readerInstance.removeEventListener('load', handler)
+    }
+  }, [file])
+
+  return content
+}
+
+const useLoadGeoJson = (data?: string) => {
+  const trackRef = React.useRef<L.GeoJSON<unknown>>()
+  const map = useMap()
+
+  if (!data) {
+    return
+  }
+
+  if (trackRef.current) {
+    map.removeLayer(trackRef.current)
+  }
+
+  trackRef.current = new L.GeoJSON(JSON.parse(data.toString()), {
+    style: trackOptions.style.plain,
+  })
+
+  map.addLayer(trackRef.current)
+  map.flyToBounds(trackRef.current.getBounds())
 }
 
 const UploadButton = ({
@@ -59,13 +83,15 @@ const UploadButton = ({
 }: {
   position?: keyof typeof positionClassnames
 }) => {
-  const handleUpload = useUploadTrack()
+  const [file, selectFile] = useSelectFile()
+  const content = useReadFile(file)
+  useLoadGeoJson(content)
 
   return (
     <div className={positionClassnames[position]}>
       <div className="leaflet-control leaflet-bar bg-white h-[32px] w-[32px] top-[73px] flex justify-center">
         <input
-          onChange={handleUpload}
+          onChange={selectFile}
           type="file"
           name="track"
           accept=".json"
