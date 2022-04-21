@@ -1,4 +1,5 @@
 import L from 'leaflet'
+import React from 'react'
 import { useMap } from 'react-leaflet'
 import Upload from '../../../../../assets/upload.svg'
 
@@ -9,42 +10,62 @@ const positionClassnames = {
   topright: 'leaflet-top leaflet-right',
 }
 
+const useUploadTrack = () => {
+  const trackRef = React.useRef<L.GeoJSON<unknown>>()
+  const map = useMap()
+
+  const readFile = React.useCallback(
+    (file: File) => {
+      const reader = new FileReader()
+      reader.addEventListener('load', (e: ProgressEvent<FileReader>) => {
+        const result = e.target?.result
+
+        if (!result) {
+          return
+        }
+
+        if (trackRef.current) {
+          map.removeLayer(trackRef.current)
+        }
+
+        trackRef.current = new L.GeoJSON(JSON.parse(result.toString()))
+        map.addLayer(trackRef.current)
+      })
+
+      reader.readAsText(file)
+    },
+    [map],
+  )
+
+  const handler = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.currentTarget.files
+
+      if (!files) {
+        return
+      }
+
+      const file = files[0]
+      readFile(file)
+    },
+    [readFile],
+  )
+
+  return handler
+}
+
 const UploadButton = ({
   position = 'topleft',
 }: {
   position?: keyof typeof positionClassnames
 }) => {
-  const map = useMap()
-  const readFile = (file: File) => {
-    const reader = new FileReader()
-    reader.addEventListener('load', (e: ProgressEvent<FileReader>) => {
-      const result = e.target?.result
+  const handleUpload = useUploadTrack()
 
-      if (!result) {
-        return
-      }
-
-      map.addLayer(new L.GeoJSON(JSON.parse(result.toString())))
-    })
-
-    reader.readAsText(file)
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.currentTarget.files
-
-    if (!files) {
-      return
-    }
-
-    const file = files[0]
-    readFile(file)
-  }
   return (
     <div className={positionClassnames[position]}>
       <div className="leaflet-control leaflet-bar bg-white h-[32px] w-[32px] top-[73px] flex justify-center">
         <input
-          onChange={handleChange}
+          onChange={handleUpload}
           type="file"
           name="track"
           accept=".json"
