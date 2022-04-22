@@ -65,7 +65,7 @@ function UploadButton({
 
 function Loader() {
   return (
-    <div className="spinner self-center shrink-0 animate-upload-button-loading border-black border-2 rounded-full w-[20px] h-[20px]"></div>
+    <div className="spinner self-center shrink-0 animate-upload-button-loading border-black border-2 rounded-full w-[20px] h-[20px]" />
   )
 }
 
