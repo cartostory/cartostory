@@ -42,6 +42,7 @@ module.exports = {
     ],
     '@typescript-eslint/func-call-spacing': ['error', 'never'],
     '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true }],
+    '@typescript-eslint/no-use-before-define': ['error', 'nofunc'],
     '@typescript-eslint/object-curly-spacing': ['error', 'always'],
     '@typescript-eslint/prefer-nullish-coalescing': 'error',
     '@typescript-eslint/prefer-optional-chain': 'error',
