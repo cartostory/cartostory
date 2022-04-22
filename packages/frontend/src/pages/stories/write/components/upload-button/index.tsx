@@ -5,7 +5,6 @@ import Upload from '../../../../../assets/upload.svg'
 import { trackOptions } from '../../../../../config'
 
 type FileReaderProgressEvent = ProgressEvent<FileReader>
-// eslint-disable-next-line @rushstack/no-new-null
 type FileReaderProgressEventTarget = Exclude<
   FileReaderProgressEvent['target'],
   null

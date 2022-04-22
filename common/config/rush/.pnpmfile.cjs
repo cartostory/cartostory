@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /**
  * When using the PNPM package manager, you can use pnpmfile.js to workaround
@@ -16,7 +16,7 @@ module.exports = {
   hooks: {
     readPackage,
   },
-};
+}
 
 /**
  * This hook is invoked during installation before a package's dependencies
@@ -33,5 +33,5 @@ function readPackage(packageJson, context) {
   //  packageJson.dependencies['log4js'] = '0.6.38';
   // }
 
-  return packageJson;
+  return packageJson
 }

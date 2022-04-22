@@ -47,3 +47,6 @@ stop-dev:
 
 stop-ci:
 	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.ci.yml stop
+
+rebuild:
+	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml rm --force --stop -v $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml build $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up $(SERVICE)

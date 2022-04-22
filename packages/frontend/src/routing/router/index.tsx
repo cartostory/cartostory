@@ -1,15 +1,16 @@
 import React from 'react'
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
-import { SignIn, SignUp, Write } from '../../pages'
+import { Home, Logout, SignIn, SignUp, Write } from '../../pages'
 import { useAuthContext } from '../../providers/auth-provider'
 
-const RequireAuth = ({
+const RequireAuthenticated = ({
   children,
-}: React.PropsWithChildren<unknown>): JSX.Element => {
+  redirectTo = '/auth/sign-in',
+}: React.PropsWithChildren<{ redirectTo?: string }>): JSX.Element => {
   const hook = useAuthContext()
 
-  if (!hook.accessToken) {
-    return <Navigate to="/auth/sign-in" />
+  if (!hook.user) {
+    return <Navigate to={redirectTo} replace />
   }
 
   return <>{children}</>
@@ -20,7 +21,7 @@ const RequireAnonymous = ({
 }: React.PropsWithChildren<unknown>): JSX.Element => {
   const hook = useAuthContext()
 
-  if (hook.accessToken) {
+  if (hook.user) {
     return <Navigate to="/" />
   }
 
@@ -29,7 +30,7 @@ const RequireAnonymous = ({
 
 const MyRoutes = (): React.ReactElement => (
   <Routes>
-    <Route path="/" element={<>/</>} />
+    <Route path="/" element={<Home />} />
     <Route
       path="/auth"
       element={
@@ -39,6 +40,14 @@ const MyRoutes = (): React.ReactElement => (
       }
     >
       <Route path="me" element={<>me</>} />
+      <Route
+        path="logout"
+        element={
+          <RequireAuthenticated redirectTo="/">
+            <Logout />
+          </RequireAuthenticated>
+        }
+      />
       <Route
         path="sign-up"
         element={
@@ -59,17 +68,17 @@ const MyRoutes = (): React.ReactElement => (
     <Route
       path="/stories"
       element={
-        <RequireAuth>
+        <RequireAuthenticated>
           <Outlet />
-        </RequireAuth>
+        </RequireAuthenticated>
       }
     >
       <Route
         path="write"
         element={
-          <RequireAuth>
+          <RequireAuthenticated>
             <Write />
-          </RequireAuth>
+          </RequireAuthenticated>
         }
       />
       <Route path=":id" element={<>id</>} />
