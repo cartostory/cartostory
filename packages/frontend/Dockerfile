@@ -11,8 +11,10 @@ RUN pnpm install #--frozen-lockfile
 
 FROM dependencies as builder
 COPY public ./public
+COPY index.html ./
 COPY src ./src
 COPY tsconfig.json ./
+COPY tsconfig.node.json ./
 RUN pnpm build
 
 # ci
@@ -22,7 +24,7 @@ ENV CI=true
 ENV NODE_ENV=production
 COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
 RUN true
-COPY --from=builder /app/build ./
+COPY --from=builder /app/dist ./
 COPY --from=builder /app/package.json ./
 CMD ["pnpm", "test"]
 
