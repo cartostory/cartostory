@@ -34,8 +34,6 @@ function AuthProvider({ children }: React.PropsWithChildren<unknown>) {
     ? jwtDecode<Context['user']>(auth.accessToken)
     : undefined
 
-  console.log('jwtUser', jwtUser)
-
   return (
     <AuthContext.Provider value={{ ...auth, user: jwtUser, login, logout }}>
       {children}

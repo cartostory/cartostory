@@ -1,7 +1,10 @@
+import { motion, useAnimation } from 'framer-motion'
 import L from 'leaflet'
 import React from 'react'
 import { useMap } from 'react-leaflet'
+import Check from '../../../../../assets/check.svg'
 import Upload from '../../../../../assets/upload.svg'
+import X from '../../../../../assets/x.svg'
 import { trackOptions } from '../../../../../config'
 
 type FileReaderProgressEvent = ProgressEvent<FileReader>
@@ -15,6 +18,8 @@ type FileReadingStatus =
   | { status: 'done'; result?: FileReaderResult }
   | ({ status: 'loading' } & Pick<FileReaderProgressEvent, 'loaded' | 'total'>)
   | { status: 'error' }
+
+type FileReadingStatusKeys = FileReadingStatus['status']
 
 const positionClassnames = {
   bottomleft: 'leaflet-bottom leaflet-left',
@@ -30,7 +35,11 @@ function UploadButton({
 }) {
   const [file, selectFile] = useSelectFile()
   const content = useReadFile(file)
-  useLoadGeoJson(content?.status === 'done' ? content.result : undefined)
+  const loaded = useLoadGeoJson(
+    content?.status === 'done' ? content.result : undefined,
+  )
+  const { uploadElementControls, uploadStatusControls } =
+    useUploadResultAnimation(file, loaded)
 
   const uploadElement = (
     <>
@@ -41,7 +50,19 @@ function UploadButton({
         accept=".json"
         className="opacity-0 absolute w-[32px] h-[32px] cursor-pointer"
       />
-      <img src={Upload} className="basis-5" />
+      <motion.img
+        src={Upload}
+        className="basis-5"
+        initial={false}
+        animate={uploadElementControls}
+      />
+      {loaded ? (
+        <motion.img
+          animate={uploadStatusControls}
+          src={loaded === 'error' ? X : Check}
+          className="basis-5"
+        />
+      ) : null}
     </>
   )
 
@@ -136,23 +157,94 @@ function useReadFile(file?: File) {
 }
 
 function useLoadGeoJson(data?: string) {
+  const [result, setResult] = React.useState<
+    Extract<FileReadingStatusKeys, 'error' | 'done'> | undefined
+  >()
   const trackRef = React.useRef<L.GeoJSON<unknown>>()
   const map = useMap()
 
-  if (!data) {
-    return
-  }
+  React.useEffect(() => {
+    if (!data) {
+      return
+    }
 
-  if (trackRef.current) {
-    map.removeLayer(trackRef.current)
-  }
+    if (trackRef.current) {
+      map.removeLayer(trackRef.current)
+    }
 
-  trackRef.current = new L.GeoJSON(JSON.parse(data.toString()), {
-    style: trackOptions.style.plain,
-  })
+    try {
+      trackRef.current = new L.GeoJSON(JSON.parse(data.toString()), {
+        style: trackOptions.style.plain,
+      })
 
-  map.addLayer(trackRef.current)
-  map.flyToBounds(trackRef.current.getBounds())
+      map.addLayer(trackRef.current)
+      map.flyToBounds(trackRef.current.getBounds())
+      setResult('done')
+    } catch (e) {
+      // TODO pass error message to user console.log(e instanceof SyntaxError)
+      setResult('error')
+    }
+  }, [data, map])
+
+  return result
+}
+
+function useUploadResultAnimation(
+  file: ReturnType<typeof useSelectFile>['0'],
+  loaded: ReturnType<typeof useLoadGeoJson>,
+) {
+  const uploadElementControls = useAnimation()
+  const uploadStatusControls = useAnimation()
+
+  React.useEffect(() => {
+    if (!loaded) {
+      return
+    }
+
+    async function start() {
+      uploadStatusControls.set({ scale: 0, display: 'none' })
+      await uploadElementControls.start({
+        scale: 0,
+      })
+    }
+
+    async function switchElements() {
+      uploadElementControls.set({ display: 'none' })
+      uploadStatusControls.set({ translateX: 0, display: 'initial' })
+      return uploadStatusControls.start({
+        scale: 1,
+      })
+    }
+
+    async function keepStatusVisible() {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(true)
+        }, 3000)
+      })
+    }
+
+    async function switchElementsBack() {
+      return uploadStatusControls.start({
+        scale: 0,
+      })
+    }
+
+    async function reset() {
+      uploadStatusControls.set({ display: 'none' })
+      uploadElementControls.set({ display: 'initial' })
+      return uploadElementControls.start({ scale: 1 })
+    }
+
+    start()
+      .then(switchElements)
+      .then(keepStatusVisible)
+      .then(switchElementsBack)
+      .then(reset)
+      .catch(() => {})
+  }, [uploadElementControls, uploadStatusControls, loaded, file])
+
+  return { uploadStatusControls, uploadElementControls }
 }
 
 export { UploadButton }
