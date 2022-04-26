@@ -2,9 +2,9 @@ import { motion, useAnimation } from 'framer-motion'
 import L from 'leaflet'
 import React from 'react'
 import { useMap } from 'react-leaflet'
-import Check from '../../../../../assets/check.svg'
-import Upload from '../../../../../assets/upload.svg'
-import X from '../../../../../assets/x.svg'
+import { ReactComponent as Check } from '../../../../../assets/check.svg'
+import { ReactComponent as Upload } from '../../../../../assets/upload.svg'
+import { ReactComponent as X } from '../../../../../assets/x.svg'
 import { trackOptions } from '../../../../../config'
 
 type FileReaderProgressEvent = ProgressEvent<FileReader>
@@ -251,17 +251,19 @@ function FileInput() {
         accept=".json"
         className="opacity-0 absolute w-[34px] h-[34px] cursor-pointer"
       />
-      <motion.img
-        src={Upload}
-        className="basis-5 block"
+      <motion.span
+        className="basis-5 block flex self-center"
         animate={uploadElementControls}
-      />
+      >
+        <Upload />
+      </motion.span>
       {loaded ? (
-        <motion.img
+        <motion.span
           animate={uploadStatusControls}
-          src={loaded === 'error' ? X : Check}
-          className="basis-5 block"
-        />
+          className="basis-5 block flex self-center"
+        >
+          {loaded === 'error' ? <X /> : <Check />}
+        </motion.span>
       ) : null}
     </>
   )

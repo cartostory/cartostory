@@ -5,6 +5,7 @@ volumes:
 
 services:
   frontend:
+    container_name: cartostory_frontend_dev
     ports:
       - '3000:3000'
     build:
@@ -16,6 +17,7 @@ services:
     command: >
       sh -c "cd /app && npm run dev"
   backend:
+    container_name: cartostory_backend_dev
     build:
       context: ../backend
       target: development
@@ -29,6 +31,7 @@ services:
     command: >
       sh -c "cd /app && npm run dev"
   mailer:
+    container_name: cartostory_mailer_dev
     build:
       context: ../mailer
       target: development
@@ -36,6 +39,7 @@ services:
       - ../mailer:/app
       - /app/node_modules
   database:
+    container_name: cartostory_database_dev
     deploy:
       restart_policy:
         condition: on-failure
