@@ -12,6 +12,12 @@ POSTGRES_MULTIPLE_EXTENSIONS ?= postgis
 NODE_ENV ?= development
 NODE_JWT_SECRET ?= secret
 
+# DOCKER
+DOCKER_COMPOSE_CI = -f docker-compose.yml -f docker-compose.ci.yml -p cartostory-ci
+DOCKER_COMPOSE_DEV = -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev
+DOCKER_COMPOSE_PROD = -f docker-compose.yml -f docker-compose.prod.yml -p cartostory-prod
+DOCKER_COMPOSE_TEST = -f docker-compose.yml -f docker-compose.test.yml -p cartostory-test
+
 .EXPORT_ALL_VARIABLES:
 	PGDATA = $${PGDATA}
 	POSTGRES_DB = $${POSTGRES_DB}
@@ -23,30 +29,30 @@ NODE_JWT_SECRET ?= secret
 	NODE_JWT_SECRET = $${NODE_JWT_SECRET}
 
 run-dev:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev up
+	cd ./docker && docker-compose $${DOCKER_COMPOSE_DEV} up
 
 run-prod:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.prod.yml -p cartostory-prod up
+	cd ./docker && docker-compose $${DOCKER_COMPOSE_PROD} up
 
 run-test:
 	@cd ./docker; \
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml -p cartostory-test up --exit-code-from backend --renew-anon-volumes backend; \
+	docker-compose $${DOCKER_COMPOSE_TEST} up --exit-code-from backend --renew-anon-volumes backend; \
 	EXIT_CODE=$$?; \
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml -p cartostory-test kill database; \
+	docker-compose $${DOCKER_COMPOSE_TEST} kill database; \
 	exit $$EXIT_CODE
 
 run-ci:
 	@cd ./docker; \
-	docker-compose -f docker-compose.yml -f docker-compose.ci.yml -p cartostory-ci up --build --exit-code-from backend --renew-anon-volumes backend; \
+	docker-compose $${DOCKER_COMPOSE_CI} up --build --exit-code-from backend --renew-anon-volumes backend; \
 	EXIT_CODE=$$?; \
-	docker-compose -f docker-compose.yml -f docker-compose.ci.yml -p cartostory-ci kill database; \
+	docker-compose $${DOCKER_COMPOSE_CI} kill database; \
 	exit $$EXIT_CODE
 
 stop-dev:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev stop
+	cd ./docker && docker-compose $${DOCKER_COMPOSE_DEV} stop
 
 stop-ci:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.ci.yml -p cartostory-ci stop
+	cd ./docker && docker-compose $${DOCKER_COMPOSE_CI} stop
 
 rebuild:
 	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev rm --force --stop -v $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev build $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev up $(SERVICE)
