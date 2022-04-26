@@ -1,7 +1,10 @@
 import type { FastifyInstance } from 'fastify'
 import { comparePasswordAndHash, isValidEmail } from './components/utils'
 import { auth } from '../../services/database/index'
-import { UserNotFoundError } from '../../services/database/auth/sign-in'
+import {
+  UserNotFoundError,
+  WrongPasswordError,
+} from '../../services/database/auth/sign-in'
 
 const opts = {
   schema: {
@@ -45,8 +48,7 @@ const signIn = async (fastify: FastifyInstance) => {
         const rightPassword = await comparePasswordAndHash(password, hash)
 
         if (!rightPassword) {
-          // eslint-disable-next-line no-throw-literal
-          throw { statusCode: 401, status: 'error', message: 'wrong password' }
+          throw new WrongPasswordError()
         }
 
         return {
@@ -66,6 +68,11 @@ const signIn = async (fastify: FastifyInstance) => {
             status: 'error',
             message: 'user cannot log in',
           }
+        }
+
+        if (e instanceof WrongPasswordError) {
+          // eslint-disable-next-line no-throw-literal
+          throw { statusCode: 401, status: 'error', message: 'wrong password' }
         }
 
         // eslint-disable-next-line no-throw-literal

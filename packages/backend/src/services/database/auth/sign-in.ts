@@ -13,6 +13,18 @@ export class UserNotFoundError extends Error {
   }
 }
 
+export class WrongPasswordError extends Error {
+  constructor() {
+    super()
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, UserNotFoundError)
+    }
+
+    this.name = 'WrongPasswordError'
+  }
+}
+
 export const getUser = (db: Knex) => async (email: string) => {
   const found = await db<User>('user').select('*').where({
     email,

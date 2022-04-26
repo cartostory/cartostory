@@ -2,9 +2,13 @@ version: '3.7'
 
 services:
   backend:
-    image: node:16-alpine
+    container_name: cartostory_backend_test
+    build:
+      context: ../backend
+      target: development
     volumes:
       - ../backend:/app
+      - /app/node_modules
     depends_on:
       - database
       - flyway

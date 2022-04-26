@@ -30,7 +30,7 @@ run-prod:
 
 run-test:
 	@cd ./docker; \
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml up --build --exit-code-from backend --renew-anon-volumes backend; \
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from backend --renew-anon-volumes backend; \
 	EXIT_CODE=$$?; \
 	docker-compose kill database; \
 	exit $$EXIT_CODE

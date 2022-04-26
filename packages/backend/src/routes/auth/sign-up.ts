@@ -35,7 +35,11 @@ const signUp = async (fastify: FastifyInstance) => {
 
       if (!isValidEmail(email)) {
         // eslint-disable-next-line no-throw-literal
-        throw { statusCode: 400, message: 'e-mail is not valid' }
+        throw {
+          status: 'error',
+          statusCode: 400,
+          message: 'e-mail is not valid',
+        }
       }
 
       const hash = await generateHash(password)
