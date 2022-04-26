@@ -29,9 +29,12 @@ const positionClassnames = {
 }
 
 const UploadContext = React.createContext<
-  | (ReturnType<typeof useSelectFile> &
-      ReturnType<typeof useReadFile> &
-      ReturnType<typeof useLoadGeoJson>)
+  | {
+      file: ReturnType<typeof useSelectFile>['0']
+      selectFile: ReturnType<typeof useSelectFile>['1']
+      content: ReturnType<typeof useReadFile>
+      loaded: ReturnType<typeof useLoadGeoJson>
+    }
   | undefined
 >(undefined)
 
@@ -41,6 +44,8 @@ function useUploadContext() {
   if (!context) {
     throw new Error('UploadContext is only available inside UploadProvider.')
   }
+
+  return context
 }
 
 function UploadProvider({ children }: React.PropsWithChildren<unknown>) {
@@ -61,28 +66,11 @@ function UploadButton({
 }: {
   position?: keyof typeof positionClassnames
 }) {
-  const [file, selectFile] = useSelectFile()
-  const content = useReadFile(file)
-  const loaded = useLoadGeoJson(
-    content?.status === 'done' ? content.result : undefined,
-  )
-
-  const children: {
-    [key in FileReadingStatus['status'] | 'unknown']: JSX.Element
-  } = {
-    done: <UploadElement selectFile={selectFile} loaded={loaded} file={file} />,
-    error: <>oh no</>,
-    loading: <Loader />,
-    unknown: (
-      <UploadElement selectFile={selectFile} loaded={loaded} file={file} />
-    ),
-  }
-
   return (
     <UploadProvider>
       <div className={positionClassnames[position]}>
         <div className="leaflet-control leaflet-bar bg-white h-[32px] w-[32px] top-[73px] flex justify-center">
-          {children[content?.status ?? 'unknown']}
+          <UploadElement />
         </div>
       </div>
     </UploadProvider>
@@ -207,7 +195,6 @@ function useUploadResultAnimation(
     }
 
     async function start() {
-      console.log('start')
       uploadStatusControls.set({ scale: 0, display: 'none' })
       await uploadElementControls.start({
         scale: 0,
@@ -215,32 +202,26 @@ function useUploadResultAnimation(
     }
 
     async function switchElements() {
-      console.log('switchElements')
       uploadElementControls.set({ display: 'none' })
       uploadStatusControls.set({ display: 'initial' })
       return uploadStatusControls.start({
-        scale: 1,
-      })
-    }
-
-    async function keepStatusVisible() {
-      console.log('keepStatusVisible')
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(true)
-        }, 3000)
+        scale: [1.3, 0.7, 1],
+        transition: {
+          type: 'spring',
+        },
       })
     }
 
     async function switchElementsBack() {
-      console.log('switchElementsBack')
       return uploadStatusControls.start({
         scale: 0,
+        transition: {
+          delay: 3,
+        },
       })
     }
 
     async function reset() {
-      console.log('reset')
       uploadStatusControls.set({ display: 'none' })
       uploadElementControls.set({ display: 'initial' })
       return uploadElementControls.start({ scale: 1 })
@@ -248,7 +229,6 @@ function useUploadResultAnimation(
 
     start()
       .then(switchElements)
-      .then(keepStatusVisible)
       .then(switchElementsBack)
       .then(reset)
       .catch(() => {})
@@ -257,16 +237,11 @@ function useUploadResultAnimation(
   return { uploadStatusControls, uploadElementControls }
 }
 
-function UploadElement({
-  file,
-  loaded,
-  selectFile,
-}: {
-  file: ReturnType<typeof useSelectFile>['0']
-  loaded: ReturnType<typeof useLoadGeoJson>
-}) {
+function FileInput() {
+  const { file, loaded, selectFile } = useUploadContext()
   const { uploadElementControls, uploadStatusControls } =
     useUploadResultAnimation(file, loaded)
+
   return (
     <>
       <input
@@ -274,7 +249,7 @@ function UploadElement({
         type="file"
         name="track"
         accept=".json"
-        className="opacity-0 absolute w-[32px] h-[32px] cursor-pointer"
+        className="opacity-0 absolute w-[34px] h-[34px] cursor-pointer"
       />
       <motion.img
         src={Upload}
@@ -294,6 +269,23 @@ function UploadElement({
       ) : null}
     </>
   )
+}
+
+// memoize otherwise every animation except the first one makes icons flicker
+const MemoizedFileInput = React.memo(FileInput, () => true)
+
+function UploadElement() {
+  const { content } = useUploadContext()
+  const children: {
+    [key in FileReadingStatus['status'] | 'unknown']: JSX.Element
+  } = {
+    done: <MemoizedFileInput />,
+    error: <>oh no</>, // TODO deal with error
+    loading: <Loader />,
+    unknown: <MemoizedFileInput />,
+  }
+
+  return <>{children[content?.status ?? 'unknown']}</>
 }
 
 export { UploadButton }
