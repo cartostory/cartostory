@@ -5,8 +5,6 @@ WORKDIR /app
 COPY package.json ./
 
 FROM base as dependencies
-RUN pnpm install --production #--frozen-lockfile
-RUN cp -R node_modules prod_node_modules
 RUN pnpm install #--frozen-lockfile
 
 FROM dependencies as builder
@@ -15,6 +13,7 @@ COPY index.html ./
 COPY src ./src
 COPY tsconfig.json ./
 COPY tsconfig.node.json ./
+COPY vite.config.ts ./
 RUN pnpm build
 
 # ci

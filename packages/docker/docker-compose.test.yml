@@ -1,8 +1,10 @@
 version: '3.7'
 
+volumes:
+  database-data-test:
+
 services:
   backend:
-    container_name: cartostory_backend_test
     build:
       context: ../backend
       target: development
@@ -15,3 +17,6 @@ services:
       - rabbitmq
     command: >
       sh -c "cd /app && npm run test -- --watchAll"
+  database:
+    volumes:
+      - database-data-test:${PGDATA}

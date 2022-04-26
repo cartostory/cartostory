@@ -3,8 +3,8 @@ import L from 'leaflet'
 import React from 'react'
 import { useMap } from 'react-leaflet'
 import { ReactComponent as Check } from '../../../../../assets/check.svg'
-import { ReactComponent as Upload } from '../../../../../assets/upload.svg'
 import { ReactComponent as X } from '../../../../../assets/x.svg'
+import { ReactComponent as Upload } from '../../../../../assets/upload.svg'
 import { trackOptions } from '../../../../../config'
 
 type FileReaderProgressEvent = ProgressEvent<FileReader>

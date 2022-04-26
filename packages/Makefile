@@ -23,30 +23,30 @@ NODE_JWT_SECRET ?= secret
 	NODE_JWT_SECRET = $${NODE_JWT_SECRET}
 
 run-dev:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev up
 
 run-prod:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.prod.yml -p cartostory-prod up
 
 run-test:
 	@cd ./docker; \
-	docker-compose -f docker-compose.yml -f docker-compose.test.yml up --exit-code-from backend --renew-anon-volumes backend; \
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml -p cartostory-test up --exit-code-from backend --renew-anon-volumes backend; \
 	EXIT_CODE=$$?; \
-	docker-compose kill database; \
+	docker-compose -f docker-compose.yml -f docker-compose.test.yml -p cartostory-test kill database; \
 	exit $$EXIT_CODE
 
 run-ci:
 	@cd ./docker; \
-	docker-compose -f docker-compose.yml -f docker-compose.ci.yml up --build --exit-code-from backend --renew-anon-volumes backend; \
+	docker-compose -f docker-compose.yml -f docker-compose.ci.yml -p cartostory-ci up --build --exit-code-from backend --renew-anon-volumes backend; \
 	EXIT_CODE=$$?; \
-	docker-compose kill database; \
+	docker-compose -f docker-compose.yml -f docker-compose.ci.yml -p cartostory-ci kill database; \
 	exit $$EXIT_CODE
 
 stop-dev:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml stop
+	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev stop
 
 stop-ci:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.ci.yml stop
+	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.ci.yml -p cartostory-ci stop
 
 rebuild:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml rm --force --stop -v $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml build $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml up $(SERVICE)
+	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev rm --force --stop -v $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev build $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev up $(SERVICE)
