@@ -255,16 +255,12 @@ function FileInput() {
         src={Upload}
         className="basis-5 block"
         animate={uploadElementControls}
-        onAnimationStart={() => console.log('uploadElementControls started')}
-        onAnimationComplete={() => console.log('uploadElementControls ended')}
       />
       {loaded ? (
         <motion.img
           animate={uploadStatusControls}
           src={loaded === 'error' ? X : Check}
           className="basis-5 block"
-          onAnimationStart={() => console.log('uploadStatusControls started')}
-          onAnimationComplete={() => console.log('uploadStatusControls ended')}
         />
       ) : null}
     </>
