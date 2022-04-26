@@ -2,14 +2,18 @@
 
 http://localhost:8080/backend/openapi/static/index.html
 
+# Makefile
+
+## Rebuild a service
+
+Run `ENVIRONMENT=CI|DEV|PROD|TEST` SERVICE=backend|database|frontend|mailer make rebuild`. See docker-compose yaml files to find what services are available on different environments.
+
 # Troubleshooting
 
 ## npm dependency is not found
 
-See https://github.com/docker/compose/issues/4337. The problem is anonymous volumes are not being removed during the build. To use the newly added dependency, run this sequence of commands:
+See https://github.com/docker/compose/issues/4337. The problem is anonymous volumes are not being removed during the build. To use the newly added dependency, run this command:
 
 ```
-docker-compose -f docker-compose.yml -f ... rm service1
-docker-compose -f docker-compose.yml -f ... build service1
-docker-compose -f docker-compose.yml -f ... up service1
+ENVIRONMENT=DEV SERVICE=frontend make rebuild
 ```

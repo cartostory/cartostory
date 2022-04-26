@@ -55,4 +55,4 @@ stop-ci:
 	cd ./docker && docker-compose $${DOCKER_COMPOSE_CI} stop
 
 rebuild:
-	cd ./docker && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev rm --force --stop -v $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev build $(SERVICE) && docker-compose -f docker-compose.yml -f docker-compose.dev.yml -p cartostory-dev up $(SERVICE)
+	cd ./docker && docker-compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} rm --force --stop -v $(SERVICE) && docker-compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} build $(SERVICE) && docker-compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} up $(SERVICE)
