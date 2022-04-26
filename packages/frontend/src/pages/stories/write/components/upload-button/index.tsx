@@ -203,9 +203,9 @@ function useUploadResultAnimation(
 
     async function switchElements() {
       uploadElementControls.set({ display: 'none' })
-      uploadStatusControls.set({ display: 'initial' })
+      uploadStatusControls.set({ display: 'flex' })
       return uploadStatusControls.start({
-        scale: [1.3, 0.7, 1],
+        scale: [1.2, 0.4, 1],
         transition: {
           type: 'spring',
         },
@@ -223,7 +223,7 @@ function useUploadResultAnimation(
 
     async function reset() {
       uploadStatusControls.set({ display: 'none' })
-      uploadElementControls.set({ display: 'initial' })
+      uploadElementControls.set({ display: 'flex' })
       return uploadElementControls.start({ scale: 1 })
     }
 
@@ -252,7 +252,7 @@ function FileInput() {
         className="opacity-0 absolute w-[34px] h-[34px] cursor-pointer"
       />
       <motion.span
-        className="basis-5 block flex self-center"
+        className="basis-5 flex self-center"
         animate={uploadElementControls}
       >
         <Upload />
@@ -260,9 +260,13 @@ function FileInput() {
       {loaded ? (
         <motion.span
           animate={uploadStatusControls}
-          className="basis-5 block flex self-center"
+          className="basis-5 flex self-center"
         >
-          {loaded === 'error' ? <X /> : <Check />}
+          {loaded === 'error' ? (
+            <X className="self-center" />
+          ) : (
+            <Check className="self-center" />
+          )}
         </motion.span>
       ) : null}
     </>
