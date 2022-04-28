@@ -81,6 +81,8 @@ importers:
       '@testing-library/react': ^13.0.1
       '@testing-library/user-event': ^13.5.0
       '@tiptap/core': ^2.0.0-beta.1
+      '@tiptap/extension-bubble-menu': ~2.0.0-beta.56
+      '@tiptap/react': ~2.0.0-beta.109
       '@tiptap/starter-kit': ~2.0.0-beta.183
       '@types/jest': ^27.4.1
       '@types/leaflet': ~1.7.9
@@ -120,6 +122,8 @@ importers:
     dependencies:
       '@react-leaflet/core': 2.0.0_eb1e5a72b2c63eca062ec87b122a9384
       '@tiptap/core': 2.0.0-beta.174
+      '@tiptap/extension-bubble-menu': 2.0.0-beta.56_@tiptap+core@2.0.0-beta.174
+      '@tiptap/react': 2.0.0-beta.109_e7b1a2166aee0100516d7187592da77b
       '@tiptap/starter-kit': 2.0.0-beta.183
       axios: 0.26.1
       framer-motion: 6.3.2_react-dom@18.0.0+react@18.0.0
@@ -2419,6 +2423,13 @@ packages:
       }
     dev: true
 
+  /@popperjs/core/2.11.5:
+    resolution:
+      {
+        integrity: sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw==,
+      }
+    dev: false
+
   /@react-leaflet/core/2.0.0_eb1e5a72b2c63eca062ec87b122a9384:
     resolution:
       {
@@ -2861,6 +2872,20 @@ packages:
       '@tiptap/core': 2.0.0-beta.174
     dev: false
 
+  /@tiptap/extension-bubble-menu/2.0.0-beta.56_@tiptap+core@2.0.0-beta.174:
+    resolution:
+      {
+        integrity: sha512-nZozwauICdaNPmDPrSn1JFd/9/2rLtK8i2vBOcqxWHObVROvu8ZlJspnrJv23vS6P7/ZO3e/QLVHpnn+1yVq3g==,
+      }
+    peerDependencies:
+      '@tiptap/core': ^2.0.0-beta.1
+    dependencies:
+      '@tiptap/core': 2.0.0-beta.174
+      prosemirror-state: 1.3.4
+      prosemirror-view: 1.23.12
+      tippy.js: 6.3.7
+    dev: false
+
   /@tiptap/extension-bullet-list/2.0.0-beta.26_@tiptap+core@2.0.0-beta.174:
     resolution:
       {
@@ -2917,6 +2942,20 @@ packages:
       '@tiptap/core': 2.0.0-beta.174
       '@types/prosemirror-dropcursor': 1.0.3
       prosemirror-dropcursor: 1.4.0
+    dev: false
+
+  /@tiptap/extension-floating-menu/2.0.0-beta.51_@tiptap+core@2.0.0-beta.174:
+    resolution:
+      {
+        integrity: sha512-rEe7jADK9xr2n2LJsrGEN3Dz7sEGC1JT/7AdTdaZBxQRQvwxTjomqYGrt+LnX+v0MYggh6swMzj7upJosnKbBg==,
+      }
+    peerDependencies:
+      '@tiptap/core': ^2.0.0-beta.1
+    dependencies:
+      '@tiptap/core': 2.0.0-beta.174
+      prosemirror-state: 1.3.4
+      prosemirror-view: 1.23.12
+      tippy.js: 6.3.7
     dev: false
 
   /@tiptap/extension-gapcursor/2.0.0-beta.34_@tiptap+core@2.0.0-beta.174:
@@ -3043,6 +3082,24 @@ packages:
       '@tiptap/core': ^2.0.0-beta.1
     dependencies:
       '@tiptap/core': 2.0.0-beta.174
+    dev: false
+
+  /@tiptap/react/2.0.0-beta.109_e7b1a2166aee0100516d7187592da77b:
+    resolution:
+      {
+        integrity: sha512-kx/I+9DbiKX+LPFYTQf1Mycbw4U77nRsuztMi5UyGoONnwVwVxOUN6sxdnsNX0uo/H0Rf5ZAtQn8vQBaTWPzsQ==,
+      }
+    peerDependencies:
+      '@tiptap/core': ^2.0.0-beta.1
+      react: ^17.0.0 || ^18.0.0
+      react-dom: ^17.0.0 || ^18.0.0
+    dependencies:
+      '@tiptap/core': 2.0.0-beta.174
+      '@tiptap/extension-bubble-menu': 2.0.0-beta.56_@tiptap+core@2.0.0-beta.174
+      '@tiptap/extension-floating-menu': 2.0.0-beta.51_@tiptap+core@2.0.0-beta.174
+      prosemirror-view: 1.23.12
+      react: 18.0.0
+      react-dom: 18.0.0_react@18.0.0
     dev: false
 
   /@tiptap/starter-kit/2.0.0-beta.183:
@@ -12231,6 +12288,15 @@ packages:
       }
     engines: { node: '>=14.0.0' }
     dev: true
+
+  /tippy.js/6.3.7:
+    resolution:
+      {
+        integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==,
+      }
+    dependencies:
+      '@popperjs/core': 2.11.5
+    dev: false
 
   /tmpl/1.0.5:
     resolution:
