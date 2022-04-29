@@ -81,8 +81,8 @@ export const TestMark = Mark.create<TestOptions>({
         ({ commands }) => {
           const { lat, lng } = layer.getLatLng()
           const attributes = {
-            'data-lat': lat,
-            'data-lng': lng,
+            'data-lat': lat.toFixed(6),
+            'data-lng': lng.toFixed(6),
           }
           return commands.setMark(this.name, attributes)
         },

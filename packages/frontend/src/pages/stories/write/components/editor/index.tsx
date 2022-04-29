@@ -1,6 +1,5 @@
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-import { useWriteContext } from '../..'
 import { ReactComponent as Bold } from '../../../../../assets/bold.svg'
 import { ReactComponent as Italic } from '../../../../../assets/italic.svg'
 import { ReactComponent as H1 } from '../../../../../assets/h-1.svg'
@@ -14,13 +13,14 @@ import { ReactComponent as ListUnordered } from '../../../../../assets/list-unor
 import { ReactComponent as MapPinAddLine } from '../../../../../assets/map-pin-add-line.svg'
 import { ReactComponent as CropLine } from '../../../../../assets/crop-line.svg'
 import { TestMark } from './test-mark'
+import { useStoryContext } from '../../providers/story-provider'
 
 function Editor() {
   const editor = useEditor({
     extensions: [StarterKit, TestMark],
     content: '<p>Hello World!</p>',
   })
-  const { addMarker, addRectangle, setCallback } = useWriteContext()
+  const { addMarker, addRectangle, setCallback } = useStoryContext()
 
   return (
     <>
