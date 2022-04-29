@@ -11,6 +11,7 @@ import markerRetinaIcon from 'leaflet/dist/images/marker-icon-2x.png'
 import 'leaflet-draw'
 import 'leaflet-draw/dist/leaflet.draw.css'
 import 'leaflet/dist/leaflet.css'
+import { randomString } from '../../../../../utils'
 
 L.Marker.prototype.setIcon(
   L.icon({
@@ -29,10 +30,26 @@ function Map() {
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
       <EditLayer />
-      <UploadButton />
       <MapLayers />
+      <Features />
+      <UploadButton />
     </MapContainer>
   )
+}
+
+function Features() {
+  const map = useMap()
+  const { features } = useStoryContext()
+
+  React.useEffect(() => {
+    if (!map || !features) {
+      return
+    }
+
+    features.forEach(feature => map.addLayer(feature))
+  }, [features, map])
+
+  return null
 }
 
 function EditLayer() {
@@ -42,21 +59,49 @@ function EditLayer() {
   return null
 }
 
+function useCreateFeature(featureType?: 'marker' | 'rectangle') {
+  if (!featureType) {
+    return
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
+  type Config = {
+    [key in Exclude<typeof featureType, undefined>]: {
+      handler: (
+        e: L.LeafletEvent,
+      ) => key extends 'marker' ? L.Marker : L.Rectangle
+      feature: typeof L.Draw[Capitalize<key>]
+      options?: key extends 'marker'
+        ? L.DrawOptions.MarkerOptions
+        : L.DrawOptions.RectangleOptions
+    }
+  }
+
+  const config: Config = {
+    marker: {
+      feature: L.Draw.Marker,
+      handler: createMarker,
+    },
+    rectangle: {
+      feature: L.Draw.Rectangle,
+      handler: createRectangle,
+      options: {
+        showArea: false, // if removed, Leaflet.Draw throws error
+        shapeOptions: bboxOptions.plain.style,
+      },
+    },
+  }
+
+  const { feature, handler, options = {} } = config[featureType]
+
+  return { feature, handler, options }
+}
+
 function useDraw(featureType?: 'marker' | 'rectangle') {
   const map = useMap() as L.DrawMap
-  const { callback } = useStoryContext()
-
-  const createRectangle = React.useCallback((e: L.LeafletEvent) => {
-    const bounds = e.layer.getBounds() as L.LatLngBounds
-
-    return L.rectangle(bounds, {
-      ...bboxOptions.plain.style,
-    })
-  }, [])
-
-  const createMarker = React.useCallback((e: L.LeafletEvent) => {
-    return e.layer
-  }, [])
+  const { callback, addFeature } = useStoryContext()
+  const { feature, handler, options } = useCreateFeature(featureType) ?? {}
+  const drawing = React.useRef<L.Draw.Marker | L.Draw.Rectangle>()
 
   React.useEffect(() => {
     if (!map) {
@@ -68,45 +113,37 @@ function useDraw(featureType?: 'marker' | 'rectangle') {
       return
     }
 
-    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
-    type Config = {
-      [key in typeof featureType]: {
-        handler: (
-          e: L.LeafletEvent,
-        ) => key extends 'marker' ? L.Marker : L.Rectangle
-        feature: typeof L.Draw[Capitalize<key>]
-        options?: key extends 'marker'
-          ? L.DrawOptions.MarkerOptions
-          : L.DrawOptions.RectangleOptions
-      }
+    if (!feature || !handler) {
+      return
     }
 
-    const config: Config = {
-      marker: {
-        feature: L.Draw.Marker,
-        handler: createMarker,
-      },
-      rectangle: {
-        feature: L.Draw.Rectangle,
-        handler: createRectangle,
-        options: {
-          showArea: false, // if removed, Leaflet.Draw throws error
-          shapeOptions: bboxOptions.plain.style,
-        },
-      },
+    if (!drawing.current) {
+      drawing.current = new feature(map, options)
     }
 
-    const { feature, handler, options = {} } = config[featureType]
+    drawing.current.enable()
 
-    new feature(map, options).enable()
-
-    map.off(window.L.Draw.Event.CREATED)
     map.on(window.L.Draw.Event.CREATED, e => {
       const newFeature = handler(e)
-      map.addLayer(newFeature)
-      callback?.(newFeature)
+      addFeature(newFeature)
+      drawing.current?.disable()
     })
-  }, [callback, map, featureType, createRectangle, createMarker])
+  }, [addFeature, callback, map, featureType, feature, handler, options])
+}
+
+function createRectangle(e: L.LeafletEvent) {
+  const bounds = e.layer.getBounds() as L.LatLngBounds
+
+  return L.rectangle(bounds, {
+    ...bboxOptions.plain.style,
+    id: randomString(6), // TODO extend L.rectangle to accept id
+  })
+}
+
+function createMarker(e: L.LeafletEvent) {
+  return L.marker(e.layer.getLatLng(), {
+    id: randomString(6), // TODO extend L.marker to accept id
+  })
 }
 
 export { Map }

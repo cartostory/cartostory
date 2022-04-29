@@ -32,23 +32,31 @@ function Editor() {
         >
           <button
             onClick={() => {
-              console.log(
-                'editor.commands.setFeatureMark',
-                editor.commands.setTest,
-              )
               setCallback(() => editor.commands.setTest)
               addMarker()
             }}
           >
             <MapPinAddLine />
           </button>
-          <button onClick={() => addRectangle()}>
+          <button onClick={addRectangle}>
             <CropLine />
           </button>
         </BubbleMenu>
       ) : null}
       <div className="overflow-auto grow">
-        <EditorContent editor={editor} />
+        <EditorContent
+          onClick={e => {
+            const element = e.target as HTMLElement
+            const featureId = element.getAttribute('data-feature-id')
+
+            if (!featureId) {
+              return
+            }
+
+            console.log('data-feature-id', featureId)
+          }}
+          editor={editor}
+        />
       </div>
     </>
   )

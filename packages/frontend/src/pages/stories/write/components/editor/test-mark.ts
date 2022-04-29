@@ -2,7 +2,11 @@ import { Mark, mergeAttributes } from '@tiptap/core'
 
 export interface TestOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  HTMLAttributes: Record<string, any>
+  HTMLAttributes: {
+    'data-lat'?: string
+    'data-lng'?: string
+    'data-feature-id'?: string
+  }
 }
 
 declare module '@tiptap/core' {
@@ -11,7 +15,7 @@ declare module '@tiptap/core' {
       /**
        * Set a feature mark
        */
-      setTest: (layer: L.Marker) => ReturnType
+      setTest: (layer: L.Marker, handler: () => void) => ReturnType
       /**
        * Toggle a feature mark
        */
@@ -25,7 +29,7 @@ declare module '@tiptap/core' {
 }
 
 export const TestMark = Mark.create<TestOptions>({
-  name: 'test',
+  name: 'feature',
 
   addOptions() {
     return {
@@ -33,27 +37,21 @@ export const TestMark = Mark.create<TestOptions>({
     }
   },
 
+  // data-lat + data-lng are duplicate to data-feature-id
+  // leave it as is until I find what works better
   addAttributes() {
     return {
       'data-lat': {
         default: null,
-        // Customize the HTML parsing (for example, to load the initial content)
-        parseHTML: element => element.getAttribute('data-lat'),
-        // … and customize the HTML rendering.
-        renderHTML: attributes => {
-          return {
-            'data-lat': attributes['data-lat'],
-          }
-        },
       },
       'data-lng': {
         default: null,
-        parseHTML: element => element.getAttribute('data-lng'),
-        renderHTML: attributes => {
-          return {
-            'data-lng': attributes['data-lng'],
-          }
-        },
+      },
+      'data-feature-id': {
+        default: null,
+      },
+      onclick: {
+        default: null,
       },
     }
   },
@@ -61,28 +59,55 @@ export const TestMark = Mark.create<TestOptions>({
   parseHTML() {
     return [
       {
-        tag: 'a',
+        tag: 'button',
       },
     ]
   },
 
-  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, unknown> }) {
+  renderHTML({
+    HTMLAttributes,
+  }: {
+    HTMLAttributes: TestOptions['HTMLAttributes']
+  }) {
     return [
-      'a',
+      'button',
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
       0,
+    ]
+  },
+
+  addProseMirrorPlugins() {
+    return [
+      {
+        getState() {},
+        spec: {},
+        props: {
+          handleClickOn: () => {
+            const attrs = this.editor.getAttributes('feature')
+            const featureId = attrs['data-feature-id']
+            const lat = attrs['data-lat']
+            const lng = attrs['data-lng']
+            attrs.onclick?.({ lat, lng })
+            return false
+          },
+        },
+      },
     ]
   },
 
   addCommands() {
     return {
       setTest:
-        layer =>
+        (layer, handler) =>
         ({ commands }) => {
+          console.log('layer', layer, 'handler', handler)
           const { lat, lng } = layer.getLatLng()
+          const { id } = layer.options
           const attributes = {
             'data-lat': lat.toFixed(6),
             'data-lng': lng.toFixed(6),
+            'data-feature-id': id,
+            onclick: handler,
           }
           return commands.setMark(this.name, attributes)
         },

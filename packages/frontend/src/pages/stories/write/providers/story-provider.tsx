@@ -1,4 +1,5 @@
 import React from 'react'
+import type L from 'leaflet'
 
 type FeatureType = 'marker' | 'rectangle'
 
@@ -21,21 +22,24 @@ function useMapEditor() {
   >()
   const [callback, setCallback] = React.useState<() => {}>()
 
-  React.useEffect(() => {
-    console.log('useMapEditor callback', callback)
-  }, [callback])
-
   const addMarker = () => setNextFeature('marker')
   const addRectangle = () => setNextFeature('rectangle')
   const cancel = () => {
     setNextFeature(undefined)
     setCallback(undefined)
   }
+  const addFeature = (feature: typeof L[Capitalize<FeatureType>]) => {
+    callback?.(feature)
+    setFeatures(cur => [...(cur ?? []), feature])
+    cancel()
+  }
 
   return {
     nextFeature,
     addMarker,
     addRectangle,
+    addFeature,
+    features,
     cancel,
     callback,
     setCallback,
