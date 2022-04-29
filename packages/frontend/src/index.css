@@ -25,3 +25,8 @@
   font-weight: 700;
   font-display: swap;
 }
+
+a[data-lat] {
+  cursor: pointer;
+  text-decoration: underline;
+}

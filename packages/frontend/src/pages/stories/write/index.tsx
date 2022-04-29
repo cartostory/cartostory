@@ -1,6 +1,8 @@
 import React from 'react'
 import L from 'leaflet'
-import { MapContainer, useMapEvents } from 'react-leaflet'
+import { MapContainer, useMap } from 'react-leaflet'
+import 'leaflet-draw'
+import 'leaflet-draw/dist/leaflet.draw.css'
 import 'leaflet/dist/leaflet.css'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
@@ -11,7 +13,9 @@ import { ReactComponent as Link } from '../../../assets/link.svg'
 import { deburr as _deburr, kebabCase as _kebabCase } from 'lodash-es'
 import { randomString } from '../../../utils'
 import { Editor } from './components/editor'
-import { useToggle } from '../../../hooks'
+import { bboxOptions } from '../../../config'
+
+type FeatureType = 'marker' | 'rectangle'
 
 L.Marker.prototype.setIcon(
   L.icon({
@@ -32,16 +36,6 @@ const WriteContext = React.createContext<
   ReturnType<typeof useMapEditor> | undefined
 >(undefined)
 
-function useWriteContext() {
-  const context = React.useContext(WriteContext)
-
-  if (!context) {
-    throw new Error('WriteContext is only available inside WriteProvider.')
-  }
-
-  return context
-}
-
 function WriteProvider({ children }: React.PropsWithChildren<unknown>) {
   const editor = useMapEditor()
 
@@ -51,16 +45,30 @@ function WriteProvider({ children }: React.PropsWithChildren<unknown>) {
 }
 
 function useMapEditor() {
-  const [isEditing, { setOn: startEditing, setOff: stopEditing }] =
-    useToggle(false)
+  const [nextFeature, setNextFeature] = React.useState<FeatureType>()
   const [features, setFeatures] = React.useState<
-    Array<L.Marker | L.Rectangle> | undefined
+    Array<typeof L[Capitalize<FeatureType>]> | undefined
   >()
+  const [callback, setCallback] = React.useState<() => {}>()
+
+  React.useEffect(() => {
+    console.log('useMapEditor callback', callback)
+  }, [callback])
+
+  const addMarker = () => setNextFeature('marker')
+  const addRectangle = () => setNextFeature('rectangle')
+  const cancel = () => {
+    setNextFeature(undefined)
+    setCallback(undefined)
+  }
 
   return {
-    isEditing,
-    startEditing,
-    stopEditing,
+    nextFeature,
+    addMarker,
+    addRectangle,
+    cancel,
+    callback,
+    setCallback,
   }
 }
 
@@ -109,26 +117,89 @@ function Write() {
 function Map() {
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
-      <InteractiveLayer />
+      <EditLayer />
       <UploadButton />
       <MapLayers />
     </MapContainer>
   )
 }
 
-function InteractiveLayer() {
-  const { isEditing, stopEditing } = useWriteContext()
-
-  useMapEvents({
-    click: isEditing
-      ? e => {
-          console.log('clicked', e)
-          stopEditing()
-        }
-      : () => {},
-  })
+function EditLayer() {
+  const { nextFeature } = useWriteContext()
+  useDraw(nextFeature)
 
   return null
+}
+
+function useDraw(featureType?: 'marker' | 'rectangle') {
+  const map = useMap() as L.DrawMap
+  const { callback } = useWriteContext()
+
+  React.useEffect(() => {
+    console.log('useDraw callback', callback)
+  }, [callback])
+
+  const createRectangle = React.useCallback((e: L.LeafletEvent) => {
+    const bounds = e.layer.getBounds() as L.LatLngBounds
+
+    return L.rectangle(bounds, {
+      ...bboxOptions.plain.style,
+    })
+  }, [])
+
+  const createMarker = React.useCallback((e: L.LeafletEvent) => {
+    return e.layer
+  }, [])
+
+  React.useEffect(() => {
+    if (!map) {
+      return
+    }
+
+    if (!featureType) {
+      map.off(window.L.Draw.Event.CREATED)
+      return
+    }
+
+    // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
+    type Config = {
+      [key in typeof featureType]: {
+        handler: (
+          e: L.LeafletEvent,
+        ) => key extends 'marker' ? L.Marker : L.Rectangle
+        feature: typeof L.Draw[Capitalize<key>]
+        options?: key extends 'marker'
+          ? L.DrawOptions.MarkerOptions
+          : L.DrawOptions.RectangleOptions
+      }
+    }
+
+    const config: Config = {
+      marker: {
+        feature: L.Draw.Marker,
+        handler: createMarker,
+      },
+      rectangle: {
+        feature: L.Draw.Rectangle,
+        handler: createRectangle,
+        options: {
+          showArea: false,
+          shapeOptions: bboxOptions.plain.style,
+        },
+      },
+    }
+
+    const { feature, handler, options = {} } = config[featureType]
+
+    new feature(map, options).enable()
+
+    map.off(window.L.Draw.Event.CREATED)
+    map.on(window.L.Draw.Event.CREATED, e => {
+      const newFeature = handler(e)
+      map.addLayer(newFeature)
+      callback?.(newFeature)
+    })
+  }, [callback, map, featureType, createRectangle, createMarker])
 }
 
 function useTitle(): [string, React.FormEventHandler<HTMLInputElement>] {
@@ -139,6 +210,16 @@ function useTitle(): [string, React.FormEventHandler<HTMLInputElement>] {
   }
 
   return [title, handleChange]
+}
+
+function useWriteContext() {
+  const context = React.useContext(WriteContext)
+
+  if (!context) {
+    throw new Error('WriteContext is only available inside WriteProvider.')
+  }
+
+  return context
 }
 
 export { Write, useWriteContext }
