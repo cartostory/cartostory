@@ -6,7 +6,7 @@ http://localhost:8080/backend/openapi/static/index.html
 
 ## Rebuild a service
 
-Run `ENVIRONMENT=CI|DEV|PROD|TEST` SERVICE=backend|database|frontend|mailer make rebuild`. See docker-compose yaml files to find what services are available on different environments.
+Run `ENVIRONMENT=CI|DEV|PROD|TEST SERVICE=backend|database|frontend|mailer make rebuild`. See docker-compose yaml files to find what services are available on different environments.
 
 # Troubleshooting
 
