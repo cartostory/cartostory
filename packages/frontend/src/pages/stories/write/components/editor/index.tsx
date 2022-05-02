@@ -1,3 +1,4 @@
+import React from 'react'
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { ReactComponent as Bold } from '../../../../../assets/bold.svg'
@@ -11,18 +12,20 @@ import { ReactComponent as H6 } from '../../../../../assets/h-6.svg'
 import { ReactComponent as ListOrdered } from '../../../../../assets/list-ordered.svg'
 import { ReactComponent as ListUnordered } from '../../../../../assets/list-unordered.svg'
 import { ReactComponent as MapPinAddLine } from '../../../../../assets/map-pin-add-line.svg'
+import { ReactComponent as MapPinRemoveLine } from '../../../../../assets/map-pin-remove-line.svg'
 import { ReactComponent as CropLine } from '../../../../../assets/crop-line.svg'
-import { TestMark } from './test-mark'
+import { FeatureMark } from './test-mark'
 import { useStoryContext } from '../../providers/story-provider'
-import React from 'react'
 
 function Editor() {
   const editor = useEditor({
-    extensions: [StarterKit, TestMark],
+    extensions: [StarterKit, FeatureMark],
     content: '<p>Hello World!</p>',
   })
+  const [hasMarker, setHasMarker] = React.useState(false)
   const { addMarker, addRectangle, setCallback, map } = useStoryContext()
   const handleMarkerTextClick = useMarkerTextClick(map)
+  const MarkerIcon = hasMarker ? <MapPinRemoveLine /> : <MapPinAddLine />
 
   return (
     <>
@@ -34,19 +37,36 @@ function Editor() {
         >
           <button
             onClick={() => {
-              setCallback(() => editor.commands.setTest)
-              addMarker()
+              if (hasMarker) {
+                editor.commands.toggleMarker()
+              } else {
+                setCallback(() => editor.commands.setMarker)
+                addMarker()
+              }
             }}
           >
-            <MapPinAddLine />
+            {MarkerIcon}
           </button>
           <button onClick={addRectangle}>
             <CropLine />
           </button>
+          <button
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={editor.isActive('italic') ? 'is-active' : ''}
+          >
+            italic
+          </button>
         </BubbleMenu>
       ) : null}
       <div className="overflow-auto grow">
-        <EditorContent onClick={handleMarkerTextClick} editor={editor} />
+        <EditorContent
+          onClick={e => {
+            handleMarkerTextClick?.(e)
+            const attrs = editor?.getAttributes('feature')
+            setHasMarker(attrs?.['data-lat'])
+          }}
+          editor={editor}
+        />
       </div>
     </>
   )

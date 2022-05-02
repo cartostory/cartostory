@@ -15,20 +15,20 @@ declare module '@tiptap/core' {
       /**
        * Set a feature mark
        */
-      setTest: (layer: L.Marker, handler: () => void) => ReturnType
+      setMarker: (layer: L.Marker, handler: () => void) => ReturnType
       /**
        * Toggle a feature mark
        */
-      toggleTest: () => ReturnType
+      toggleMarker: () => ReturnType
       /**
        * Unset a feature mark
        */
-      unsetTest: () => ReturnType
+      unsetMarker: () => ReturnType
     }
   }
 }
 
-export const TestMark = Mark.create<TestOptions>({
+export const FeatureMark = Mark.create<TestOptions>({
   name: 'feature',
 
   addOptions() {
@@ -84,7 +84,6 @@ export const TestMark = Mark.create<TestOptions>({
         props: {
           handleClickOn: () => {
             const attrs = this.editor.getAttributes('feature')
-            const featureId = attrs['data-feature-id']
             const lat = attrs['data-lat']
             const lng = attrs['data-lng']
             attrs.onclick?.({ lat, lng })
@@ -97,7 +96,7 @@ export const TestMark = Mark.create<TestOptions>({
 
   addCommands() {
     return {
-      setTest:
+      setMarker:
         (layer, handler) =>
         ({ commands }) => {
           console.log('layer', layer, 'handler', handler)
@@ -111,12 +110,12 @@ export const TestMark = Mark.create<TestOptions>({
           }
           return commands.setMark(this.name, attributes)
         },
-      toggleTest:
+      toggleMarker:
         () =>
         ({ commands }) => {
           return commands.toggleMark(this.name)
         },
-      unsetTest:
+      unsetMarker:
         () =>
         ({ commands }) => {
           return commands.unsetMark(this.name)
