@@ -21,6 +21,7 @@ function useMapEditor() {
     Array<typeof L[Capitalize<FeatureType>]> | undefined
   >()
   const [callback, setCallback] = React.useState<() => {}>()
+  const [map, setMap] = React.useState<L.Map | undefined>()
 
   const addMarker = () => setNextFeature('marker')
   const addRectangle = () => setNextFeature('rectangle')
@@ -43,6 +44,8 @@ function useMapEditor() {
     cancel,
     callback,
     setCallback,
+    map,
+    setMap,
   }
 }
 

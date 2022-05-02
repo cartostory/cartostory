@@ -20,7 +20,7 @@ function Editor() {
     extensions: [StarterKit, TestMark],
     content: '<p>Hello World!</p>',
   })
-  const { addMarker, addRectangle, setCallback } = useStoryContext()
+  const { addMarker, addRectangle, setCallback, map } = useStoryContext()
 
   return (
     <>
@@ -48,12 +48,14 @@ function Editor() {
           onClick={e => {
             const element = e.target as HTMLElement
             const featureId = element.getAttribute('data-feature-id')
+            const lat = element.getAttribute('data-lat')
+            const lng = element.getAttribute('data-lng')
 
-            if (!featureId) {
+            if (!(featureId && lat && lng)) {
               return
             }
 
-            console.log('data-feature-id', featureId)
+            map?.flyTo([parseFloat(lat), parseFloat(lng)])
           }}
           editor={editor}
         />

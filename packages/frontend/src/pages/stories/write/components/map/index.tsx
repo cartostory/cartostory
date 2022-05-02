@@ -29,12 +29,24 @@ L.Marker.prototype.setIcon(
 function Map() {
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
+      <ProvideMapToStory />
       <EditLayer />
       <MapLayers />
       <Features />
       <UploadButton />
     </MapContainer>
   )
+}
+
+function ProvideMapToStory() {
+  const map = useMap()
+  const { setMap } = useStoryContext()
+
+  React.useEffect(() => {
+    setMap(map)
+  }, [map, setMap])
+
+  return null
 }
 
 function Features() {
