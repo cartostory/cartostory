@@ -59,7 +59,7 @@ export const TestMark = Mark.create<TestOptions>({
   parseHTML() {
     return [
       {
-        tag: 'button',
+        tag: 'a',
       },
     ]
   },
@@ -70,7 +70,7 @@ export const TestMark = Mark.create<TestOptions>({
     HTMLAttributes: TestOptions['HTMLAttributes']
   }) {
     return [
-      'button',
+      'a',
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
       0,
     ]

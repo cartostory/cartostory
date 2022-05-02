@@ -14,6 +14,7 @@ import { ReactComponent as MapPinAddLine } from '../../../../../assets/map-pin-a
 import { ReactComponent as CropLine } from '../../../../../assets/crop-line.svg'
 import { TestMark } from './test-mark'
 import { useStoryContext } from '../../providers/story-provider'
+import React from 'react'
 
 function Editor() {
   const editor = useEditor({
@@ -21,6 +22,7 @@ function Editor() {
     content: '<p>Hello World!</p>',
   })
   const { addMarker, addRectangle, setCallback, map } = useStoryContext()
+  const handleMarkerTextClick = useMarkerTextClick(map)
 
   return (
     <>
@@ -44,21 +46,7 @@ function Editor() {
         </BubbleMenu>
       ) : null}
       <div className="overflow-auto grow">
-        <EditorContent
-          onClick={e => {
-            const element = e.target as HTMLElement
-            const featureId = element.getAttribute('data-feature-id')
-            const lat = element.getAttribute('data-lat')
-            const lng = element.getAttribute('data-lng')
-
-            if (!(featureId && lat && lng)) {
-              return
-            }
-
-            map?.flyTo([parseFloat(lat), parseFloat(lng)])
-          }}
-          editor={editor}
-        />
+        <EditorContent onClick={handleMarkerTextClick} editor={editor} />
       </div>
     </>
   )
@@ -150,6 +138,25 @@ function MenuBar({ editor }: { editor: ReturnType<typeof useEditor> }) {
       </button>
     </div>
   )
+}
+
+function useMarkerTextClick(map?: L.Map) {
+  if (!map) {
+    return
+  }
+
+  return (e: React.MouseEvent<HTMLDivElement>) => {
+    const element = e.target as HTMLElement
+    const featureId = element.getAttribute('data-feature-id')
+    const lat = element.getAttribute('data-lat')
+    const lng = element.getAttribute('data-lng')
+
+    if (!(featureId && lat && lng)) {
+      return
+    }
+
+    map?.flyTo([parseFloat(lat), parseFloat(lng)])
+  }
 }
 
 export { Editor }
