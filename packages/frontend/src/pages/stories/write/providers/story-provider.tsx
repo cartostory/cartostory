@@ -34,12 +34,16 @@ function useMapEditor() {
     setFeatures(cur => [...(cur ?? []), feature])
     cancel()
   }
+  const removeFeature = (id: string) => {
+    setFeatures(cur => cur?.filter(feature => feature.options.id !== id))
+  }
 
   return {
     nextFeature,
     addMarker,
     addRectangle,
     addFeature,
+    removeFeature,
     features,
     cancel,
     callback,

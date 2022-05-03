@@ -22,10 +22,11 @@ function Editor() {
     extensions: [StarterKit, FeatureMark],
     content: '<p>Hello World!</p>',
   })
-  const [hasMarker, setHasMarker] = React.useState(false)
-  const { addMarker, addRectangle, setCallback, map } = useStoryContext()
+  const [featureId, setFeatureId] = React.useState<string | undefined>()
+  const { addMarker, addRectangle, setCallback, map, removeFeature } =
+    useStoryContext()
   const handleMarkerTextClick = useMarkerTextClick(map)
-  const MarkerIcon = hasMarker ? <MapPinRemoveLine /> : <MapPinAddLine />
+  const MarkerIcon = featureId ? <MapPinRemoveLine /> : <MapPinAddLine />
 
   return (
     <>
@@ -37,8 +38,9 @@ function Editor() {
         >
           <button
             onClick={() => {
-              if (hasMarker) {
+              if (featureId) {
                 editor.commands.toggleMarker()
+                removeFeature(featureId)
               } else {
                 setCallback(() => editor.commands.setMarker)
                 addMarker()
@@ -50,12 +52,6 @@ function Editor() {
           <button onClick={addRectangle}>
             <CropLine />
           </button>
-          <button
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={editor.isActive('italic') ? 'is-active' : ''}
-          >
-            italic
-          </button>
         </BubbleMenu>
       ) : null}
       <div className="overflow-auto grow">
@@ -63,7 +59,7 @@ function Editor() {
           onClick={e => {
             handleMarkerTextClick?.(e)
             const attrs = editor?.getAttributes('feature')
-            setHasMarker(attrs?.['data-lat'])
+            setFeatureId(attrs?.['data-feature-id'])
           }}
           editor={editor}
         />

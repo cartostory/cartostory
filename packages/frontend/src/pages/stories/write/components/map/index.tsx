@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { MapContainer, useMap } from 'react-leaflet'
+import { MapContainer, Marker, useMap } from 'react-leaflet'
 import { bboxOptions } from '../../../../../config'
 import { MapLayers } from '../map-layers'
 import { useStoryContext } from '../../providers/story-provider'
@@ -27,13 +27,16 @@ L.Marker.prototype.setIcon(
 )
 
 function Map() {
+  const { features } = useStoryContext()
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
       <ProvideMapToStory />
       <EditLayer />
       <MapLayers />
-      <Features />
       <UploadButton />
+      {features?.map(feature => (
+        <Marker position={feature.getLatLng()} />
+      ))}
     </MapContainer>
   )
 }
@@ -45,21 +48,6 @@ function ProvideMapToStory() {
   React.useEffect(() => {
     setMap(map)
   }, [map, setMap])
-
-  return null
-}
-
-function Features() {
-  const map = useMap()
-  const { features } = useStoryContext()
-
-  React.useEffect(() => {
-    if (!map || !features) {
-      return
-    }
-
-    features.forEach(feature => map.addLayer(feature))
-  }, [features, map])
 
   return null
 }
