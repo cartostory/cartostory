@@ -14,7 +14,7 @@ import { ReactComponent as ListUnordered } from '../../../../../assets/list-unor
 import { ReactComponent as MapPinAddLine } from '../../../../../assets/map-pin-add-line.svg'
 import { ReactComponent as MapPinRemoveLine } from '../../../../../assets/map-pin-remove-line.svg'
 import { ReactComponent as CropLine } from '../../../../../assets/crop-line.svg'
-import { FeatureMark } from './test-mark'
+import { FeatureMark } from './feature-mark'
 import { useStoryContext } from '../../providers/story-provider'
 import { useStoryContext as useXStateStoryContext } from '../../providers/story-provider.xstate'
 import { useActor } from '@xstate/react'
@@ -24,11 +24,9 @@ function Editor() {
     extensions: [StarterKit, FeatureMark],
     content: '<p>Hello World!</p>',
   })
-  const { addMarker, addRectangle, setCallback, map, removeFeature } =
-    useStoryContext()
+  const { addRectangle, map } = useStoryContext()
   const x = useXStateStoryContext()
   const [state, send] = useActor(x)
-  console.log('Editor state', state)
   const isBubbleMenuVisible = state.matches('empty')
   const selectionHasMarker = state.matches('selected.marker')
   const handleMarkerTextClick = useMarkerTextClick(map)
@@ -37,10 +35,6 @@ function Editor() {
   ) : (
     <MapPinAddLine />
   )
-
-  React.useEffect(() => {
-    console.log('Editor state.context', state.context)
-  }, [state.context])
 
   return (
     <>
