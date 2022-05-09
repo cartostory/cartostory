@@ -12,6 +12,8 @@ import 'leaflet-draw'
 import 'leaflet-draw/dist/leaflet.draw.css'
 import 'leaflet/dist/leaflet.css'
 import { randomString } from '../../../../../utils'
+import { useActor } from '@xstate/react'
+import { useStoryContext as useXStateStoryContext } from '../../providers/story-provider.xstate'
 
 L.Marker.prototype.setIcon(
   L.icon({
@@ -27,15 +29,17 @@ L.Marker.prototype.setIcon(
 )
 
 function Map() {
-  const { features } = useStoryContext()
+  const x = useXStateStoryContext()
+  const [state] = useActor(x)
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
       <ProvideMapToStory />
       <EditLayer />
       <MapLayers />
       <UploadButton />
-      {features?.map(feature => (
-        <Marker position={feature.getLatLng()} />
+      {state.context.features.map(feature => (
+        // @ts-expect-error error
+        <Marker key={feature.options.id} position={feature.getLatLng()} />
       ))}
     </MapContainer>
   )
@@ -45,6 +49,7 @@ function ProvideMapToStory() {
   const map = useMap()
   const { setMap } = useStoryContext()
 
+  // eslint-disable-next-line use-encapsulation/prefer-custom-hooks
   React.useEffect(() => {
     setMap(map)
   }, [map, setMap])
@@ -53,8 +58,13 @@ function ProvideMapToStory() {
 }
 
 function EditLayer() {
-  const { nextFeature } = useStoryContext()
-  useDraw(nextFeature)
+  const x = useXStateStoryContext()
+  const [state] = useActor(x)
+  useDraw(
+    state.matches('withNoFeatureYet.featureAdditionInProgress')
+      ? 'marker'
+      : undefined,
+  )
 
   return null
 }
@@ -86,7 +96,8 @@ function useCreateFeature(featureType?: 'marker' | 'rectangle') {
       feature: L.Draw.Rectangle,
       handler: createRectangle,
       options: {
-        showArea: false, // if removed, Leaflet.Draw throws error
+        // @ts-expect-error if removed, Leaflet.Draw throws error
+        showArea: false,
         shapeOptions: bboxOptions.plain.style,
       },
     },
@@ -98,8 +109,9 @@ function useCreateFeature(featureType?: 'marker' | 'rectangle') {
 }
 
 function useDraw(featureType?: 'marker' | 'rectangle') {
+  const x = useXStateStoryContext()
+  const [, send] = useActor(x)
   const map = useMap() as L.DrawMap
-  const { callback, addFeature } = useStoryContext()
   const { feature, handler, options } = useCreateFeature(featureType) ?? {}
   const drawing = React.useRef<L.Draw.Marker | L.Draw.Rectangle>()
 
@@ -124,11 +136,11 @@ function useDraw(featureType?: 'marker' | 'rectangle') {
     drawing.current.enable()
 
     map.on(window.L.Draw.Event.CREATED, e => {
-      const newFeature = handler(e)
-      addFeature(newFeature)
+      const feature = handler(e)
+      send({ type: 'FINISH_FEATURE_ADDITION', data: { feature } })
       drawing.current?.disable()
     })
-  }, [addFeature, callback, map, featureType, feature, handler, options])
+  }, [send, map, featureType, feature, handler, options])
 }
 
 function createRectangle(e: L.LeafletEvent) {
@@ -136,13 +148,15 @@ function createRectangle(e: L.LeafletEvent) {
 
   return L.rectangle(bounds, {
     ...bboxOptions.plain.style,
-    id: randomString(6), // TODO extend L.rectangle to accept id
+    // @ts-expect-error TODO extend L.rectangle to accept id
+    id: randomString(6),
   })
 }
 
 function createMarker(e: L.LeafletEvent) {
   return L.marker(e.layer.getLatLng(), {
-    id: randomString(6), // TODO extend L.marker to accept id
+    // @ts-expect-error TODO extend L.marker to accept id
+    id: randomString(6),
   })
 }
 

@@ -30,11 +30,13 @@ function useMapEditor() {
     setCallback(undefined)
   }
   const addFeature = (feature: typeof L[Capitalize<FeatureType>]) => {
+    // @ts-expect-error error
     callback?.(feature)
     setFeatures(cur => [...(cur ?? []), feature])
     cancel()
   }
   const removeFeature = (id: string) => {
+    // @ts-expect-error error
     setFeatures(cur => cur?.filter(feature => feature.options.id !== id))
   }
 

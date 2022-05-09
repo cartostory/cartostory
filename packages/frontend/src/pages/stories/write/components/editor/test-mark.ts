@@ -101,6 +101,7 @@ export const FeatureMark = Mark.create<TestOptions>({
         ({ commands }) => {
           console.log('layer', layer, 'handler', handler)
           const { lat, lng } = layer.getLatLng()
+          // @ts-expect-error error
           const { id } = layer.options
           const attributes = {
             'data-lat': lat.toFixed(6),

@@ -16,17 +16,31 @@ import { ReactComponent as MapPinRemoveLine } from '../../../../../assets/map-pi
 import { ReactComponent as CropLine } from '../../../../../assets/crop-line.svg'
 import { FeatureMark } from './test-mark'
 import { useStoryContext } from '../../providers/story-provider'
+import { useStoryContext as useXStateStoryContext } from '../../providers/story-provider.xstate'
+import { useActor } from '@xstate/react'
 
 function Editor() {
   const editor = useEditor({
     extensions: [StarterKit, FeatureMark],
     content: '<p>Hello World!</p>',
   })
-  const [featureId, setFeatureId] = React.useState<string | undefined>()
   const { addMarker, addRectangle, setCallback, map, removeFeature } =
     useStoryContext()
+  const x = useXStateStoryContext()
+  const [state, send] = useActor(x)
+  console.log('Editor state', state)
+  const isBubbleMenuVisible = state.matches('empty')
+  const selectionHasMarker = state.matches('selected.marker')
   const handleMarkerTextClick = useMarkerTextClick(map)
-  const MarkerIcon = featureId ? <MapPinRemoveLine /> : <MapPinAddLine />
+  const MarkerIcon = selectionHasMarker ? (
+    <MapPinRemoveLine />
+  ) : (
+    <MapPinAddLine />
+  )
+
+  React.useEffect(() => {
+    console.log('Editor state.context', state.context)
+  }, [state.context])
 
   return (
     <>
@@ -34,16 +48,20 @@ function Editor() {
       {editor ? (
         <BubbleMenu
           editor={editor}
-          className="bg-white border flex space-x-5 px-2 py-1 drop-shadow"
+          className={`bg-white border flex space-x-5 px-2 py-1 drop-shadow ${
+            isBubbleMenuVisible ? 'visible' : 'invisible'
+          }`}
         >
           <button
             onClick={() => {
-              if (featureId) {
-                editor.commands.toggleMarker()
-                removeFeature(featureId)
+              if (selectionHasMarker) {
+                const featureIdAttribute =
+                  editor?.getAttributes('feature')?.['data-feature-id']
+                send('UNSELECT', { featureId: featureIdAttribute })
               } else {
-                setCallback(() => editor.commands.setMarker)
-                addMarker()
+                send('START_FEATURE_ADDITION')
+                //setCallback(() => editor.commands.setMarker)
+                //addMarker()
               }
             }}
           >
@@ -57,9 +75,19 @@ function Editor() {
       <div className="overflow-auto grow">
         <EditorContent
           onClick={e => {
-            handleMarkerTextClick?.(e)
-            const attrs = editor?.getAttributes('feature')
-            setFeatureId(attrs?.['data-feature-id'])
+            const emptySelection = editor?.view.state.selection.empty
+            const featureIdAttribute =
+              editor?.getAttributes('feature')?.['data-feature-id']
+
+            if (featureIdAttribute) {
+              handleMarkerTextClick?.(e)
+            }
+
+            if (emptySelection) {
+              send('UNSELECT')
+            } else {
+              send({ type: 'SELECT', data: { featureId: featureIdAttribute } })
+            }
           }}
           editor={editor}
         />
