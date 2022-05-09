@@ -1,6 +1,6 @@
 import { Mark, mergeAttributes } from '@tiptap/core'
 
-export interface TestOptions {
+export interface FeatureOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLAttributes: {
     'data-lat'?: string
@@ -28,7 +28,7 @@ declare module '@tiptap/core' {
   }
 }
 
-export const FeatureMark = Mark.create<TestOptions>({
+export const FeatureMark = Mark.create<FeatureOptions>({
   name: 'feature',
 
   addOptions() {
@@ -67,7 +67,7 @@ export const FeatureMark = Mark.create<TestOptions>({
   renderHTML({
     HTMLAttributes,
   }: {
-    HTMLAttributes: TestOptions['HTMLAttributes']
+    HTMLAttributes: FeatureOptions['HTMLAttributes']
   }) {
     return [
       'a',
