@@ -27,7 +27,7 @@ function Editor() {
   const { addRectangle, map } = useStoryContext()
   const x = useXStateStoryContext()
   const [state, send] = useActor(x)
-  const isBubbleMenuVisible = state.matches('empty')
+  const isBubbleMenuVisible = !state.matches('empty')
   const selectionHasMarker = state.matches('selected.marker')
   const handleMarkerTextClick = useMarkerTextClick(map)
   const MarkerIcon = selectionHasMarker ? (
@@ -53,9 +53,12 @@ function Editor() {
                   editor?.getAttributes('feature')?.['data-feature-id']
                 send('UNSELECT', { featureId: featureIdAttribute })
               } else {
-                send('START_FEATURE_ADDITION')
-                //setCallback(() => editor.commands.setMarker)
-                //addMarker()
+                send({
+                  type: 'START_FEATURE_ADDITION',
+                  data: {
+                    callback: editor.commands.setMarker,
+                  },
+                })
               }
             }}
           >
