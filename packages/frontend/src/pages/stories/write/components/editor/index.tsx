@@ -1,4 +1,3 @@
-import React from 'react'
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { ReactComponent as Bold } from '../../../../../assets/bold.svg'
@@ -32,7 +31,6 @@ function Editor() {
   const [state, send] = useActor(x)
   const isBubbleMenuVisible = !state.matches('empty')
   const selectionWithFeature = selectionHasFeature(state)
-  console.log(JSON.stringify(state.value))
   const MarkerIcon = selectionWithFeature ? (
     <MapPinRemoveLine />
   ) : (
@@ -54,7 +52,10 @@ function Editor() {
               if (selectionWithFeature) {
                 const featureIdAttribute =
                   editor?.getAttributes('feature')?.['data-feature-id']
-                send('UNSELECT', { featureId: featureIdAttribute })
+                send({
+                  type: 'REMOVE_FEATURE',
+                  id: featureIdAttribute,
+                })
               } else {
                 send({
                   type: 'START_FEATURE_ADDITION',
@@ -86,11 +87,11 @@ function Editor() {
               }
               send('UNSELECT')
             } else {
-              console.log('i am here')
               if (featureIdAttribute) {
                 send({
                   type: 'SELECT_WITH_FEATURE_ALREADY',
                   featureId: featureIdAttribute,
+                  callback: editor.commands.toggleMarker,
                 })
               } else {
                 send('SELECT_WITH_NO_FEATURE_YET')

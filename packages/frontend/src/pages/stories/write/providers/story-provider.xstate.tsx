@@ -11,6 +11,8 @@ type Context = {
   features: Array<ReturnType<typeof entityMarker> | L.Rectangle>
   previousOnFeatureAdd?: (feature: L.Marker | L.Rectangle) => void
   onFeatureAdd?: (feature: L.Marker | L.Rectangle) => void
+  previousOnFeatureRemove?: () => void
+  onFeatureRemove?: (feature: L.Marker | L.Rectangle) => void
   mapFeature?: L.Marker | L.Rectangle
 }
 
@@ -24,6 +26,8 @@ const machine = createMachine<Context>(
       // see https://egghead.io/lessons/xstate-how-action-order-affects-assigns-to-context-in-a-xstate-machine
       previousOnFeatureAdd: undefined,
       onFeatureAdd: undefined,
+      previousOnFeatureRemove: undefined,
+      onFeatureRemove: undefined,
       features: [],
       mapFeature: undefined,
     },
@@ -66,20 +70,57 @@ const machine = createMachine<Context>(
           selected: {
             states: {
               withFeatureAlready: {
-                initial: 'featureRemovalTodo',
+                initial: 'todo',
                 states: {
-                  featureRemovalTodo: {},
-                  featureRemovalInProgress: {},
+                  todo: {
+                    entry: [
+                      assign({
+                        onFeatureRemove: (_context, event) => event.callback,
+                      }),
+                    ],
+                    on: {
+                      REMOVE_FEATURE: {
+                        target: 'done',
+                        actions: [
+                          assign({
+                            features: (context, event) =>
+                              context.features
+                                .filter(isEntityMarker)
+                                .filter(
+                                  feature => feature.options.id !== event.id,
+                                ),
+                          }),
+                        ],
+                      },
+                    },
+                  },
+                  done: {
+                    always: '#story.text.empty',
+                    entry: [
+                      'clearPreviousFeatureRemovalCallback',
+                      'runFeatureRemovalCallback',
+                      'clearFeatureRemovalCallback',
+                    ],
+                  },
                 },
                 on: {
                   CANCEL_FEATURE_REMOVAL: '#story.text.empty',
-                  START_FEATURE_REMOVAL: '.featureRemovalInProgress',
                   UNSELECT: '#story.text.empty',
                 },
               },
               withNoFeatureYet: {
                 initial: 'featureAdditionToStart',
                 states: {
+                  featureAdditionToStart: {
+                    on: {
+                      START_FEATURE_ADDITION: {
+                        target: 'featureAdditionInProgress',
+                        actions: assign({
+                          onFeatureAdd: (_context, event) => event.callback,
+                        }),
+                      },
+                    },
+                  },
                   featureAdditionInProgress: {
                     on: {
                       FINISH_FEATURE_ADDITION: {
@@ -89,16 +130,6 @@ const machine = createMachine<Context>(
                             ...context.features,
                             event.feature,
                           ],
-                        }),
-                      },
-                    },
-                  },
-                  featureAdditionToStart: {
-                    on: {
-                      START_FEATURE_ADDITION: {
-                        target: 'featureAdditionInProgress',
-                        actions: assign({
-                          onFeatureAdd: (_context, event) => event.callback,
                         }),
                       },
                     },
@@ -127,13 +158,17 @@ const machine = createMachine<Context>(
     },
   },
   {
-    guards: {
-      hasFeatureAlready(_, event) {
-        console.log('hasFeatureAlready', event)
-        return !!event.featureId
-      },
-    },
     actions: {
+      runFeatureRemovalCallback: context => {
+        context.previousOnFeatureRemove?.()
+      },
+      clearFeatureRemovalCallback: assign<Context>({
+        onFeatureRemove: undefined,
+      }),
+      clearPreviousFeatureRemovalCallback: assign<Context>({
+        previousOnFeatureRemove: (context: Context) => context.onFeatureRemove,
+      }),
+
       runFeatureAdditionCallback: context => {
         const feature = last(context.features)
         if (!feature) {
