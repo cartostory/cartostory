@@ -29,14 +29,13 @@ function Editor() {
   const [state, send] = useActor(x)
   const isBubbleMenuVisible = !state.matches('empty')
   const selectionHasMarker = state.matches('selected.marker')
-  const handleMarkerTextClick = useMarkerTextClick(map)
   const MarkerIcon = selectionHasMarker ? (
     <MapPinRemoveLine />
   ) : (
     <MapPinAddLine />
   )
 
-  console.log(state.value)
+  console.log(state.context)
 
   return (
     <>
@@ -73,17 +72,20 @@ function Editor() {
       ) : null}
       <div className="overflow-auto grow">
         <EditorContent
-          onClick={e => {
+          onClick={() => {
             const emptySelection = editor?.view.state.selection.empty
             const featureIdAttribute =
               editor?.getAttributes('feature')?.['data-feature-id']
 
-            if (featureIdAttribute) {
-              handleMarkerTextClick?.(e)
-            }
-
             if (emptySelection) {
-              send('UNSELECT')
+              if (featureIdAttribute) {
+                send({
+                  type: 'CENTER_ON_FEATURE',
+                  data: { featureId: featureIdAttribute },
+                })
+              } else {
+                send('UNSELECT')
+              }
             } else {
               send({ type: 'SELECT', data: { featureId: featureIdAttribute } })
             }
@@ -181,25 +183,6 @@ function MenuBar({ editor }: { editor: ReturnType<typeof useEditor> }) {
       </button>
     </div>
   )
-}
-
-function useMarkerTextClick(map?: L.Map) {
-  if (!map) {
-    return
-  }
-
-  return (e: React.MouseEvent<HTMLDivElement>) => {
-    const element = e.target as HTMLElement
-    const featureId = element.getAttribute('data-feature-id')
-    const lat = element.getAttribute('data-lat')
-    const lng = element.getAttribute('data-lng')
-
-    if (!(featureId && lat && lng)) {
-      return
-    }
-
-    map?.flyTo([parseFloat(lat), parseFloat(lng)])
-  }
 }
 
 export { Editor }

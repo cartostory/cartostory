@@ -9,6 +9,7 @@ type Context = {
   features: Array<L.Marker | L.Rectangle>
   previousOnFeatureAdd?: (feature: L.Marker | L.Rectangle) => void
   onFeatureAdd?: (feature: L.Marker | L.Rectangle) => void
+  mapFeature?: L.Marker | L.Rectangle
 }
 
 const machine = createMachine<Context>(
@@ -22,84 +23,111 @@ const machine = createMachine<Context>(
       previousOnFeatureAdd: undefined,
       onFeatureAdd: undefined,
       features: [],
+      mapFeature: undefined,
     },
-    initial: 'empty',
+    type: 'parallel',
     states: {
-      empty: {
+      map: {
         on: {
-          SELECT: {
-            target: 'selected',
-          },
-        },
-      },
-      selected: {
-        initial: 'deciding',
-        states: {
-          // see https://spectrum.chat/statecharts/introductions/xstate-eventless-transitions-to-the-child-state~4b8ca744-be6d-405c-a431-73c57c42f209 needed to avoid too much recursion error
-          deciding: {
-            always: [
-              {
-                target: 'withFeatureAlready',
-                cond: 'hasFeatureAlready',
-              },
-              {
-                target: 'withNoFeatureYet',
-              },
+          CENTER_ON_FEATURE: {
+            target: '.centeredOnFeature',
+            actions: [
+              assign<Context>({
+                mapFeature: (context, event) =>
+                  context.features.find(
+                    feature => feature.options.id === event.data.featureId,
+                  ),
+              }),
             ],
           },
-          withFeatureAlready: {
-            initial: 'featureRemovalTodo',
-            states: {
-              featureRemovalTodo: {},
-              featureRemovalInProgress: {},
-            },
+        },
+        initial: 'unknown',
+        states: {
+          unknown: {},
+          centeredOnFeature: {},
+        },
+      },
+      text: {
+        initial: 'empty',
+        states: {
+          empty: {
             on: {
-              CANCEL_FEATURE_REMOVAL: '#story.empty',
-              START_FEATURE_REMOVAL: '.featureRemovalInProgress',
-              UNSELECT: '#story.empty',
+              SELECT: {
+                target: 'selected',
+              },
             },
           },
-          withNoFeatureYet: {
-            initial: 'featureAdditionToStart',
+          selected: {
+            initial: 'deciding',
             states: {
-              featureAdditionInProgress: {
-                on: {
-                  FINISH_FEATURE_ADDITION: {
-                    target: 'featureAdditionDone',
-                    actions: assign({
-                      features: (context, event) => [
-                        ...context.features,
-                        event.data.feature,
-                      ],
-                    }),
+              // see https://spectrum.chat/statecharts/introductions/xstate-eventless-transitions-to-the-child-state~4b8ca744-be6d-405c-a431-73c57c42f209 needed to avoid too much recursion error
+              deciding: {
+                always: [
+                  {
+                    target: 'withFeatureAlready',
+                    cond: 'hasFeatureAlready',
                   },
-                },
-              },
-              featureAdditionToStart: {
-                on: {
-                  START_FEATURE_ADDITION: {
-                    target: 'featureAdditionInProgress',
-                    actions: assign({
-                      onFeatureAdd: (_context, event) => event.data.callback,
-                    }),
+                  {
+                    target: 'withNoFeatureYet',
                   },
-                },
-              },
-              featureAdditionDone: {
-                always: '#story.empty',
-                // see https://egghead.io/lessons/xstate-how-action-order-affects-assigns-to-context-in-a-xstate-machine
-                entry: [
-                  'clearPreviousFeatureAdditionCallback',
-                  'runFeatureAdditionCallback',
-                  'clearFeatureAdditionCallback',
                 ],
               },
-            },
-            on: {
-              CANCEL_FEATURE_ADDITION: {
-                target: '#story.empty',
+              withFeatureAlready: {
+                initial: 'featureRemovalTodo',
+                states: {
+                  featureRemovalTodo: {},
+                  featureRemovalInProgress: {},
+                },
+                on: {
+                  CANCEL_FEATURE_REMOVAL: '#story.text.empty',
+                  START_FEATURE_REMOVAL: '.featureRemovalInProgress',
+                  UNSELECT: '#story.text.empty',
+                },
               },
-              UNSELECT: '#story.empty',
+              withNoFeatureYet: {
+                initial: 'featureAdditionToStart',
+                states: {
+                  featureAdditionInProgress: {
+                    on: {
+                      FINISH_FEATURE_ADDITION: {
+                        target: 'featureAdditionDone',
+                        actions: assign({
+                          features: (context, event) => [
+                            ...context.features,
+                            event.data.feature,
+                          ],
+                        }),
+                      },
+                    },
+                  },
+                  featureAdditionToStart: {
+                    on: {
+                      START_FEATURE_ADDITION: {
+                        target: 'featureAdditionInProgress',
+                        actions: assign({
+                          onFeatureAdd: (_context, event) =>
+                            event.data.callback,
+                        }),
+                      },
+                    },
+                  },
+                  featureAdditionDone: {
+                    always: '#story.text.empty',
+                    // see https://egghead.io/lessons/xstate-how-action-order-affects-assigns-to-context-in-a-xstate-machine
+                    entry: [
+                      'clearPreviousFeatureAdditionCallback',
+                      'runFeatureAdditionCallback',
+                      'clearFeatureAdditionCallback',
+                    ],
+                  },
+                },
+                on: {
+                  CANCEL_FEATURE_ADDITION: {
+                    target: '#story.text.empty',
+                  },
+                  UNSELECT: '#story.text.empty',
+                },
+              },
             },
           },
         },
@@ -153,17 +181,23 @@ function useStoryContext() {
 }
 
 function isSelectionEmpty(state) {
-  console.log('isSelectionEmpty', state.matches('empty'), state.value)
-  return state.matches('empty')
+  console.log('isSelectionEmpty', state.matches('story.empty'), state.value)
+  return state.matches('story.empty')
 }
 
 function selectionHasMarker(state) {
   console.log('isMarkerActivated', state.value)
-  return state.matches('selected.marker')
+  return state.matches('text.selected.marker')
 }
 
 function isAddingFeature(state) {
-  return state.matches('selected.withNoFeatureYet.featureAdditionInProgress')
+  return state.matches(
+    'text.selected.withNoFeatureYet.featureAdditionInProgress',
+  )
+}
+
+function isCenteredOnFeature(state) {
+  return state.matches('map.centeredOnFeature')
 }
 
 export {
@@ -173,4 +207,5 @@ export {
   selectionHasMarker,
   isSelectionEmpty,
   isAddingFeature,
+  isCenteredOnFeature,
 }

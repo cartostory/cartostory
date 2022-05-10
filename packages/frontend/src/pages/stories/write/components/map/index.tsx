@@ -2,7 +2,6 @@ import L from 'leaflet'
 import { MapContainer, Marker, useMap } from 'react-leaflet'
 import { bboxOptions } from '../../../../../config'
 import { MapLayers } from '../map-layers'
-import { useStoryContext } from '../../providers/story-provider'
 import { UploadButton } from '../upload-button'
 import React from 'react'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
@@ -15,6 +14,7 @@ import { randomString } from '../../../../../utils'
 import { useActor } from '@xstate/react'
 import {
   isAddingFeature,
+  isCenteredOnFeature,
   useStoryContext as useXStateStoryContext,
 } from '../../providers/story-provider.xstate'
 
@@ -31,14 +31,36 @@ L.Marker.prototype.setIcon(
   }),
 )
 
+function FlyToFeature() {
+  const x = useXStateStoryContext()
+  const [state] = useActor(x)
+  const feature = isCenteredOnFeature(state)
+    ? state.context.mapFeature
+    : undefined
+  const map = useMap()
+
+  // eslint-disable-next-line use-encapsulation/prefer-custom-hooks
+  React.useEffect(() => {
+    if (!(feature && map)) {
+      return
+    }
+
+    // @ts-expect-error depends on whether feature is a marker or a rectangle
+    map.flyTo(feature.getLatLng())
+  }, [feature, map])
+
+  return null
+}
+
 function Map() {
   const x = useXStateStoryContext()
   const [state] = useActor(x)
+
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
-      <ProvideMapToStory />
       <EditLayer />
       <MapLayers />
+      <FlyToFeature />
       <UploadButton />
       {state.context.features.map(feature => (
         // @ts-expect-error error
@@ -46,18 +68,6 @@ function Map() {
       ))}
     </MapContainer>
   )
-}
-
-function ProvideMapToStory() {
-  const map = useMap()
-  const { setMap } = useStoryContext()
-
-  // eslint-disable-next-line use-encapsulation/prefer-custom-hooks
-  React.useEffect(() => {
-    setMap(map)
-  }, [map, setMap])
-
-  return null
 }
 
 function EditLayer() {
