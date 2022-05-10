@@ -17,6 +17,7 @@ import {
   isCenteredOnFeature,
   useStoryContext as useXStateStoryContext,
 } from '../../providers/story-provider.xstate'
+import { entityMarker, isEntityMarker } from '../../../../../lib/entity-marker'
 
 L.Marker.prototype.setIcon(
   L.icon({
@@ -41,11 +42,10 @@ function FlyToFeature() {
 
   // eslint-disable-next-line use-encapsulation/prefer-custom-hooks
   React.useEffect(() => {
-    if (!(feature && map)) {
+    if (!(feature && map && isEntityMarker(feature))) {
       return
     }
 
-    // @ts-expect-error depends on whether feature is a marker or a rectangle
     map.flyTo(feature.getLatLng())
   }, [feature, map])
 
@@ -62,8 +62,7 @@ function Map() {
       <MapLayers />
       <FlyToFeature />
       <UploadButton />
-      {state.context.features.map(feature => (
-        // @ts-expect-error error
+      {state.context.features.filter(isEntityMarker).map(feature => (
         <Marker key={feature.options.id} position={feature.getLatLng()} />
       ))}
     </MapContainer>
@@ -163,10 +162,7 @@ function createRectangle(e: L.LeafletEvent) {
 }
 
 function createMarker(e: L.LeafletEvent) {
-  return L.marker(e.layer.getLatLng(), {
-    // @ts-expect-error TODO extend L.marker to accept id
-    id: randomString(6),
-  })
+  return entityMarker(e.layer.getLatLng())
 }
 
 export { Map }

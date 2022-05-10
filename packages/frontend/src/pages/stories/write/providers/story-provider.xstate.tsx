@@ -4,9 +4,11 @@ import { assign } from 'xstate'
 import { createMachine } from 'xstate'
 import { useInterpret } from '@xstate/react'
 import { last } from 'lodash-es'
+import type { entityMarker } from '../../../../lib/entity-marker'
+import { isEntityMarker } from '../../../../lib/entity-marker'
 
 type Context = {
-  features: Array<L.Marker | L.Rectangle>
+  features: Array<ReturnType<typeof entityMarker> | L.Rectangle>
   previousOnFeatureAdd?: (feature: L.Marker | L.Rectangle) => void
   onFeatureAdd?: (feature: L.Marker | L.Rectangle) => void
   mapFeature?: L.Marker | L.Rectangle
@@ -34,7 +36,8 @@ const machine = createMachine<Context>(
             actions: [
               assign<Context>({
                 mapFeature: (context, event) =>
-                  context.features.find(
+                  context.features.filter(isEntityMarker).find(
+                    // @ts-expect-error error
                     feature => feature.options.id === event.data.featureId,
                   ),
               }),
@@ -158,9 +161,9 @@ const machine = createMachine<Context>(
   },
 )
 
-const StoryContext =
-  // @ts-expect-error error
-  React.createContext<InterpreterFrom<typeof machine>>(undefined)
+const StoryContext = React.createContext<
+  InterpreterFrom<typeof machine> | undefined
+>(undefined)
 
 function StoryProvider({ children }: React.PropsWithChildren<unknown>) {
   const editor = useInterpret(machine)
@@ -181,12 +184,10 @@ function useStoryContext() {
 }
 
 function isSelectionEmpty(state) {
-  console.log('isSelectionEmpty', state.matches('story.empty'), state.value)
   return state.matches('story.empty')
 }
 
 function selectionHasMarker(state) {
-  console.log('isMarkerActivated', state.value)
   return state.matches('text.selected.marker')
 }
 
