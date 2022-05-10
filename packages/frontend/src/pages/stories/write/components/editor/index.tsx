@@ -24,7 +24,7 @@ function Editor() {
     extensions: [StarterKit, FeatureMark],
     content: '<p>Hello World!</p>',
   })
-  const { addRectangle, map } = useStoryContext()
+  const { addRectangle } = useStoryContext()
   const x = useXStateStoryContext()
   const [state, send] = useActor(x)
   const isBubbleMenuVisible = !state.matches('empty')
@@ -34,8 +34,6 @@ function Editor() {
   ) : (
     <MapPinAddLine />
   )
-
-  console.log(state.context)
 
   return (
     <>
