@@ -145,7 +145,7 @@ function useDraw(featureType?: 'marker' | 'rectangle') {
 
     map.on(window.L.Draw.Event.CREATED, e => {
       const feature = handler(e)
-      send({ type: 'FINISH_FEATURE_ADDITION', data: { feature } })
+      send({ type: 'FINISH_FEATURE_ADDITION', feature })
       drawing.current?.disable()
     })
   }, [send, map, featureType, feature, handler, options])

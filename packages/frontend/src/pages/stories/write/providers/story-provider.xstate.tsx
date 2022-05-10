@@ -38,7 +38,7 @@ const machine = createMachine<Context>(
                 mapFeature: (context, event) =>
                   context.features.filter(isEntityMarker).find(
                     // @ts-expect-error error
-                    feature => feature.options.id === event.data.featureId,
+                    feature => feature.options.id === event.featureId,
                   ),
               }),
             ],
@@ -55,26 +55,16 @@ const machine = createMachine<Context>(
         states: {
           empty: {
             on: {
-              SELECT: {
-                target: 'selected',
+              SELECT_WITH_FEATURE_ALREADY: {
+                target: 'selected.withFeatureAlready',
+              },
+              SELECT_WITH_NO_FEATURE_YET: {
+                target: 'selected.withNoFeatureYet',
               },
             },
           },
           selected: {
-            initial: 'deciding',
             states: {
-              // see https://spectrum.chat/statecharts/introductions/xstate-eventless-transitions-to-the-child-state~4b8ca744-be6d-405c-a431-73c57c42f209 needed to avoid too much recursion error
-              deciding: {
-                always: [
-                  {
-                    target: 'withFeatureAlready',
-                    cond: 'hasFeatureAlready',
-                  },
-                  {
-                    target: 'withNoFeatureYet',
-                  },
-                ],
-              },
               withFeatureAlready: {
                 initial: 'featureRemovalTodo',
                 states: {
@@ -97,7 +87,7 @@ const machine = createMachine<Context>(
                         actions: assign({
                           features: (context, event) => [
                             ...context.features,
-                            event.data.feature,
+                            event.feature,
                           ],
                         }),
                       },
@@ -108,8 +98,7 @@ const machine = createMachine<Context>(
                       START_FEATURE_ADDITION: {
                         target: 'featureAdditionInProgress',
                         actions: assign({
-                          onFeatureAdd: (_context, event) =>
-                            event.data.callback,
+                          onFeatureAdd: (_context, event) => event.callback,
                         }),
                       },
                     },
@@ -140,6 +129,7 @@ const machine = createMachine<Context>(
   {
     guards: {
       hasFeatureAlready(_, event) {
+        console.log('hasFeatureAlready', event)
         return !!event.featureId
       },
     },
@@ -187,8 +177,8 @@ function isSelectionEmpty(state) {
   return state.matches('story.empty')
 }
 
-function selectionHasMarker(state) {
-  return state.matches('text.selected.marker')
+function selectionHasFeature(state) {
+  return state.matches('text.selected.withFeatureAlready')
 }
 
 function isAddingFeature(state) {
@@ -205,7 +195,7 @@ export {
   machine,
   useStoryContext,
   StoryProvider,
-  selectionHasMarker,
+  selectionHasFeature,
   isSelectionEmpty,
   isAddingFeature,
   isCenteredOnFeature,

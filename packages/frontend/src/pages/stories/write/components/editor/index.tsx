@@ -16,7 +16,10 @@ import { ReactComponent as MapPinRemoveLine } from '../../../../../assets/map-pi
 import { ReactComponent as CropLine } from '../../../../../assets/crop-line.svg'
 import { FeatureMark } from './feature-mark'
 import { useStoryContext } from '../../providers/story-provider'
-import { useStoryContext as useXStateStoryContext } from '../../providers/story-provider.xstate'
+import {
+  selectionHasFeature,
+  useStoryContext as useXStateStoryContext,
+} from '../../providers/story-provider.xstate'
 import { useActor } from '@xstate/react'
 
 function Editor() {
@@ -28,8 +31,9 @@ function Editor() {
   const x = useXStateStoryContext()
   const [state, send] = useActor(x)
   const isBubbleMenuVisible = !state.matches('empty')
-  const selectionHasMarker = state.matches('selected.marker')
-  const MarkerIcon = selectionHasMarker ? (
+  const selectionWithFeature = selectionHasFeature(state)
+  console.log(JSON.stringify(state.value))
+  const MarkerIcon = selectionWithFeature ? (
     <MapPinRemoveLine />
   ) : (
     <MapPinAddLine />
@@ -47,16 +51,14 @@ function Editor() {
         >
           <button
             onClick={() => {
-              if (selectionHasMarker) {
+              if (selectionWithFeature) {
                 const featureIdAttribute =
                   editor?.getAttributes('feature')?.['data-feature-id']
                 send('UNSELECT', { featureId: featureIdAttribute })
               } else {
                 send({
                   type: 'START_FEATURE_ADDITION',
-                  data: {
-                    callback: editor.commands.setMarker,
-                  },
+                  callback: editor.commands.setMarker,
                 })
               }
             }}
@@ -79,13 +81,20 @@ function Editor() {
               if (featureIdAttribute) {
                 send({
                   type: 'CENTER_ON_FEATURE',
-                  data: { featureId: featureIdAttribute },
+                  featureId: featureIdAttribute,
+                })
+              }
+              send('UNSELECT')
+            } else {
+              console.log('i am here')
+              if (featureIdAttribute) {
+                send({
+                  type: 'SELECT_WITH_FEATURE_ALREADY',
+                  featureId: featureIdAttribute,
                 })
               } else {
-                send('UNSELECT')
+                send('SELECT_WITH_NO_FEATURE_YET')
               }
-            } else {
-              send({ type: 'SELECT', data: { featureId: featureIdAttribute } })
             }
           }}
           editor={editor}
