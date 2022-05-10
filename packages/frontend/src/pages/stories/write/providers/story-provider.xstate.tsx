@@ -33,69 +33,75 @@ const machine = createMachine<Context>(
         },
       },
       selected: {
-        always: [
-          {
-            target: 'withFeatureAlready',
-            cond: 'hasFeatureAlready',
-          },
-          {
-            target: 'withNoFeatureYet',
-          },
-        ],
-      },
-      withFeatureAlready: {
-        initial: 'featureRemovalTodo',
+        initial: 'deciding',
         states: {
-          featureRemovalTodo: {},
-          featureRemovalInProgress: {},
-        },
-        on: {
-          CANCEL_FEATURE_REMOVAL: '#story.empty',
-          START_FEATURE_REMOVAL: '.featureRemovalInProgress',
-          UNSELECT: '#story.empty',
-        },
-      },
-      withNoFeatureYet: {
-        initial: 'featureAdditionToStart',
-        states: {
-          featureAdditionInProgress: {
-            on: {
-              FINISH_FEATURE_ADDITION: {
-                target: 'featureAdditionDone',
-                actions: assign({
-                  features: (context, event) => [
-                    ...context.features,
-                    event.data.feature,
-                  ],
-                }),
+          // see https://spectrum.chat/statecharts/introductions/xstate-eventless-transitions-to-the-child-state~4b8ca744-be6d-405c-a431-73c57c42f209 needed to avoid too much recursion error
+          deciding: {
+            always: [
+              {
+                target: 'withFeatureAlready',
+                cond: 'hasFeatureAlready',
               },
-            },
-          },
-          featureAdditionToStart: {
-            on: {
-              START_FEATURE_ADDITION: {
-                target: 'featureAdditionInProgress',
-                actions: assign({
-                  onFeatureAdd: (_context, event) => event.data.callback,
-                }),
+              {
+                target: 'withNoFeatureYet',
               },
-            },
-          },
-          featureAdditionDone: {
-            always: '#story.empty',
-            // see https://egghead.io/lessons/xstate-how-action-order-affects-assigns-to-context-in-a-xstate-machine
-            entry: [
-              'clearPreviousFeatureAdditionCallback',
-              'runFeatureAdditionCallback',
-              'clearFeatureAdditionCallback',
             ],
           },
-        },
-        on: {
-          CANCEL_FEATURE_ADDITION: {
-            target: '#story.empty',
+          withFeatureAlready: {
+            initial: 'featureRemovalTodo',
+            states: {
+              featureRemovalTodo: {},
+              featureRemovalInProgress: {},
+            },
+            on: {
+              CANCEL_FEATURE_REMOVAL: '#story.empty',
+              START_FEATURE_REMOVAL: '.featureRemovalInProgress',
+              UNSELECT: '#story.empty',
+            },
           },
-          UNSELECT: '#story.empty',
+          withNoFeatureYet: {
+            initial: 'featureAdditionToStart',
+            states: {
+              featureAdditionInProgress: {
+                on: {
+                  FINISH_FEATURE_ADDITION: {
+                    target: 'featureAdditionDone',
+                    actions: assign({
+                      features: (context, event) => [
+                        ...context.features,
+                        event.data.feature,
+                      ],
+                    }),
+                  },
+                },
+              },
+              featureAdditionToStart: {
+                on: {
+                  START_FEATURE_ADDITION: {
+                    target: 'featureAdditionInProgress',
+                    actions: assign({
+                      onFeatureAdd: (_context, event) => event.data.callback,
+                    }),
+                  },
+                },
+              },
+              featureAdditionDone: {
+                always: '#story.empty',
+                // see https://egghead.io/lessons/xstate-how-action-order-affects-assigns-to-context-in-a-xstate-machine
+                entry: [
+                  'clearPreviousFeatureAdditionCallback',
+                  'runFeatureAdditionCallback',
+                  'clearFeatureAdditionCallback',
+                ],
+              },
+            },
+            on: {
+              CANCEL_FEATURE_ADDITION: {
+                target: '#story.empty',
+              },
+              UNSELECT: '#story.empty',
+            },
+          },
         },
       },
     },
@@ -156,10 +162,15 @@ function selectionHasMarker(state) {
   return state.matches('selected.marker')
 }
 
+function isAddingFeature(state) {
+  return state.matches('selected.withNoFeatureYet.featureAdditionInProgress')
+}
+
 export {
   machine,
   useStoryContext,
   StoryProvider,
   selectionHasMarker,
   isSelectionEmpty,
+  isAddingFeature,
 }

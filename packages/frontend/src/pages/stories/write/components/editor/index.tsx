@@ -36,6 +36,8 @@ function Editor() {
     <MapPinAddLine />
   )
 
+  console.log(state.value)
+
   return (
     <>
       <MenuBar editor={editor} />

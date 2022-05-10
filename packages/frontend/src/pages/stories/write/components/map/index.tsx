@@ -13,7 +13,10 @@ import 'leaflet-draw/dist/leaflet.draw.css'
 import 'leaflet/dist/leaflet.css'
 import { randomString } from '../../../../../utils'
 import { useActor } from '@xstate/react'
-import { useStoryContext as useXStateStoryContext } from '../../providers/story-provider.xstate'
+import {
+  isAddingFeature,
+  useStoryContext as useXStateStoryContext,
+} from '../../providers/story-provider.xstate'
 
 L.Marker.prototype.setIcon(
   L.icon({
@@ -60,11 +63,7 @@ function ProvideMapToStory() {
 function EditLayer() {
   const x = useXStateStoryContext()
   const [state] = useActor(x)
-  useDraw(
-    state.matches('withNoFeatureYet.featureAdditionInProgress')
-      ? 'marker'
-      : undefined,
-  )
+  useDraw(isAddingFeature(state) ? 'marker' : undefined)
 
   return null
 }
