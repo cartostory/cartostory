@@ -22,7 +22,7 @@ import { entityMarker, isEntityMarker } from '../../../../../lib/entity-marker'
 function Map() {
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
-      <UnsetMapCenter />
+      <UnsetActiveFeatureOnMove />
       <MapLayers />
       <EditLayer />
       <FlyToFeature />
@@ -32,7 +32,7 @@ function Map() {
   )
 }
 
-function UnsetMapCenter() {
+function UnsetActiveFeatureOnMove() {
   const storyMachine = useStoryContext()
   const [, send] = useActor(storyMachine)
   useMapEvent('move', () => {
