@@ -19,39 +19,6 @@ import {
 } from '../../providers/story-provider'
 import { entityMarker, isEntityMarker } from '../../../../../lib/entity-marker'
 
-L.Marker.prototype.setIcon(
-  L.icon({
-    iconUrl: markerIcon,
-    iconRetinaUrl: markerRetinaIcon,
-    shadowUrl: markerShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    tooltipAnchor: [16, -28],
-    shadowSize: [41, 41],
-  }),
-)
-
-function FlyToFeature() {
-  const storyMachine = useStoryContext()
-  const [state] = useActor(storyMachine)
-  const feature = useSelector(storyMachine, isCenteredOnFeature)
-    ? state.context.mapFeature
-    : undefined
-  const map = useMap()
-
-  // eslint-disable-next-line use-encapsulation/prefer-custom-hooks
-  React.useEffect(() => {
-    if (!(feature && map && isEntityMarker(feature))) {
-      return
-    }
-
-    map.flyTo(feature.getLatLng())
-  }, [feature, map])
-
-  return null
-}
-
 function Map() {
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
@@ -170,6 +137,26 @@ function useDraw(featureType?: 'marker' | 'rectangle') {
   }, [send, map, featureType, feature, handler, options])
 }
 
+function FlyToFeature() {
+  const storyMachine = useStoryContext()
+  const [state] = useActor(storyMachine)
+  const feature = useSelector(storyMachine, isCenteredOnFeature)
+    ? state.context.mapFeature
+    : undefined
+  const map = useMap()
+
+  // eslint-disable-next-line use-encapsulation/prefer-custom-hooks
+  React.useEffect(() => {
+    if (!(feature && map && isEntityMarker(feature))) {
+      return
+    }
+
+    map.flyTo(feature.getLatLng())
+  }, [feature, map])
+
+  return null
+}
+
 function createRectangle(e: L.LeafletEvent) {
   const bounds = e.layer.getBounds() as L.LatLngBounds
 
@@ -183,5 +170,18 @@ function createRectangle(e: L.LeafletEvent) {
 function createMarker(e: L.LeafletEvent) {
   return entityMarker(e.layer.getLatLng())
 }
+
+L.Marker.prototype.setIcon(
+  L.icon({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerRetinaIcon,
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41],
+  }),
+)
 
 export { Map }
