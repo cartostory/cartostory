@@ -33,8 +33,8 @@ L.Marker.prototype.setIcon(
 )
 
 function FlyToFeature() {
-  const x = useXStateStoryContext()
-  const [state] = useActor(x)
+  const storyMachine = useXStateStoryContext()
+  const [state] = useActor(storyMachine)
   const feature = isCenteredOnFeature(state)
     ? state.context.mapFeature
     : undefined
@@ -53,8 +53,8 @@ function FlyToFeature() {
 }
 
 function Map() {
-  const x = useXStateStoryContext()
-  const [state] = useActor(x)
+  const storyMachine = useXStateStoryContext()
+  const [state] = useActor(storyMachine)
 
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
@@ -70,8 +70,8 @@ function Map() {
 }
 
 function EditLayer() {
-  const x = useXStateStoryContext()
-  const [state] = useActor(x)
+  const storyMachine = useXStateStoryContext()
+  const [state] = useActor(storyMachine)
   useDraw(isAddingFeature(state) ? 'marker' : undefined)
 
   return null
@@ -117,8 +117,8 @@ function useCreateFeature(featureType?: 'marker' | 'rectangle') {
 }
 
 function useDraw(featureType?: 'marker' | 'rectangle') {
-  const x = useXStateStoryContext()
-  const [, send] = useActor(x)
+  const storyMachine = useXStateStoryContext()
+  const [, send] = useActor(storyMachine)
   const map = useMap() as L.DrawMap
   const { feature, handler, options } = useCreateFeature(featureType) ?? {}
   const drawing = React.useRef<L.Draw.Marker | L.Draw.Rectangle>()
