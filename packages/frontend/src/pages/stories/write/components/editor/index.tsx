@@ -86,7 +86,7 @@ function Editor() {
               if (featureId) {
                 send({
                   type: 'CENTER_ON_FEATURE',
-                  featureId,
+                  id: featureId,
                 })
               }
               send('UNSELECT')

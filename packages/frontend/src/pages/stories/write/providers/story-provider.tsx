@@ -16,14 +16,35 @@ type Context = {
   mapFeature?: L.Marker | L.Rectangle
 }
 
+type Events =
+  | { type: 'CANCEL_FEATURE_ADDITION' }
+  | { type: 'CANCEL_FEATURE_REMOVAL' }
+  | { type: 'CENTER_ON_FEATURE'; id: string }
+  | {
+      type: 'FINISH_FEATURE_ADDITION'
+      feature: typeof entityMarker | L.Rectangle
+    }
+  | { type: 'REMOVE_FEATURE'; id: string }
+  | { type: 'SELECT_WITH_FEATURE_ALREADY' }
+  | { type: 'SELECT_WITH_NO_FEATURE_YET' }
+  | {
+      type: 'START_FEATURE_ADDITION'
+      callback: Exclude<Context['onFeatureAdd'], undefined>
+    }
+  | { type: 'UNSELECT' }
+
 const machine = createMachine<Context>(
   {
     id: 'story',
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+    tsTypes: {} as import('./story-provider.typegen').Typegen0,
     schema: {
       context: {} as Context,
+      events: {} as Events,
     },
     context: {
-      // see https://egghead.io/lessons/xstate-how-action-order-affects-assigns-to-context-in-a-xstate-machine
+      // see https://egghead.io/lessons/xstate-how-action-order-affects-assigns-to-context-in-a-xstate-machine on why prev/cur pair are needed
       previousOnFeatureAdd: undefined,
       onFeatureAdd: undefined,
       previousOnFeatureRemove: undefined,
@@ -37,15 +58,7 @@ const machine = createMachine<Context>(
         on: {
           CENTER_ON_FEATURE: {
             target: '.centeredOnFeature',
-            actions: [
-              assign<Context>({
-                mapFeature: (context, event) =>
-                  context.features.filter(isEntityMarker).find(
-                    // @ts-expect-error error
-                    feature => feature.options.id === event.featureId,
-                  ),
-              }),
-            ],
+            actions: 'setActiveMapFeature',
           },
         },
         initial: 'unknown',
@@ -63,7 +76,6 @@ const machine = createMachine<Context>(
                 target: 'selected.withFeatureAlready',
               },
               SELECT_WITH_NO_FEATURE_YET: {
-                actions: [() => console.log('SELECT_WITH_NO_FEATURE_YET')],
                 target: 'selected.withNoFeatureYet',
               },
             },
@@ -74,24 +86,11 @@ const machine = createMachine<Context>(
                 initial: 'todo',
                 states: {
                   todo: {
-                    entry: [
-                      assign({
-                        onFeatureRemove: (_context, event) => event.callback,
-                      }),
-                    ],
+                    entry: 'addFeatureRemovalCallback',
                     on: {
                       REMOVE_FEATURE: {
                         target: 'done',
-                        actions: [
-                          assign({
-                            features: (context, event) =>
-                              context.features
-                                .filter(isEntityMarker)
-                                .filter(
-                                  feature => feature.options.id !== event.id,
-                                ),
-                          }),
-                        ],
+                        actions: 'removeFeature',
                       },
                     },
                   },
@@ -116,12 +115,7 @@ const machine = createMachine<Context>(
                     on: {
                       START_FEATURE_ADDITION: {
                         target: 'featureAdditionInProgress',
-                        actions: [
-                          () => console.log('START_FEATURE_ADDITION'),
-                          assign({
-                            onFeatureAdd: (_context, event) => event.callback,
-                          }),
-                        ],
+                        actions: 'addFeatureAdditionCallback',
                       },
                     },
                   },
@@ -129,12 +123,7 @@ const machine = createMachine<Context>(
                     on: {
                       FINISH_FEATURE_ADDITION: {
                         target: 'featureAdditionDone',
-                        actions: assign({
-                          features: (context, event) => [
-                            ...context.features,
-                            event.feature,
-                          ],
-                        }),
+                        actions: 'addFeature',
                       },
                     },
                   },
@@ -166,11 +155,14 @@ const machine = createMachine<Context>(
       runFeatureRemovalCallback: context => {
         context.previousOnFeatureRemove?.()
       },
-      clearFeatureRemovalCallback: assign<Context>({
+      clearFeatureRemovalCallback: assign({
         onFeatureRemove: undefined,
       }),
-      clearPreviousFeatureRemovalCallback: assign<Context>({
-        previousOnFeatureRemove: (context: Context) => context.onFeatureRemove,
+      clearPreviousFeatureRemovalCallback: assign({
+        previousOnFeatureRemove: context => context.onFeatureRemove,
+      }),
+      addFeatureRemovalCallback: assign({
+        onFeatureRemove: (_context, event) => event.callback,
       }),
 
       runFeatureAdditionCallback: context => {
@@ -180,11 +172,30 @@ const machine = createMachine<Context>(
         }
         context.previousOnFeatureAdd?.(feature)
       },
-      clearFeatureAdditionCallback: assign<Context>({
+      clearFeatureAdditionCallback: assign({
         onFeatureAdd: undefined,
       }),
-      clearPreviousFeatureAdditionCallback: assign<Context>({
-        previousOnFeatureAdd: (context: Context) => context.onFeatureAdd,
+      clearPreviousFeatureAdditionCallback: assign({
+        previousOnFeatureAdd: context => context.onFeatureAdd,
+      }),
+      addFeatureAdditionCallback: assign({
+        onFeatureAdd: (_context, event) => event.callback,
+      }),
+
+      addFeature: assign({
+        features: (context, event) => [...context.features, event.feature],
+      }),
+      removeFeature: assign({
+        features: (context, event) =>
+          context.features
+            .filter(isEntityMarker)
+            .filter(feature => feature.options.id !== event.id),
+      }),
+      setActiveMapFeature: assign({
+        mapFeature: (context, event) =>
+          context.features
+            .filter(isEntityMarker)
+            .find(feature => feature.options.id === event.id),
       }),
     },
   },

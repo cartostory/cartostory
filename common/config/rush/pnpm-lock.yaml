@@ -96,6 +96,7 @@ importers:
       '@types/testing-library__jest-dom': ~5.14.3
       '@vitejs/plugin-react': ^1.3.0
       '@vitest/ui': ~0.9.4
+      '@xstate/cli': ~0.1.7
       '@xstate/react': ~3.0.0
       autoprefixer: ^10.4.4
       axios: ~0.26.1
@@ -165,6 +166,7 @@ importers:
       '@types/testing-library__jest-dom': 5.14.3
       '@vitejs/plugin-react': 1.3.1
       '@vitest/ui': 0.9.4
+      '@xstate/cli': 0.1.7_prettier@2.6.2
       autoprefixer: 10.4.5_postcss@8.4.12
       eslint: 8.13.0
       eslint-config-prettier: 8.5.0_eslint@8.13.0
@@ -4413,6 +4415,37 @@ packages:
       sirv: 2.0.2
     dev: true
 
+  /@xstate/cli/0.1.7_prettier@2.6.2:
+    resolution:
+      {
+        integrity: sha512-BE2EumZoivO19PWXLPAx/gzOAQHrEWrp/T8L7u0LigbUODoAmZwKCuF94IYmRipUYKeyjhYUX2jstoHXg/7Asg==,
+      }
+    hasBin: true
+    dependencies:
+      '@babel/core': 7.17.9
+      '@xstate/machine-extractor': 0.6.4_@babel+core@7.17.9+xstate@4.31.0
+      '@xstate/tools-shared': 1.1.5_d9260602859b89fb40cdea4be0a8706b
+      chokidar: 3.5.3
+      commander: 8.3.0
+      xstate: 4.31.0
+    transitivePeerDependencies:
+      - prettier
+      - supports-color
+    dev: true
+
+  /@xstate/machine-extractor/0.6.4_@babel+core@7.17.9+xstate@4.31.0:
+    resolution:
+      {
+        integrity: sha512-CTDHDdXbAdhS8XFOi0P/GF3zhh7rrcpycrM1Anlc1f0awILaNo+2kATBEVsL6k7nfFsGStjGeE8RwWeiUfYwag==,
+      }
+    peerDependencies:
+      '@babel/core': ^7
+      xstate: ^4
+    dependencies:
+      '@babel/core': 7.17.9
+      xstate: 4.31.0
+    dev: true
+
   /@xstate/react/3.0.0_e81f27d273afe79278a0c969ff9b8d4c:
     resolution:
       {
@@ -4435,6 +4468,22 @@ packages:
     transitivePeerDependencies:
       - '@types/react'
     dev: false
+
+  /@xstate/tools-shared/1.1.5_d9260602859b89fb40cdea4be0a8706b:
+    resolution:
+      {
+        integrity: sha512-Gr9UMEMJxdrN16bEIb3eIys9pi08K4dAHK5ptIC3mBHy77JBGtgfYMTO619uy1pdmbBRVFWg7aPAcMIusqjq8w==,
+      }
+    peerDependencies:
+      prettier: ^2.3.1
+      xstate: ^4
+    dependencies:
+      '@xstate/machine-extractor': 0.6.4_@babel+core@7.17.9+xstate@4.31.0
+      prettier: 2.6.2
+      xstate: 4.31.0
+    transitivePeerDependencies:
+      - '@babel/core'
+    dev: true
 
   /abab/2.0.6:
     resolution:
@@ -13992,7 +14041,6 @@ packages:
       {
         integrity: sha512-UK5m6OqUsTlPuKWkfRR5cR9/Yt7sysFyEg+PVIbEH9mwHSf9zuCvWO7rRvhBq7T+3pEXLKTEMfaqmLxl9Ob1pw==,
       }
-    dev: false
 
   /xtend/4.0.2:
     resolution:

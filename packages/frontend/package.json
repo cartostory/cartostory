@@ -30,7 +30,8 @@
     "lint": "npx eslint . --ext .ts --ext .tsx",
     "lint:fix": "npx eslint . --ext .ts --ext .tsx --fix",
     "test": "vitest",
-    "test:e2e": "DEBUG=pw:api npx playwright test --headed"
+    "test:e2e": "DEBUG=pw:api npx playwright test --headed",
+    "postinstall": "xstate typegen \"./src/**/*.ts?(x)\""
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -86,6 +87,7 @@
     "@vitest/ui": "~0.9.4",
     "vite-plugin-svgr": "~1.1.0",
     "@types/leaflet-draw": "~1.0.5",
-    "@playwright/test": "~1.21.1"
+    "@playwright/test": "~1.21.1",
+    "@xstate/cli": "~0.1.7"
   }
 }
