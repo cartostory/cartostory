@@ -53,19 +53,27 @@ function FlyToFeature() {
 }
 
 function Map() {
-  const storyMachine = useXStateStoryContext()
-  const [state] = useActor(storyMachine)
-
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
       <EditLayer />
       <MapLayers />
       <FlyToFeature />
       <UploadButton />
+      <Features />
+    </MapContainer>
+  )
+}
+
+function Features() {
+  const storyMachine = useXStateStoryContext()
+  const [state] = useActor(storyMachine)
+
+  return (
+    <>
       {state.context.features.filter(isEntityMarker).map(feature => (
         <Marker key={feature.options.id} position={feature.getLatLng()} />
       ))}
-    </MapContainer>
+    </>
   )
 }
 
