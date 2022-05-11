@@ -16,7 +16,7 @@ import {
   isAddingFeature,
   isCenteredOnFeature,
   useStoryContext as useXStateStoryContext,
-} from '../../providers/story-provider.xstate'
+} from '../../providers/story-provider'
 import { entityMarker, isEntityMarker } from '../../../../../lib/entity-marker'
 
 L.Marker.prototype.setIcon(

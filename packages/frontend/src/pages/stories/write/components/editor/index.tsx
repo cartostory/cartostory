@@ -14,11 +14,11 @@ import { ReactComponent as MapPinAddLine } from '../../../../../assets/map-pin-a
 import { ReactComponent as MapPinRemoveLine } from '../../../../../assets/map-pin-remove-line.svg'
 import { ReactComponent as CropLine } from '../../../../../assets/crop-line.svg'
 import { FeatureMark } from './feature-mark'
-import { useStoryContext } from '../../providers/story-provider'
 import {
+  isSelectionEmpty,
   selectionHasFeature,
   useStoryContext as useXStateStoryContext,
-} from '../../providers/story-provider.xstate'
+} from '../../providers/story-provider'
 import { useActor } from '@xstate/react'
 
 function Editor() {
@@ -26,10 +26,9 @@ function Editor() {
     extensions: [StarterKit, FeatureMark],
     content: '<p>Hello World!</p>',
   })
-  const { addRectangle } = useStoryContext()
   const x = useXStateStoryContext()
   const [state, send] = useActor(x)
-  const isBubbleMenuVisible = !state.matches('empty')
+  const isBubbleMenuVisible = !isSelectionEmpty(state)
   const selectionWithFeature = selectionHasFeature(state)
   const MarkerIcon = selectionWithFeature ? (
     <MapPinRemoveLine />
@@ -67,7 +66,11 @@ function Editor() {
           >
             {MarkerIcon}
           </button>
-          <button onClick={addRectangle}>
+          <button
+            onClick={() => {
+              console.log('todo add bounding box')
+            }}
+          >
             <CropLine />
           </button>
         </BubbleMenu>
