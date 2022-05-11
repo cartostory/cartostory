@@ -23,9 +23,9 @@ function Map() {
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
       <UnsetActiveFeatureOnMove />
+      <FlyToFeature />
       <MapLayers />
       <EditLayer />
-      <FlyToFeature />
       <Features />
       <UploadButton />
     </MapContainer>
@@ -35,8 +35,11 @@ function Map() {
 function UnsetActiveFeatureOnMove() {
   const storyMachine = useStoryContext()
   const [, send] = useActor(storyMachine)
-  useMapEvent('move', () => {
-    send('RESET_MAP')
+  const isCentered = useSelector(storyMachine, isCenteredOnFeature)
+  useMapEvent('moveend', () => {
+    if (isCentered) {
+      send('RESET')
+    }
   })
 
   return null
@@ -44,12 +47,24 @@ function UnsetActiveFeatureOnMove() {
 
 function Features() {
   const storyMachine = useStoryContext()
-  const [state] = useActor(storyMachine)
+  const [state, send] = useActor(storyMachine)
 
   return (
     <>
       {state.context.features.filter(isEntityMarker).map(feature => (
-        <Marker key={feature.options.id} position={feature.getLatLng()} />
+        <Marker
+          eventHandlers={{
+            click: () => {
+              send({
+                type: 'CENTER_ON_FEATURE',
+                id: feature.options.id,
+                target: 'story',
+              })
+            },
+          }}
+          key={feature.options.id}
+          position={feature.getLatLng()}
+        />
       ))}
     </>
   )
@@ -139,20 +154,26 @@ function useDraw(featureType?: 'marker' | 'rectangle') {
 
 function FlyToFeature() {
   const storyMachine = useStoryContext()
-  const [state] = useActor(storyMachine)
+  const [state, send] = useActor(storyMachine)
   const feature = useSelector(storyMachine, isCenteredOnFeature)
-    ? state.context.mapFeature
+    ? state.context.feature?.feature
     : undefined
   const map = useMap()
 
   // eslint-disable-next-line use-encapsulation/prefer-custom-hooks
   React.useEffect(() => {
-    if (!(feature && map && isEntityMarker(feature))) {
+    if (
+      !(
+        feature &&
+        isEntityMarker(feature) &&
+        state.context.feature?.target === 'map'
+      )
+    ) {
       return
     }
 
     map.flyTo(feature.getLatLng())
-  }, [feature, map])
+  }, [feature, map, send, state.context.feature?.target])
 
   return null
 }

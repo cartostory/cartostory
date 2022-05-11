@@ -15,10 +15,13 @@ import { ReactComponent as MapPinRemoveLine } from '../../../../../assets/map-pi
 import { ReactComponent as CropLine } from '../../../../../assets/crop-line.svg'
 import { FeatureMark } from './feature-mark'
 import {
+  isCenteredOnFeature,
   selectionHasFeature,
   useStoryContext,
 } from '../../providers/story-provider'
 import { useActor, useSelector } from '@xstate/react'
+import React from 'react'
+import { isEntityMarker } from '../../../../../lib/entity-marker'
 
 function Editor() {
   const editor = useEditor({
@@ -26,13 +29,41 @@ function Editor() {
     content: '<p>Hello World!</p>',
   })
   const storyMachine = useStoryContext()
-  const [, send] = useActor(storyMachine)
+  const [state, send] = useActor(storyMachine)
   const selectionWithFeature = useSelector(storyMachine, selectionHasFeature)
+  const isCentered = useSelector(storyMachine, isCenteredOnFeature)
   const MarkerIcon = selectionWithFeature ? (
     <MapPinRemoveLine />
   ) : (
     <MapPinAddLine />
   )
+
+  React.useEffect(() => {
+    if (
+      !(
+        isCentered &&
+        state.context.feature?.target === 'story' &&
+        isEntityMarker(state.context.feature.feature)
+      )
+    ) {
+      return
+    }
+
+    const elm = document.querySelector(
+      `[data-feature-id="${state.context.feature.feature.options.id}"]`,
+    )
+
+    if (!elm) {
+      return
+    }
+
+    elm.scrollIntoView({ behavior: 'smooth' })
+  }, [
+    isCentered,
+    state.context.feature?.feature,
+    state.context.feature?.feature.options.id,
+    state.context.feature?.target,
+  ])
 
   return (
     <>
@@ -73,6 +104,7 @@ function Editor() {
       ) : null}
       <div className="overflow-auto grow">
         <EditorContent
+          style={{ minHeight: '1000px' }}
           onClick={() => {
             const emptySelection = editor?.view.state.selection.empty
             const featureId =
@@ -82,6 +114,7 @@ function Editor() {
               send({
                 type: 'CENTER_ON_FEATURE',
                 id: featureId,
+                target: 'map',
               })
             }
 

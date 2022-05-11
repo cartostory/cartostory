@@ -13,7 +13,7 @@ type Context = {
   onFeatureAdd?: (feature: L.Marker | L.Rectangle) => void
   previousOnFeatureRemove?: () => void
   onFeatureRemove?: (feature: L.Marker | L.Rectangle) => void
-  mapFeature?: L.Marker | L.Rectangle
+  feature?: { feature: L.Marker | L.Rectangle; target: 'map' | 'story' }
 }
 
 type Events =
@@ -25,7 +25,7 @@ type Events =
       feature: typeof entityMarker | L.Rectangle
     }
   | { type: 'REMOVE_FEATURE'; id: string }
-  | { type: 'RESET_MAP' }
+  | { type: 'RESET' }
   | { type: 'SELECT_WITH_FEATURE_ALREADY' }
   | { type: 'SELECT_WITH_NO_FEATURE_YET' }
   | {
@@ -51,25 +51,26 @@ const machine = createMachine<Context>(
       previousOnFeatureRemove: undefined,
       onFeatureRemove: undefined,
       features: [],
-      mapFeature: undefined,
+      feature: undefined,
     },
     type: 'parallel',
     states: {
-      map: {
+      feature: {
+        initial: 'unknown',
         on: {
           CENTER_ON_FEATURE: {
-            target: '.centeredOnFeature',
-            actions: 'setActiveMapFeature',
+            target: '.centered',
           },
-          RESET_MAP: {
+          RESET: {
             target: '.unknown',
-            actions: 'dropActiveMapFeature',
+            actions: ['dropActiveFeature'],
           },
         },
-        initial: 'unknown',
         states: {
           unknown: {},
-          centeredOnFeature: {},
+          centered: {
+            entry: [() => console.log('centered'), 'setActiveFeature'],
+          },
         },
       },
       text: {
@@ -196,14 +197,24 @@ const machine = createMachine<Context>(
             .filter(isEntityMarker)
             .filter(feature => feature.options.id !== event.id),
       }),
-      setActiveMapFeature: assign({
-        mapFeature: (context, event) =>
-          context.features
+      setActiveFeature: assign({
+        feature: (context, event) => {
+          if (!event.id) {
+            return context.feature
+          }
+          const feature = context.features
             .filter(isEntityMarker)
-            .find(feature => feature.options.id === event.id),
+            .find(f => f.options.id === event.id)
+
+          if (!feature) {
+            return
+          }
+
+          return { feature, target: event.target }
+        },
       }),
-      dropActiveMapFeature: assign({
-        mapFeature: undefined,
+      dropActiveFeature: assign({
+        feature: undefined,
       }),
     },
   },
@@ -242,7 +253,7 @@ function isAddingFeature(state) {
 }
 
 function isCenteredOnFeature(state) {
-  return state.matches('map.centeredOnFeature')
+  return state.matches('feature.centered')
 }
 
 export {

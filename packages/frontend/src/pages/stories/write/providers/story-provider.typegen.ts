@@ -3,11 +3,11 @@
 export interface Typegen0 {
   '@@xstate/typegen': true
   eventsCausingActions: {
-    setActiveMapFeature: 'CENTER_ON_FEATURE'
-    dropActiveMapFeature: 'RESET_MAP'
+    dropActiveFeature: 'RESET'
     removeFeature: 'REMOVE_FEATURE'
     addFeatureAdditionCallback: 'START_FEATURE_ADDITION'
     addFeature: 'FINISH_FEATURE_ADDITION'
+    setActiveFeature: 'CENTER_ON_FEATURE'
     addFeatureRemovalCallback: 'xstate.init'
     clearPreviousFeatureRemovalCallback: 'REMOVE_FEATURE'
     runFeatureRemovalCallback: 'REMOVE_FEATURE'
@@ -30,9 +30,9 @@ export interface Typegen0 {
   eventsCausingGuards: {}
   eventsCausingDelays: {}
   matchesStates:
-    | 'map'
-    | 'map.unknown'
-    | 'map.centeredOnFeature'
+    | 'feature'
+    | 'feature.unknown'
+    | 'feature.centered'
     | 'text'
     | 'text.empty'
     | 'text.selected'
@@ -44,7 +44,7 @@ export interface Typegen0 {
     | 'text.selected.withNoFeatureYet.featureAdditionInProgress'
     | 'text.selected.withNoFeatureYet.featureAdditionDone'
     | {
-        map?: 'unknown' | 'centeredOnFeature'
+        feature?: 'unknown' | 'centered'
         text?:
           | 'empty'
           | 'selected'
