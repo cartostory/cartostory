@@ -223,10 +223,6 @@ function useStoryContext() {
   return context
 }
 
-function isSelectionEmpty(state) {
-  return state.matches('story.empty')
-}
-
 function selectionHasFeature(state) {
   return state.matches('text.selected.withFeatureAlready')
 }
@@ -246,7 +242,6 @@ export {
   useStoryContext,
   StoryProvider,
   selectionHasFeature,
-  isSelectionEmpty,
   isAddingFeature,
   isCenteredOnFeature,
 }

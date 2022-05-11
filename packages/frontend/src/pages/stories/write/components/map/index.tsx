@@ -11,7 +11,7 @@ import 'leaflet-draw'
 import 'leaflet-draw/dist/leaflet.draw.css'
 import 'leaflet/dist/leaflet.css'
 import { randomString } from '../../../../../utils'
-import { useActor } from '@xstate/react'
+import { useActor, useSelector } from '@xstate/react'
 import {
   isAddingFeature,
   isCenteredOnFeature,
@@ -35,7 +35,7 @@ L.Marker.prototype.setIcon(
 function FlyToFeature() {
   const storyMachine = useStoryContext()
   const [state] = useActor(storyMachine)
-  const feature = isCenteredOnFeature(state)
+  const feature = useSelector(storyMachine, isCenteredOnFeature)
     ? state.context.mapFeature
     : undefined
   const map = useMap()
@@ -79,8 +79,8 @@ function Features() {
 
 function EditLayer() {
   const storyMachine = useStoryContext()
-  const [state] = useActor(storyMachine)
-  useDraw(isAddingFeature(state) ? 'marker' : undefined)
+  const isFeatureBeingAdded = useSelector(storyMachine, isAddingFeature)
+  useDraw(isFeatureBeingAdded ? 'marker' : undefined)
 
   return null
 }

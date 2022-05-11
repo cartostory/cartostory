@@ -15,11 +15,10 @@ import { ReactComponent as MapPinRemoveLine } from '../../../../../assets/map-pi
 import { ReactComponent as CropLine } from '../../../../../assets/crop-line.svg'
 import { FeatureMark } from './feature-mark'
 import {
-  isSelectionEmpty,
   selectionHasFeature,
   useStoryContext,
 } from '../../providers/story-provider'
-import { useActor } from '@xstate/react'
+import { useActor, useSelector } from '@xstate/react'
 
 function Editor() {
   const editor = useEditor({
@@ -27,9 +26,8 @@ function Editor() {
     content: '<p>Hello World!</p>',
   })
   const storyMachine = useStoryContext()
-  const [state, send] = useActor(storyMachine)
-  const isBubbleMenuVisible = !isSelectionEmpty(state)
-  const selectionWithFeature = selectionHasFeature(state)
+  const [, send] = useActor(storyMachine)
+  const selectionWithFeature = useSelector(storyMachine, selectionHasFeature)
   const MarkerIcon = selectionWithFeature ? (
     <MapPinRemoveLine />
   ) : (
@@ -42,9 +40,7 @@ function Editor() {
       {editor ? (
         <BubbleMenu
           editor={editor}
-          className={`bg-white border flex space-x-5 px-2 py-1 drop-shadow ${
-            isBubbleMenuVisible ? 'visible' : 'invisible'
-          }`}
+          className={`bg-white border flex space-x-5 px-2 py-1 drop-shadow`}
         >
           <button
             data-testid={`pin-${selectionWithFeature ? 'remove' : 'add'}`}
