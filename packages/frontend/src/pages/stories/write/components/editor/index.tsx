@@ -17,7 +17,7 @@ import { FeatureMark } from './feature-mark'
 import {
   isSelectionEmpty,
   selectionHasFeature,
-  useStoryContext as useXStateStoryContext,
+  useStoryContext,
 } from '../../providers/story-provider'
 import { useActor } from '@xstate/react'
 
@@ -26,8 +26,8 @@ function Editor() {
     extensions: [StarterKit, FeatureMark],
     content: '<p>Hello World!</p>',
   })
-  const x = useXStateStoryContext()
-  const [state, send] = useActor(x)
+  const storyMachine = useStoryContext()
+  const [state, send] = useActor(storyMachine)
   const isBubbleMenuVisible = !isSelectionEmpty(state)
   const selectionWithFeature = selectionHasFeature(state)
   const MarkerIcon = selectionWithFeature ? (

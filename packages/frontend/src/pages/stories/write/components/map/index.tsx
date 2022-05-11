@@ -15,7 +15,7 @@ import { useActor } from '@xstate/react'
 import {
   isAddingFeature,
   isCenteredOnFeature,
-  useStoryContext as useXStateStoryContext,
+  useStoryContext,
 } from '../../providers/story-provider'
 import { entityMarker, isEntityMarker } from '../../../../../lib/entity-marker'
 
@@ -33,7 +33,7 @@ L.Marker.prototype.setIcon(
 )
 
 function FlyToFeature() {
-  const storyMachine = useXStateStoryContext()
+  const storyMachine = useStoryContext()
   const [state] = useActor(storyMachine)
   const feature = isCenteredOnFeature(state)
     ? state.context.mapFeature
@@ -65,7 +65,7 @@ function Map() {
 }
 
 function Features() {
-  const storyMachine = useXStateStoryContext()
+  const storyMachine = useStoryContext()
   const [state] = useActor(storyMachine)
 
   return (
@@ -78,7 +78,7 @@ function Features() {
 }
 
 function EditLayer() {
-  const storyMachine = useXStateStoryContext()
+  const storyMachine = useStoryContext()
   const [state] = useActor(storyMachine)
   useDraw(isAddingFeature(state) ? 'marker' : undefined)
 
@@ -125,7 +125,7 @@ function useCreateFeature(featureType?: 'marker' | 'rectangle') {
 }
 
 function useDraw(featureType?: 'marker' | 'rectangle') {
-  const storyMachine = useXStateStoryContext()
+  const storyMachine = useStoryContext()
   const [, send] = useActor(storyMachine)
   const map = useMap() as L.DrawMap
   const { feature, handler, options } = useCreateFeature(featureType) ?? {}
