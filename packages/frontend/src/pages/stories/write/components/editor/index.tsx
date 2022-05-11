@@ -76,22 +76,22 @@ function Editor() {
         <EditorContent
           onClick={() => {
             const emptySelection = editor?.view.state.selection.empty
-            const featureIdAttribute =
+            const featureId =
               editor?.getAttributes('feature')?.['data-feature-id']
 
             if (emptySelection) {
-              if (featureIdAttribute) {
+              if (featureId) {
                 send({
                   type: 'CENTER_ON_FEATURE',
-                  featureId: featureIdAttribute,
+                  featureId,
                 })
               }
               send('UNSELECT')
             } else {
-              if (featureIdAttribute) {
+              if (featureId) {
                 send({
                   type: 'SELECT_WITH_FEATURE_ALREADY',
-                  featureId: featureIdAttribute,
+                  featureId: featureId,
                   callback: editor.commands.toggleMarker,
                 })
               } else {
