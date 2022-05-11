@@ -63,6 +63,7 @@ const machine = createMachine<Context>(
                 target: 'selected.withFeatureAlready',
               },
               SELECT_WITH_NO_FEATURE_YET: {
+                actions: [() => console.log('SELECT_WITH_NO_FEATURE_YET')],
                 target: 'selected.withNoFeatureYet',
               },
             },
@@ -115,9 +116,12 @@ const machine = createMachine<Context>(
                     on: {
                       START_FEATURE_ADDITION: {
                         target: 'featureAdditionInProgress',
-                        actions: assign({
-                          onFeatureAdd: (_context, event) => event.callback,
-                        }),
+                        actions: [
+                          () => console.log('START_FEATURE_ADDITION'),
+                          assign({
+                            onFeatureAdd: (_context, event) => event.callback,
+                          }),
+                        ],
                       },
                     },
                   },

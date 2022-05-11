@@ -29,7 +29,8 @@
     "dev": "vite --host",
     "lint": "npx eslint . --ext .ts --ext .tsx",
     "lint:fix": "npx eslint . --ext .ts --ext .tsx --fix",
-    "test": "vitest"
+    "test": "vitest",
+    "test:e2e": "DEBUG=pw:api npx playwright test --headed"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -84,6 +85,7 @@
     "vitest": "~0.9.4",
     "@vitest/ui": "~0.9.4",
     "vite-plugin-svgr": "~1.1.0",
-    "@types/leaflet-draw": "~1.0.5"
+    "@types/leaflet-draw": "~1.0.5",
+    "@playwright/test": "~1.21.1"
   }
 }

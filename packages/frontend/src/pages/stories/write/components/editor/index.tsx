@@ -48,6 +48,7 @@ function Editor() {
           }`}
         >
           <button
+            data-testid={`pin-${selectionWithFeature ? 'remove' : 'add'}`}
             onClick={() => {
               if (selectionWithFeature) {
                 const featureIdAttribute =
@@ -99,6 +100,7 @@ function Editor() {
             }
           }}
           editor={editor}
+          data-testid="editor"
         />
       </div>
     </>
