@@ -55,11 +55,11 @@ function FlyToFeature() {
 function Map() {
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
-      <EditLayer />
       <MapLayers />
+      <EditLayer />
       <FlyToFeature />
-      <UploadButton />
       <Features />
+      <UploadButton />
     </MapContainer>
   )
 }
