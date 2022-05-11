@@ -25,6 +25,7 @@ type Events =
       feature: typeof entityMarker | L.Rectangle
     }
   | { type: 'REMOVE_FEATURE'; id: string }
+  | { type: 'RESET_MAP' }
   | { type: 'SELECT_WITH_FEATURE_ALREADY' }
   | { type: 'SELECT_WITH_NO_FEATURE_YET' }
   | {
@@ -59,6 +60,10 @@ const machine = createMachine<Context>(
           CENTER_ON_FEATURE: {
             target: '.centeredOnFeature',
             actions: 'setActiveMapFeature',
+          },
+          RESET_MAP: {
+            target: '.unknown',
+            actions: 'dropActiveMapFeature',
           },
         },
         initial: 'unknown',
@@ -196,6 +201,9 @@ const machine = createMachine<Context>(
           context.features
             .filter(isEntityMarker)
             .find(feature => feature.options.id === event.id),
+      }),
+      dropActiveMapFeature: assign({
+        mapFeature: undefined,
       }),
     },
   },

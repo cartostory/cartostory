@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { MapContainer, Marker, useMap } from 'react-leaflet'
+import { MapContainer, Marker, useMap, useMapEvent } from 'react-leaflet'
 import { bboxOptions } from '../../../../../config'
 import { MapLayers } from '../map-layers'
 import { UploadButton } from '../upload-button'
@@ -55,6 +55,7 @@ function FlyToFeature() {
 function Map() {
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
+      <UnsetMapCenter />
       <MapLayers />
       <EditLayer />
       <FlyToFeature />
@@ -62,6 +63,16 @@ function Map() {
       <UploadButton />
     </MapContainer>
   )
+}
+
+function UnsetMapCenter() {
+  const storyMachine = useStoryContext()
+  const [, send] = useActor(storyMachine)
+  useMapEvent('move', () => {
+    send('RESET_MAP')
+  })
+
+  return null
 }
 
 function Features() {

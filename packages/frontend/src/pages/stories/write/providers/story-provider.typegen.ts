@@ -4,6 +4,7 @@ export interface Typegen0 {
   '@@xstate/typegen': true
   eventsCausingActions: {
     setActiveMapFeature: 'CENTER_ON_FEATURE'
+    dropActiveMapFeature: 'RESET_MAP'
     removeFeature: 'REMOVE_FEATURE'
     addFeatureAdditionCallback: 'START_FEATURE_ADDITION'
     addFeature: 'FINISH_FEATURE_ADDITION'
