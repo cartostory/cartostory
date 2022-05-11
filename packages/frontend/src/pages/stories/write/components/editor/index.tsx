@@ -78,13 +78,14 @@ function Editor() {
             const featureId =
               editor?.getAttributes('feature')?.['data-feature-id']
 
+            if (featureId) {
+              send({
+                type: 'CENTER_ON_FEATURE',
+                id: featureId,
+              })
+            }
+
             if (emptySelection) {
-              if (featureId) {
-                send({
-                  type: 'CENTER_ON_FEATURE',
-                  id: featureId,
-                })
-              }
               send('UNSELECT')
             } else {
               if (featureId) {
