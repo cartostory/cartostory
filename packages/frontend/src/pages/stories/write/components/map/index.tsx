@@ -17,63 +17,72 @@ import {
   isCenteredOnFeature,
   useStoryContext,
 } from '../../providers/story-provider'
+import type { EntityMarker } from '../../../../../lib/entity-marker'
 import { entityMarker, isEntityMarker } from '../../../../../lib/entity-marker'
 
 function Map() {
+  const storyMachine = useStoryContext()
+  const isCentered = useSelector(storyMachine, isCenteredOnFeature)
+  const isFeatureBeingAdded = useSelector(storyMachine, isAddingFeature)
+  const [state, send] = useActor(storyMachine)
+  const features = state.context.features.filter(isEntityMarker)
+  const feature =
+    isCentered && state.context.feature?.target === 'map'
+      ? state.context.feature?.feature
+      : undefined
+  const centerOnFeature = (f: typeof features[number]) => {
+    send({
+      type: 'CENTER_ON_FEATURE',
+      id: f.options.id,
+      target: 'story',
+    })
+  }
+
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
-      <UnsetActiveFeatureOnMove />
-      <FlyToFeature />
+      {isCentered ? <OnMapMove callback={() => send('RESET')} /> : null}
+      {feature ? <FlyToFeature feature={feature} /> : null}
       <MapLayers />
-      <EditLayer />
-      <Features />
+      {isFeatureBeingAdded ? <EditLayer /> : null}
+      {features.map(feature => (
+        <Feature
+          key={feature.options.id}
+          feature={feature}
+          onClick={centerOnFeature}
+        />
+      ))}
+
       <UploadButton />
     </MapContainer>
   )
 }
 
-function UnsetActiveFeatureOnMove() {
-  const storyMachine = useStoryContext()
-  const [, send] = useActor(storyMachine)
-  const isCentered = useSelector(storyMachine, isCenteredOnFeature)
-  useMapEvent('moveend', () => {
-    if (isCentered) {
-      send('RESET')
-    }
-  })
+function Feature({
+  feature,
+  onClick,
+}: {
+  feature: EntityMarker
+  onClick: (f: typeof feature) => void
+}) {
+  return (
+    <Marker
+      eventHandlers={{
+        click: () => onClick(feature),
+      }}
+      key={feature.options.id}
+      position={feature.getLatLng()}
+    />
+  )
+}
+
+function OnMapMove({ callback }: { callback: () => void }) {
+  useMapEvent('moveend', callback)
 
   return null
 }
 
-function Features() {
-  const storyMachine = useStoryContext()
-  const [state, send] = useActor(storyMachine)
-
-  return (
-    <>
-      {state.context.features.filter(isEntityMarker).map(feature => (
-        <Marker
-          eventHandlers={{
-            click: () => {
-              send({
-                type: 'CENTER_ON_FEATURE',
-                id: feature.options.id,
-                target: 'story',
-              })
-            },
-          }}
-          key={feature.options.id}
-          position={feature.getLatLng()}
-        />
-      ))}
-    </>
-  )
-}
-
 function EditLayer() {
-  const storyMachine = useStoryContext()
-  const isFeatureBeingAdded = useSelector(storyMachine, isAddingFeature)
-  useDraw(isFeatureBeingAdded ? 'marker' : undefined)
+  useDraw('marker')
 
   return null
 }
@@ -125,16 +134,12 @@ function useDraw(featureType?: 'marker' | 'rectangle') {
   const drawing = React.useRef<L.Draw.Marker | L.Draw.Rectangle>()
 
   React.useEffect(() => {
-    if (!map) {
+    if (!(map && feature && handler)) {
       return
     }
 
     if (!featureType) {
       map.off(window.L.Draw.Event.CREATED)
-      return
-    }
-
-    if (!feature || !handler) {
       return
     }
 
@@ -152,28 +157,17 @@ function useDraw(featureType?: 'marker' | 'rectangle') {
   }, [send, map, featureType, feature, handler, options])
 }
 
-function FlyToFeature() {
-  const storyMachine = useStoryContext()
-  const [state, send] = useActor(storyMachine)
-  const feature = useSelector(storyMachine, isCenteredOnFeature)
-    ? state.context.feature?.feature
-    : undefined
+function FlyToFeature({ feature }: { feature: L.Marker | L.Rectangle }) {
   const map = useMap()
 
   // eslint-disable-next-line use-encapsulation/prefer-custom-hooks
   React.useEffect(() => {
-    if (
-      !(
-        feature &&
-        isEntityMarker(feature) &&
-        state.context.feature?.target === 'map'
-      )
-    ) {
+    if (!(feature && isEntityMarker(feature))) {
       return
     }
 
     map.flyTo(feature.getLatLng())
-  }, [feature, map, send, state.context.feature?.target])
+  }, [feature, map])
 
   return null
 }
