@@ -26,7 +26,7 @@
   font-display: swap;
 }
 
-[data-lat] {
+[data-feature-id] {
   cursor: pointer;
   text-decoration: underline;
 }

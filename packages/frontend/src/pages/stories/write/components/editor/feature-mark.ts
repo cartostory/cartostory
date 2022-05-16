@@ -1,10 +1,9 @@
 import { Mark, mergeAttributes } from '@tiptap/core'
+import type { EntityMarker } from '../../../../../lib/editor'
 
 export interface FeatureOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLAttributes: {
-    'data-lat'?: string
-    'data-lng'?: string
     'data-feature-id'?: string
   }
 }
@@ -15,7 +14,7 @@ declare module '@tiptap/core' {
       /**
        * Set a feature mark
        */
-      setMarker: (layer: L.Marker, handler: () => void) => ReturnType
+      setMarker: (layer: EntityMarker, handler: () => void) => ReturnType
       /**
        * Toggle a feature mark
        */
@@ -37,16 +36,8 @@ export const FeatureMark = Mark.create<FeatureOptions>({
     }
   },
 
-  // data-lat + data-lng are duplicate to data-feature-id
-  // leave it as is until I find what works better
   addAttributes() {
     return {
-      'data-lat': {
-        default: null,
-      },
-      'data-lng': {
-        default: null,
-      },
       'data-feature-id': {
         default: null,
       },
@@ -76,38 +67,13 @@ export const FeatureMark = Mark.create<FeatureOptions>({
     ]
   },
 
-  addProseMirrorPlugins() {
-    return [
-      {
-        getState() {},
-        spec: {},
-        props: {
-          handleClickOn: () => {
-            const attrs = this.editor.getAttributes('feature')
-            const lat = attrs['data-lat']
-            const lng = attrs['data-lng']
-            attrs.onclick?.({ lat, lng })
-            return false
-          },
-        },
-      },
-    ]
-  },
-
   addCommands() {
     return {
       setMarker:
-        (layer, handler) =>
+        layer =>
         ({ commands }) => {
-          console.log('layer', layer, 'handler', handler)
-          const { lat, lng } = layer.getLatLng()
-          // @ts-expect-error error
-          const { id } = layer.options
           const attributes = {
-            'data-lat': lat.toFixed(6),
-            'data-lng': lng.toFixed(6),
-            'data-feature-id': id,
-            onclick: handler,
+            'data-feature-id': layer.options.id,
           }
           return commands.setMark(this.name, attributes)
         },
