@@ -4,21 +4,16 @@ import { bboxOptions } from '../../../../../config'
 import { MapLayers } from '../map-layers'
 import { UploadButton } from '../upload-button'
 import React from 'react'
-import markerIcon from 'leaflet/dist/images/marker-icon.png'
-import markerShadow from 'leaflet/dist/images/marker-shadow.png'
-import markerRetinaIcon from 'leaflet/dist/images/marker-icon-2x.png'
-import 'leaflet-draw'
-import 'leaflet-draw/dist/leaflet.draw.css'
-import 'leaflet/dist/leaflet.css'
 import { randomString } from '../../../../../utils'
 import { useActor, useSelector } from '@xstate/react'
 import {
   isAddingFeature,
   isCenteredOnFeature,
-  useStoryContext,
-} from '../../providers/story-provider'
-import type { EntityMarker } from '../../../../../lib/entity-marker'
-import { entityMarker, isEntityMarker } from '../../../../../lib/entity-marker'
+} from '../../../../../lib/state/story'
+import { useStoryContext } from '../../providers/story-provider'
+import type { EntityMarker } from '../../../../../lib/editor'
+import { entityMarker, isEntityMarker } from '../../../../../lib/editor'
+import '../../../../../lib/leaflet'
 
 function Map() {
   const storyMachine = useStoryContext()
@@ -185,18 +180,5 @@ function createRectangle(e: L.LeafletEvent) {
 function createMarker(e: L.LeafletEvent) {
   return entityMarker(e.layer.getLatLng())
 }
-
-L.Marker.prototype.setIcon(
-  L.icon({
-    iconUrl: markerIcon,
-    iconRetinaUrl: markerRetinaIcon,
-    shadowUrl: markerShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    tooltipAnchor: [16, -28],
-    shadowSize: [41, 41],
-  }),
-)
 
 export { Map }

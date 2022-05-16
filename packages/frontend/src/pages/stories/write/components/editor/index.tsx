@@ -7,11 +7,11 @@ import { FeatureMark } from './feature-mark'
 import {
   isCenteredOnFeature,
   selectionHasFeature,
-  useStoryContext,
-} from '../../providers/story-provider'
+} from '../../../../../lib/state/story'
+import { useStoryContext } from '../../providers/story-provider'
 import { useActor, useSelector } from '@xstate/react'
 import React from 'react'
-import { isEntityMarker } from '../../../../../lib/entity-marker'
+import { isEntityMarker } from '../../../../../lib/editor'
 import { MenuBar } from './components'
 
 function Editor() {

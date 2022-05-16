@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { randomString } from '../utils'
+import { randomString } from '../../utils'
 
 class EntityMarker extends L.Marker {
   options: L.MarkerOptions & { id: string } = {
