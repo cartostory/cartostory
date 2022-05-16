@@ -93,7 +93,12 @@ function Editor() {
           </button>
         </BubbleMenu>
       ) : null}
-      <div className="overflow-auto grow">
+      <div
+        className="overflow-auto grow"
+        onScroll={() => {
+          send('RESET')
+        }}
+      >
         <EditorContent
           className="mt-12"
           style={{ minHeight: '1000px' }}
