@@ -4,26 +4,25 @@ import { useActor, useInterpret } from '@xstate/react'
 import { machine } from '../../../../lib/state/story'
 import type { EntityMarker } from '../../../../lib/editor'
 
+type EntityVoidAction = (id: string) => void
+
+type TActionContext = {
+  centerMap: EntityVoidAction
+  centerStory: EntityVoidAction
+  clearSelection: () => void
+  finishFeatureAddition: (feature: EntityMarker) => void
+  removeFeature: EntityVoidAction
+  reset: () => void
+  selectWithFeature: (id: string, callback: () => void) => void
+  selectWithNoFeature: () => void
+  startFeatureAddition: (callback: (feature: EntityMarker) => boolean) => void
+}
+
 const StoryContext = React.createContext<
   InterpreterFrom<typeof machine> | undefined
 >(undefined)
 
-const ActionContext = React.createContext<
-  | {
-      centerMap: (id: string) => void
-      centerStory: (id: string) => void
-      clearSelection: () => void
-      finishFeatureAddition: (feature: EntityMarker) => void
-      removeFeature: (id: string) => void
-      reset: () => void
-      selectWithFeature: (id: string, callback: () => void) => void
-      selectWithNoFeature: () => void
-      startFeatureAddition: (
-        callback: (feature: EntityMarker) => boolean,
-      ) => void
-    }
-  | undefined
->(undefined)
+const ActionContext = React.createContext<Maybe<TActionContext>>(undefined)
 
 function StoryProvider({ children }: React.PropsWithChildren<unknown>) {
   const editor = useInterpret(machine)
@@ -47,19 +46,20 @@ function ActionProvider({ children }: React.PropsWithChildren<unknown>) {
   const machine = useStoryContext()
   const [, send] = useActor(machine)
 
-  const removeFeature = (id: string) => {
+  const removeFeature: TActionContext['removeFeature'] = id => {
     send({
       type: 'REMOVE_FEATURE',
       id,
     })
   }
 
-  const startFeatureAddition = (callback: (feature: EntityMarker) => void) => {
-    send({
-      type: 'START_FEATURE_ADDITION',
-      callback,
-    })
-  }
+  const startFeatureAddition: TActionContext['startFeatureAddition'] =
+    callback => {
+      send({
+        type: 'START_FEATURE_ADDITION',
+        callback,
+      })
+    }
 
   const reset = () => {
     send('RESET')
@@ -73,15 +73,18 @@ function ActionProvider({ children }: React.PropsWithChildren<unknown>) {
     })
   }
 
-  const centerMap = _centerOnFeature('map')
+  const centerMap: TActionContext['centerMap'] = _centerOnFeature('map')
 
-  const centerStory = _centerOnFeature('story')
+  const centerStory: TActionContext['centerStory'] = _centerOnFeature('story')
 
-  const clearSelection = () => {
+  const clearSelection: TActionContext['clearSelection'] = () => {
     send('UNSELECT')
   }
 
-  const selectWithFeature = (id: string, callback: () => void) => {
+  const selectWithFeature: TActionContext['selectWithFeature'] = (
+    id,
+    callback,
+  ) => {
     send({
       type: 'SELECT_WITH_FEATURE_ALREADY',
       featureId: id,
@@ -89,13 +92,14 @@ function ActionProvider({ children }: React.PropsWithChildren<unknown>) {
     })
   }
 
-  const selectWithNoFeature = () => {
+  const selectWithNoFeature: TActionContext['selectWithNoFeature'] = () => {
     send('SELECT_WITH_NO_FEATURE_YET')
   }
 
-  const finishFeatureAddition = (feature: EntityMarker) => {
-    send({ type: 'FINISH_FEATURE_ADDITION', feature })
-  }
+  const finishFeatureAddition: TActionContext['finishFeatureAddition'] =
+    feature => {
+      send({ type: 'FINISH_FEATURE_ADDITION', feature })
+    }
 
   const value = {
     centerMap,
