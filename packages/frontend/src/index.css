@@ -30,3 +30,52 @@
   cursor: pointer;
   text-decoration: underline;
 }
+
+[contenteditable] * {
+  font-family: 'Phenomena';
+  letter-spacing: 0.5px;
+}
+
+[contenteditable] p {
+  @apply text-xl leading-loose;
+}
+
+[contenteditable] h1,
+[contenteditable] h2,
+[contenteditable] h3,
+[contenteditable] h4,
+[contenteditable] h5,
+[contenteditable] h6 {
+  font-weight: bold;
+  letter-spacing: inherit;
+}
+
+[contenteditable] h1 {
+  @apply text-5xl my-5;
+}
+
+[contenteditable] h2 {
+  @apply text-4xl my-4;
+}
+
+[contenteditable] h3 {
+  @apply text-3xl my-3;
+}
+
+[contenteditable] h4 {
+  @apply text-2xl my-3;
+}
+
+[contenteditable] h5 {
+  @apply text-xl my-2;
+}
+
+[contenteditable] ul {
+  list-style: inside;
+  list-style-type: disc;
+}
+
+/* hack to avoid line breaks in <li><p>hello world</><li> */
+[contenteditable] ul p {
+  display: inline;
+}
