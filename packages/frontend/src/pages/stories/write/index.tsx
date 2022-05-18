@@ -26,17 +26,17 @@ function Write() {
             />
           </div>
           <div className="w-1/2 p-5 px-10 flex flex-col h-[100vh]">
-            <form>
+            <form className="relative z-[2]">
               <input
                 value={title}
                 onChange={setTitle}
                 style={{ fontFamily: 'Phenomena' }}
-                className="w-full py-2 text-4xl bg-transparent border-0 border-b-2 text-gray-500 font-bold focus:outline-none"
+                className="w-full py-2 text-4xl bg-white border-0 border-b-2 text-gray-500 font-bold focus:outline-none"
                 type="text"
                 placeholder="Your story title"
               />
             </form>
-            <p className="flex space-x-2 text-gray-500 my-3">
+            <p className="flex space-x-2 text-gray-500 py-3 bg-white z-[2] relative">
               {title.length > 0 ? (
                 <>
                   <Link />

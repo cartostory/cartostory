@@ -86,6 +86,10 @@ function Editor() {
       <MenuBar editor={editor} />
       {editor ? (
         <BubbleMenu
+          tippyOptions={{
+            offset: [-20, -65],
+            zIndex: 1,
+          }}
           editor={editor}
           className="ml-12 bg-white border flex space-x-5 px-2 py-1 drop-shadow"
         >
@@ -114,7 +118,6 @@ function Editor() {
       ) : null}
       <div className="overflow-auto grow" onScroll={reset}>
         <EditorContent
-          className="mt-12"
           style={{ minHeight: '1000px' }}
           onClick={() => {
             const emptySelection = editor?.view.state.selection.empty
