@@ -21,7 +21,7 @@ function MenuBar({ editor }: { editor: ReturnType<typeof useEditor> }) {
   }
 
   return (
-    <div className="flex space-x-2 z-[2] relative bg-white">
+    <div className="flex space-x-2 z-[2] relative bg-white mb-5">
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
         className={`${editor.isActive('bold') ? 'is-active' : ''} ${

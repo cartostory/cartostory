@@ -31,6 +31,10 @@
   text-decoration: underline;
 }
 
+[contenteditable]:focus-visible {
+  outline: none;
+}
+
 [contenteditable] * {
   font-family: 'Phenomena';
   letter-spacing: 0.5px;
