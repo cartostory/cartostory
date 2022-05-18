@@ -19,3 +19,8 @@ See https://github.com/docker/compose/issues/4337. The problem is anonymous volu
 ```
 ENVIRONMENT=DEV SERVICE=frontend make rebuild
 ```
+
+## Sources
+
+- https://feathericons.com/
+- https://remixicon.com/
