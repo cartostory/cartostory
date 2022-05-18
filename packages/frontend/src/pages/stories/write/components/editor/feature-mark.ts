@@ -14,7 +14,7 @@ declare module '@tiptap/core' {
       /**
        * Set a feature mark
        */
-      setMarker: (layer: EntityMarker, handler: () => void) => ReturnType
+      setMarker: (layer: EntityMarker) => ReturnType
       /**
        * Toggle a feature mark
        */

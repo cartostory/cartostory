@@ -8,7 +8,7 @@ import {
   isCenteredOnFeature,
   selectionHasFeature,
 } from '../../../../../lib/state/story'
-import { useStoryContext } from '../../providers/story-provider'
+import { useAction, useStoryContext } from '../../providers/story-provider'
 import { useActor, useSelector } from '@xstate/react'
 import React from 'react'
 import { isEntityMarker } from '../../../../../lib/editor'
@@ -20,7 +20,16 @@ function Editor() {
     content: '<p>Hello World!</p>',
   })
   const storyMachine = useStoryContext()
-  const [state, send] = useActor(storyMachine)
+  const [state] = useActor(storyMachine)
+  const {
+    removeFeature,
+    startFeatureAddition,
+    reset,
+    centerMap,
+    clearSelection,
+    selectWithFeature,
+    selectWithNoFeature,
+  } = useAction()
   const selectionWithFeature = useSelector(storyMachine, selectionHasFeature)
   const isCentered = useSelector(storyMachine, isCenteredOnFeature)
   const MarkerIcon = selectionWithFeature ? (
@@ -70,15 +79,9 @@ function Editor() {
               if (selectionWithFeature) {
                 const featureIdAttribute =
                   editor?.getAttributes('feature')?.['data-feature-id']
-                send({
-                  type: 'REMOVE_FEATURE',
-                  id: featureIdAttribute,
-                })
+                removeFeature(featureIdAttribute)
               } else {
-                send({
-                  type: 'START_FEATURE_ADDITION',
-                  callback: editor.commands.setMarker,
-                })
+                startFeatureAddition(editor.commands.setMarker)
               }
             }}
           >
@@ -93,12 +96,7 @@ function Editor() {
           </button>
         </BubbleMenu>
       ) : null}
-      <div
-        className="overflow-auto grow"
-        onScroll={() => {
-          send('RESET')
-        }}
-      >
+      <div className="overflow-auto grow" onScroll={reset}>
         <EditorContent
           className="mt-12"
           style={{ minHeight: '1000px' }}
@@ -108,24 +106,16 @@ function Editor() {
               editor?.getAttributes('feature')?.['data-feature-id']
 
             if (featureId) {
-              send({
-                type: 'CENTER_ON_FEATURE',
-                id: featureId,
-                target: 'map',
-              })
+              centerMap(featureId)
             }
 
             if (emptySelection) {
-              send('UNSELECT')
+              clearSelection()
             } else {
               if (featureId) {
-                send({
-                  type: 'SELECT_WITH_FEATURE_ALREADY',
-                  featureId: featureId,
-                  callback: editor.commands.toggleMarker,
-                })
+                selectWithFeature(featureId, editor.commands.toggleMarker)
               } else {
-                send('SELECT_WITH_NO_FEATURE_YET')
+                selectWithNoFeature()
               }
             }
           }}

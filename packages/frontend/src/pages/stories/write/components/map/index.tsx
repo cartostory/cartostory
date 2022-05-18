@@ -10,7 +10,7 @@ import {
   isAddingFeature,
   isCenteredOnFeature,
 } from '../../../../../lib/state/story'
-import { useStoryContext } from '../../providers/story-provider'
+import { useAction, useStoryContext } from '../../providers/story-provider'
 import type { EntityMarker } from '../../../../../lib/editor'
 import { entityMarker, isEntityMarker } from '../../../../../lib/editor'
 import '../../../../../lib/leaflet'
@@ -19,23 +19,20 @@ function Map() {
   const storyMachine = useStoryContext()
   const isCentered = useSelector(storyMachine, isCenteredOnFeature)
   const isFeatureBeingAdded = useSelector(storyMachine, isAddingFeature)
-  const [state, send] = useActor(storyMachine)
+  const [state] = useActor(storyMachine)
+  const { centerStory, reset } = useAction()
   const features = state.context.features.filter(isEntityMarker)
   const feature =
     isCentered && state.context.feature?.target === 'map'
       ? state.context.feature?.feature
       : undefined
   const centerOnFeature = (f: typeof features[number]) => {
-    send({
-      type: 'CENTER_ON_FEATURE',
-      id: f.options.id,
-      target: 'story',
-    })
+    centerStory(f.options.id)
   }
 
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
-      {isCentered ? <OnMapMove callback={() => send('RESET')} /> : null}
+      {isCentered ? <OnMapMove callback={reset} /> : null}
       {feature ? <FlyToFeature feature={feature} /> : null}
       <MapLayers />
       {isFeatureBeingAdded ? <EditLayer /> : null}
@@ -122,8 +119,7 @@ function useCreateFeature(featureType?: 'marker' | 'rectangle') {
 }
 
 function useDraw(featureType?: 'marker' | 'rectangle') {
-  const storyMachine = useStoryContext()
-  const [, send] = useActor(storyMachine)
+  const { finishFeatureAddition } = useAction()
   const map = useMap() as L.DrawMap
   const { feature, handler, options } = useCreateFeature(featureType) ?? {}
   const drawing = React.useRef<L.Draw.Marker | L.Draw.Rectangle>()
@@ -146,10 +142,14 @@ function useDraw(featureType?: 'marker' | 'rectangle') {
 
     map.on(window.L.Draw.Event.CREATED, e => {
       const feature = handler(e)
-      send({ type: 'FINISH_FEATURE_ADDITION', feature })
+
+      if (isEntityMarker(feature)) {
+        finishFeatureAddition(feature)
+      }
+
       drawing.current?.disable()
     })
-  }, [send, map, featureType, feature, handler, options])
+  }, [finishFeatureAddition, map, featureType, feature, handler, options])
 }
 
 function FlyToFeature({ feature }: { feature: L.Marker | L.Rectangle }) {

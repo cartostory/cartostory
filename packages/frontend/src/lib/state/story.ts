@@ -36,7 +36,7 @@ const machine = createMachine<Context>(
     id: 'story',
     // @ts-expect-error
     // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-    tsTypes: {} as import('./story-provider.typegen').Typegen0,
+    tsTypes: {} as import('./story.typegen').Typegen0,
     schema: {
       context: {} as Context,
       events: {} as Events,
@@ -232,3 +232,4 @@ function isCenteredOnFeature(state) {
 }
 
 export { machine, selectionHasFeature, isAddingFeature, isCenteredOnFeature }
+export type { Events }
