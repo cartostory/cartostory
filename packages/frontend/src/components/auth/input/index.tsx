@@ -1,5 +1,3 @@
-import React from 'react'
-
 function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input

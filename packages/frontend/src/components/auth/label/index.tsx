@@ -1,5 +1,3 @@
-import React from 'react'
-
 function Label({
   children,
   className,

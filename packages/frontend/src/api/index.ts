@@ -37,18 +37,8 @@ myAxios.interceptors.response.use(
           myAxios.defaults.headers.common.Authorization = accessToken
           return await myAxios(originalConfig)
         } catch (_error) {
-          // @ts-expect-error unknown error
-          if (_error.response?.data) {
-            // @ts-expect-error unknown error
-            return Promise.reject(_error.response.data)
-          }
-
           return Promise.reject(_error)
         }
-      }
-
-      if (err.response.status === 403 && err.response.data) {
-        return Promise.reject(err.response.data)
       }
     }
 

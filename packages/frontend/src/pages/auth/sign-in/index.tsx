@@ -4,7 +4,8 @@ import { useMutation } from 'react-query'
 import { myAxios } from '../../../api'
 import { useAuthContext } from '../../../providers/auth-provider'
 import React from 'react'
-import { Form, Input, Label } from '../../../components'
+import { Form, Input, Label, Message } from '../../../components'
+import type { AxiosError, AxiosResponse } from 'axios'
 
 type Credentials = {
   email: string
@@ -32,15 +33,15 @@ const useTogglePassword = (): ['password' | 'text', () => void] => {
 
 const useSignIn = () => {
   const { login } = useAuthContext()
-  const mutation = useMutation(
-    async (data: Credentials) =>
-      myAxios.post<AuthTokens>('/auth/sign-in', data),
-    {
-      onSuccess: ({ data }) => {
-        login(data.data)
-      },
+  const mutation = useMutation<
+    AxiosResponse<AuthTokens>,
+    AxiosError<ApiError>,
+    Credentials
+  >(async data => myAxios.post('/auth/sign-in', data), {
+    onSuccess: ({ data }) => {
+      login(data.data)
     },
-  )
+  })
 
   return mutation
 }
@@ -111,6 +112,11 @@ function SignIn() {
         handleSubmit(e)
       }}
     >
+      {signInMutation.error?.response?.data.message ? (
+        <Message mode="block" level="error">
+          {signInMutation.error.response.data.message}
+        </Message>
+      ) : null}
       <Label>
         <span className="my-required">E-mail</span>
         <Input
@@ -119,7 +125,11 @@ function SignIn() {
           required
           type="email"
         />
-        {errors.email ? <small>{errors.email}</small> : null}
+        {errors.email ? (
+          <Message mode="inline" level="error">
+            {errors.email}
+          </Message>
+        ) : null}
       </Label>
       <Label>
         <span className="my-required">Password</span>
@@ -129,7 +139,11 @@ function SignIn() {
           required
           type={passwordType}
         />
-        {errors.password ? <small>{errors.password}</small> : null}
+        {errors.password ? (
+          <Message mode="inline" level="error">
+            {errors.password}
+          </Message>
+        ) : null}
       </Label>
       <Label className="space-x-3 mt-3 cursor-pointer">
         <input
@@ -140,6 +154,7 @@ function SignIn() {
         <span>show password</span>
       </Label>
       <input
+        disabled={signInMutation.status === 'loading'}
         className="border block w-full py-3 cursor-pointer"
         type="submit"
         value="sign in"
