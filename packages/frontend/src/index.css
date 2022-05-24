@@ -26,6 +26,10 @@
   font-display: swap;
 }
 
+.my-required {
+  @apply after:content-['*'] after:ml-0.5 after:text-red-500;
+}
+
 [data-feature-id] {
   cursor: pointer;
   text-decoration: underline;

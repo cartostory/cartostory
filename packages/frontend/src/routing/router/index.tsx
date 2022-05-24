@@ -35,7 +35,7 @@ const MyRoutes = (): React.ReactElement => (
       path="/auth"
       element={
         <>
-          auth: <Outlet />
+          <Outlet />
         </>
       }
     >

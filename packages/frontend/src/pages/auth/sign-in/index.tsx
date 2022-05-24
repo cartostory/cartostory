@@ -3,6 +3,8 @@ import { useToggle } from '../../../hooks'
 import { useMutation } from 'react-query'
 import { myAxios } from '../../../api'
 import { useAuthContext } from '../../../providers/auth-provider'
+import React from 'react'
+import { Form, Input, Label } from '../../../components'
 
 type Credentials = {
   email: string
@@ -11,6 +13,10 @@ type Credentials = {
 
 type FormCredentials = {
   [key in keyof Credentials]: { value: Credentials[key] }
+}
+
+type FormErrors = {
+  [key in keyof Credentials]: string
 }
 
 type AuthTokens = {
@@ -52,33 +58,93 @@ const useFormSubmit = (onSubmit: ReturnType<typeof useSignIn>['mutate']) => {
   return handler
 }
 
-const SignIn = () => {
+function useFormValidation(): [
+  FormErrors,
+  (elements: HTMLInputElement[]) => boolean,
+] {
+  const [errors, setErrors] = React.useState<FormErrors>({} as FormErrors)
+
+  /**
+   * TODO reconsider whether validate should return the result
+   */
+  const validate = (elements: HTMLInputElement[]) => {
+    const result = elements.reduce((prev, cur) => {
+      if (cur.validity.valid) {
+        return prev
+      }
+
+      return {
+        ...prev,
+        [cur.name]: cur.validationMessage,
+      }
+      // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
+    }, {} as FormErrors)
+
+    setErrors(result)
+
+    return Object.keys(result).length === 0
+  }
+
+  return [errors, validate]
+}
+
+function SignIn() {
   const [passwordType, togglePassword] = useTogglePassword()
   const signInMutation = useSignIn()
   const handleSubmit = useFormSubmit(signInMutation.mutate)
+  const [errors, validate] = useFormValidation()
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Form
+      noValidate
+      onSubmit={e => {
+        e.preventDefault()
+        const form = e.target as {
+          email: HTMLInputElement
+          password: HTMLInputElement
+        } & typeof e.target
+
+        if (!validate([form.email, form.password])) {
+          return
+        }
+
+        handleSubmit(e)
+      }}
+    >
+      <Label>
+        <span className="my-required">E-mail</span>
+        <Input
+          name="email"
+          placeholder="e-mail address"
+          required
+          type="email"
+        />
+        {errors.email ? <small>{errors.email}</small> : null}
+      </Label>
+      <Label>
+        <span className="my-required">Password</span>
+        <Input
+          name="password"
+          placeholder="password"
+          required
+          type={passwordType}
+        />
+        {errors.password ? <small>{errors.password}</small> : null}
+      </Label>
+      <Label className="space-x-3 mt-3 cursor-pointer">
+        <input
+          onChange={togglePassword}
+          type="checkbox"
+          className="cursor-pointer"
+        />
+        <span>show password</span>
+      </Label>
       <input
-        autoComplete="off"
-        name="email"
-        required
-        type="email"
-        placeholder="e-mail address"
+        className="border block w-full py-3 cursor-pointer"
+        type="submit"
+        value="sign in"
       />
-      <input
-        autoComplete="off"
-        name="password"
-        required
-        type={passwordType}
-        placeholder="password"
-      />
-      <label>
-        show password
-        <input onChange={() => togglePassword()} type="checkbox" />
-      </label>
-      <input type="submit" value="sign in" />
-    </form>
+    </Form>
   )
 }
 
