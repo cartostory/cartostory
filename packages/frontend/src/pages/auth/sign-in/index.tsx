@@ -25,70 +25,6 @@ type AuthTokens = {
   status: string
 }
 
-const useTogglePassword = (): ['password' | 'text', () => void] => {
-  const [isPassword, { toggle: togglePassword }] = useToggle()
-
-  return [isPassword ? 'password' : 'text', togglePassword]
-}
-
-const useSignIn = () => {
-  const { login } = useAuthContext()
-  const mutation = useMutation<
-    AxiosResponse<AuthTokens>,
-    AxiosError<ApiError>,
-    Credentials
-  >(async data => myAxios.post('/auth/sign-in', data), {
-    onSuccess: ({ data }) => {
-      login(data.data)
-    },
-  })
-
-  return mutation
-}
-
-const useFormSubmit = (onSubmit: ReturnType<typeof useSignIn>['mutate']) => {
-  const handler: FormEventHandler<HTMLFormElement> = e => {
-    e.preventDefault()
-    const target = e.target as typeof e.target & FormCredentials
-    const email = target.email.value
-    const password = target.password.value
-
-    return onSubmit({ email, password })
-  }
-
-  return handler
-}
-
-function useFormValidation(): [
-  FormErrors,
-  (elements: HTMLInputElement[]) => boolean,
-] {
-  const [errors, setErrors] = React.useState<FormErrors>({} as FormErrors)
-
-  /**
-   * TODO reconsider whether validate should return the result
-   */
-  const validate = (elements: HTMLInputElement[]) => {
-    const result = elements.reduce((prev, cur) => {
-      if (cur.validity.valid) {
-        return prev
-      }
-
-      return {
-        ...prev,
-        [cur.name]: cur.validationMessage,
-      }
-      // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
-    }, {} as FormErrors)
-
-    setErrors(result)
-
-    return Object.keys(result).length === 0
-  }
-
-  return [errors, validate]
-}
-
 function SignIn() {
   const [passwordType, togglePassword] = useTogglePassword()
   const signInMutation = useSignIn()
@@ -161,6 +97,70 @@ function SignIn() {
       />
     </Form>
   )
+}
+
+function useTogglePassword(): ['password' | 'text', () => void] {
+  const [isPassword, { toggle: togglePassword }] = useToggle()
+
+  return [isPassword ? 'password' : 'text', togglePassword]
+}
+
+function useSignIn() {
+  const { login } = useAuthContext()
+  const mutation = useMutation<
+    AxiosResponse<AuthTokens>,
+    AxiosError<ApiError>,
+    Credentials
+  >(async data => myAxios.post('/auth/sign-in', data), {
+    onSuccess: ({ data }) => {
+      login(data.data)
+    },
+  })
+
+  return mutation
+}
+
+function useFormSubmit(onSubmit: ReturnType<typeof useSignIn>['mutate']) {
+  const handler: FormEventHandler<HTMLFormElement> = e => {
+    e.preventDefault()
+    const target = e.target as typeof e.target & FormCredentials
+    const email = target.email.value
+    const password = target.password.value
+
+    return onSubmit({ email, password })
+  }
+
+  return handler
+}
+
+function useFormValidation(): [
+  FormErrors,
+  (elements: HTMLInputElement[]) => boolean,
+] {
+  const [errors, setErrors] = React.useState<FormErrors>({} as FormErrors)
+
+  /**
+   * TODO reconsider whether validate should return the result
+   */
+  const validate = (elements: HTMLInputElement[]) => {
+    const result = elements.reduce((prev, cur) => {
+      if (cur.validity.valid) {
+        return prev
+      }
+
+      return {
+        ...prev,
+        [cur.name]: cur.validationMessage,
+      }
+      // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
+    }, {} as FormErrors)
+
+    setErrors(result)
+
+    return Object.keys(result).length === 0
+  }
+
+  return [errors, validate]
 }
 
 export { SignIn }
