@@ -1,6 +1,5 @@
-import type { FormEventHandler } from 'react'
 import { Link } from 'react-router-dom'
-import { useTogglePassword } from '../../../hooks'
+import { useFormSubmit, useTogglePassword } from '../../../hooks'
 import { useMutation } from 'react-query'
 import { myAxios } from '../../../api'
 import { useAuthContext } from '../../../providers/auth-provider'
@@ -18,7 +17,9 @@ type AuthTokens = {
 function SignIn() {
   const [passwordType, togglePassword] = useTogglePassword()
   const signInMutation = useSignIn()
-  const handleSubmit = useFormSubmit(signInMutation.mutate)
+  const handleSubmit = useFormSubmit<ReturnType<typeof useSignIn>['mutate']>(
+    signInMutation.mutate,
+  )
   const [errors, validate] = useFormValidation()
 
   return (
@@ -103,20 +104,6 @@ function useSignIn() {
   })
 
   return mutation
-}
-
-function useFormSubmit(onSubmit: ReturnType<typeof useSignIn>['mutate']) {
-  const handler: FormEventHandler<HTMLFormElement> = e => {
-    e.preventDefault()
-    const target = e.target as typeof e.target &
-      MapTo<Credentials, { value: string }>
-    const email = target.email.value
-    const password = target.password.value
-
-    return onSubmit({ email, password })
-  }
-
-  return handler
 }
 
 function useFormValidation(): [

@@ -1,5 +1,4 @@
-import type { FormEventHandler } from 'react'
-import { useTogglePassword } from '../../../hooks'
+import { useFormSubmit, useTogglePassword } from '../../../hooks'
 import { useMutation } from 'react-query'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
@@ -9,13 +8,9 @@ import { Link } from 'react-router-dom'
 function SignUp() {
   const [passwordType, togglePassword] = useTogglePassword()
   const signUpMutation = useSignUp()
-
-  const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
-    e.preventDefault()
-    const { email, password } = e.target as typeof e.target &
-      MapTo<Credentials, { value: string }>
-    signUpMutation.mutate({ email: email.value, password: password.value })
-  }
+  const handleSubmit = useFormSubmit<ReturnType<typeof useSignUp>['mutate']>(
+    signUpMutation.mutate,
+  )
 
   return (
     <Form onSubmit={handleSubmit}>
