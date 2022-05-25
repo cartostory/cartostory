@@ -4,7 +4,11 @@ function Form({
 }: React.PropsWithChildren<unknown> &
   React.FormHTMLAttributes<HTMLFormElement>) {
   return (
-    <form {...props} className="mt-14 mx-auto w-max space-y-5 border p-10">
+    <form
+      {...props}
+      noValidate
+      className="mt-14 mx-auto w-max space-y-5 border p-10"
+    >
       {children}
     </form>
   )

@@ -11,9 +11,9 @@ declare global {
     password: string
   }
 
-  type MapTo<T, U> = {
-    [key in keyof T]: U
-  }
+  type MapTo<T, U> = { [key in keyof T]: U }
+
+  type MapUnionTo<T, U> = { [key in T]: U }
 }
 
 export {}

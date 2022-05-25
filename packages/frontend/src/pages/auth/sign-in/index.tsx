@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom'
-import { useFormSubmit, useTogglePassword } from '../../../hooks'
+import {
+  useFormSubmit,
+  useFormValidation,
+  useTogglePassword,
+} from '../../../hooks'
 import { useMutation } from 'react-query'
 import { myAxios } from '../../../api'
 import { useAuthContext } from '../../../providers/auth-provider'
-import React from 'react'
 import { Form, Input, Label, Message } from '../../../components'
 import type { AxiosError, AxiosResponse } from 'axios'
-
-type FormErrors = MapTo<Credentials, string>
 
 type AuthTokens = {
   data: Pick<ReturnType<typeof useAuthContext>, 'accessToken' | 'refreshToken'>
@@ -20,11 +21,10 @@ function SignIn() {
   const handleSubmit = useFormSubmit<ReturnType<typeof useSignIn>['mutate']>(
     signInMutation.mutate,
   )
-  const [errors, validate] = useFormValidation()
+  const [errors, validate] = useFormValidation<keyof Credentials>()
 
   return (
     <Form
-      noValidate
       onSubmit={e => {
         e.preventDefault()
         const { email, password } = e.target as typeof e.target &
@@ -104,36 +104,6 @@ function useSignIn() {
   })
 
   return mutation
-}
-
-function useFormValidation(): [
-  FormErrors,
-  (elements: HTMLInputElement[]) => boolean,
-] {
-  const [errors, setErrors] = React.useState<FormErrors>({} as FormErrors)
-
-  /**
-   * TODO reconsider whether validate should return the result
-   */
-  const validate = (elements: HTMLInputElement[]) => {
-    const result = elements.reduce((prev, cur) => {
-      if (cur.validity.valid) {
-        return prev
-      }
-
-      return {
-        ...prev,
-        [cur.name]: cur.validationMessage,
-      }
-      // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
-    }, {} as FormErrors)
-
-    setErrors(result)
-
-    return Object.keys(result).length === 0
-  }
-
-  return [errors, validate]
 }
 
 export { SignIn }

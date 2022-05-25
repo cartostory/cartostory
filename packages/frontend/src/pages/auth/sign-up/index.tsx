@@ -1,8 +1,12 @@
-import { useFormSubmit, useTogglePassword } from '../../../hooks'
+import {
+  useFormSubmit,
+  useFormValidation,
+  useTogglePassword,
+} from '../../../hooks'
 import { useMutation } from 'react-query'
 import type { AxiosError } from 'axios'
 import axios from 'axios'
-import { Form, Input, Label } from '../../../components'
+import { Form, Input, Label, Message } from '../../../components'
 import { Link } from 'react-router-dom'
 
 function SignUp() {
@@ -11,9 +15,27 @@ function SignUp() {
   const handleSubmit = useFormSubmit<ReturnType<typeof useSignUp>['mutate']>(
     signUpMutation.mutate,
   )
+  const [errors, validate] = useFormValidation<keyof Credentials>()
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form
+      onSubmit={e => {
+        e.preventDefault()
+        const { email, password } = e.target as typeof e.target &
+          MapTo<Credentials, HTMLInputElement>
+
+        if (!validate([email, password])) {
+          return
+        }
+
+        handleSubmit(e)
+      }}
+    >
+      {signUpMutation.error?.response?.data.message ? (
+        <Message mode="block" level="error">
+          {signUpMutation.error.response.data.message}
+        </Message>
+      ) : null}
       <Label>
         <span className="my-required">E-mail</span>
         <Input
@@ -22,6 +44,11 @@ function SignUp() {
           required
           type="email"
         />
+        {errors.email ? (
+          <Message mode="inline" level="error">
+            {errors.email}
+          </Message>
+        ) : null}
       </Label>
       <Label>
         <span className="my-required">Password</span>
@@ -31,6 +58,11 @@ function SignUp() {
           required
           type={passwordType}
         />
+        {errors.password ? (
+          <Message mode="inline" level="error">
+            {errors.password}
+          </Message>
+        ) : null}
       </Label>
       <Label className="space-x-3 mt-3 cursor-pointer">
         <input onChange={togglePassword} type="checkbox" />
