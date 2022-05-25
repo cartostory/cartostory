@@ -74,6 +74,10 @@ function Editor() {
     }
 
     elm.scrollIntoView({ behavior: 'smooth' })
+    elm.classList.add('text-red-500')
+    setTimeout(() => {
+      elm.classList.remove('text-red-500')
+    }, 1000)
   }, [
     isCentered,
     state.context.feature?.feature,
