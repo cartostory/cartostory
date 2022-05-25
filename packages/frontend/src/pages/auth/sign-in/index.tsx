@@ -1,5 +1,6 @@
 import type { FormEventHandler } from 'react'
-import { useToggle } from '../../../hooks'
+import { Link } from 'react-router-dom'
+import { useTogglePassword } from '../../../hooks'
 import { useMutation } from 'react-query'
 import { myAxios } from '../../../api'
 import { useAuthContext } from '../../../providers/auth-provider'
@@ -7,18 +8,7 @@ import React from 'react'
 import { Form, Input, Label, Message } from '../../../components'
 import type { AxiosError, AxiosResponse } from 'axios'
 
-type Credentials = {
-  email: string
-  password: string
-}
-
-type FormCredentials = {
-  [key in keyof Credentials]: { value: Credentials[key] }
-}
-
-type FormErrors = {
-  [key in keyof Credentials]: string
-}
+type FormErrors = MapTo<Credentials, string>
 
 type AuthTokens = {
   data: Pick<ReturnType<typeof useAuthContext>, 'accessToken' | 'refreshToken'>
@@ -36,12 +26,10 @@ function SignIn() {
       noValidate
       onSubmit={e => {
         e.preventDefault()
-        const form = e.target as {
-          email: HTMLInputElement
-          password: HTMLInputElement
-        } & typeof e.target
+        const { email, password } = e.target as typeof e.target &
+          MapTo<Credentials, HTMLInputElement>
 
-        if (!validate([form.email, form.password])) {
+        if (!validate([email, password])) {
           return
         }
 
@@ -93,16 +81,13 @@ function SignIn() {
         disabled={signInMutation.status === 'loading'}
         className="border block w-full py-3 cursor-pointer"
         type="submit"
-        value="sign in"
+        value="Sign in"
       />
+      <p>
+        Don't have an account yet? <Link to="/auth/sign-up">Sign up.</Link>
+      </p>
     </Form>
   )
-}
-
-function useTogglePassword(): ['password' | 'text', () => void] {
-  const [isPassword, { toggle: togglePassword }] = useToggle()
-
-  return [isPassword ? 'password' : 'text', togglePassword]
 }
 
 function useSignIn() {
@@ -123,7 +108,8 @@ function useSignIn() {
 function useFormSubmit(onSubmit: ReturnType<typeof useSignIn>['mutate']) {
   const handler: FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault()
-    const target = e.target as typeof e.target & FormCredentials
+    const target = e.target as typeof e.target &
+      MapTo<Credentials, { value: string }>
     const email = target.email.value
     const password = target.password.value
 

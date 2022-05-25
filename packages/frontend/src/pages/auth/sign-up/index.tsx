@@ -1,61 +1,65 @@
 import type { FormEventHandler } from 'react'
-import { useToggle } from '../../../hooks'
+import { useTogglePassword } from '../../../hooks'
 import { useMutation } from 'react-query'
+import type { AxiosError } from 'axios'
 import axios from 'axios'
+import { Form, Input, Label } from '../../../components'
+import { Link } from 'react-router-dom'
 
-const useTogglePassword = (): ['password' | 'text', () => void] => {
-  const [isPassword, { toggle: togglePassword }] = useToggle()
-
-  return [isPassword ? 'password' : 'text', togglePassword]
-}
-
-const useSignUp = () => {
-  const mutation = useMutation(async data =>
-    axios.post('/backend/auth/sign-up', data),
-  )
-
-  return mutation
-}
-
-const SignUp = () => {
+function SignUp() {
   const [passwordType, togglePassword] = useTogglePassword()
   const signUpMutation = useSignUp()
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault()
-    const target = e.target as typeof e.target & {
-      email: { value: string }
-      password: { value: string }
-    }
-    const email = target.email.value
-    const password = target.password.value
-    // @ts-expect-error hello
-    signUpMutation.mutate({ email, password })
+    const { email, password } = e.target as typeof e.target &
+      MapTo<Credentials, { value: string }>
+    signUpMutation.mutate({ email: email.value, password: password.value })
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Form onSubmit={handleSubmit}>
+      <Label>
+        <span className="my-required">E-mail</span>
+        <Input
+          name="email"
+          placeholder="e-mail address"
+          required
+          type="email"
+        />
+      </Label>
+      <Label>
+        <span className="my-required">Password</span>
+        <Input
+          name="password"
+          placeholder="password"
+          required
+          type={passwordType}
+        />
+      </Label>
+      <Label className="space-x-3 mt-3 cursor-pointer">
+        <input onChange={togglePassword} type="checkbox" />
+        <span>show password</span>
+      </Label>
       <input
-        autoComplete="off"
-        name="email"
-        required
-        type="email"
-        placeholder="e-mail address"
+        className="border block w-full py-3 cursor-pointer"
+        disabled={signUpMutation.status === 'loading'}
+        type="submit"
+        value="Sign up"
       />
-      <input
-        autoComplete="off"
-        name="password"
-        required
-        type={passwordType}
-        placeholder="password"
-      />
-      <label>
-        show password
-        <input onChange={() => togglePassword()} type="checkbox" />
-      </label>
-      <input type="submit" value="sign up" />
-    </form>
+      <p>
+        Already have an account? <Link to="/auth/sign-in">Sign in.</Link>
+      </p>
+    </Form>
   )
+}
+
+function useSignUp() {
+  const mutation = useMutation<void, AxiosError<ApiError>, Credentials>(
+    async data => axios.post('/backend/auth/sign-up', data),
+  )
+
+  return mutation
 }
 
 export { SignUp }
