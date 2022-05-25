@@ -11,6 +11,7 @@ import {
 import { useAction, useStoryContext } from '../../providers/story-provider'
 import { useActor, useSelector } from '@xstate/react'
 import React from 'react'
+import type { EntityMarker } from '../../../../../lib/editor'
 import { isEntityMarker } from '../../../../../lib/editor'
 import { MenuBar } from './components'
 
@@ -53,37 +54,13 @@ function Editor() {
   ) : (
     <MapPinAddLine />
   )
-
-  React.useEffect(() => {
-    if (
-      !(
-        isCentered &&
-        state.context.feature?.target === 'story' &&
-        isEntityMarker(state.context.feature.feature)
-      )
-    ) {
-      return
-    }
-
-    const elm = document.querySelector(
-      `[data-feature-id="${state.context.feature.feature.options.id}"]`,
-    )
-
-    if (!elm) {
-      return
-    }
-
-    elm.scrollIntoView({ behavior: 'smooth' })
-    elm.classList.add('text-red-500')
-    setTimeout(() => {
-      elm.classList.remove('text-red-500')
-    }, 1000)
-  }, [
-    isCentered,
-    state.context.feature?.feature,
-    state.context.feature?.feature.options.id,
-    state.context.feature?.target,
-  ])
+  const feature =
+    isCentered &&
+    state.context.feature?.target === 'story' &&
+    isEntityMarker(state.context.feature.feature)
+      ? state.context.feature.feature
+      : undefined
+  useHighlight(feature)
 
   return (
     <>
@@ -148,6 +125,29 @@ function Editor() {
       </div>
     </>
   )
+}
+
+function useHighlight(feature?: EntityMarker) {
+  React.useEffect(() => {
+    if (!feature) {
+      return
+    }
+
+    const selector = `[data-feature-id="${feature.options.id}"]`
+    const elm = document.querySelector(selector)
+    const highlight = 'text-red-500'
+
+    if (!elm) {
+      return
+    }
+
+    elm.scrollIntoView({ behavior: 'smooth' })
+    elm.classList.add(highlight)
+
+    setTimeout(() => {
+      elm.classList.remove(highlight)
+    }, 1000)
+  }, [feature])
 }
 
 export { Editor }
