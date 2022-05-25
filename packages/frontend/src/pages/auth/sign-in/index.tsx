@@ -18,9 +18,7 @@ type AuthTokens = {
 function SignIn() {
   const [passwordType, togglePassword] = useTogglePassword()
   const signInMutation = useSignIn()
-  const handleSubmit = useFormSubmit<ReturnType<typeof useSignIn>['mutate']>(
-    signInMutation.mutate,
-  )
+  const handleSubmit = useFormSubmit(signInMutation.mutate)
   const [errors, validate] = useFormValidation<keyof Credentials>()
 
   return (

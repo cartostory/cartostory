@@ -12,9 +12,7 @@ import { Link } from 'react-router-dom'
 function SignUp() {
   const [passwordType, togglePassword] = useTogglePassword()
   const signUpMutation = useSignUp()
-  const handleSubmit = useFormSubmit<ReturnType<typeof useSignUp>['mutate']>(
-    signUpMutation.mutate,
-  )
+  const handleSubmit = useFormSubmit(signUpMutation.mutate)
   const [errors, validate] = useFormValidation<keyof Credentials>()
 
   return (
