@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useAuthContext } from '../../providers/auth-provider'
-import Logout from '../../assets/log-out.svg'
-import UserCheck from '../../assets/user-check.svg'
+import { ReactComponent as Logout } from '../../assets/log-out.svg'
+import { ReactComponent as UserCheck } from '../../assets/user-check.svg'
+import { ReactComponent as DraftLine } from '../../assets/draft-line.svg'
 
 function Home() {
   return (
@@ -27,7 +28,12 @@ function AppBar() {
 function Navigation() {
   return (
     <ul className="flex grow space-x-5">
-      <li>item 1</li>
+      <li>
+        <Link className="flex space-x-2" to="/stories/write">
+          <DraftLine />
+          <span>new story</span>
+        </Link>
+      </li>
       <li>item 2</li>
       <li>item 3</li>
     </ul>
@@ -50,13 +56,13 @@ function UserMenu({
         {!notVerifiedYet ? (
           <li className="flex space-x-5">
             <span className="grow">verify</span>
-            <img src={UserCheck} />
+            <UserCheck />
           </li>
         ) : null}
         <li>
           <Link to="/auth/logout" className="flex space-x-5">
             <span className="grow">logout</span>
-            <img src={Logout} />
+            <Logout />
           </Link>
         </li>
       </ul>
