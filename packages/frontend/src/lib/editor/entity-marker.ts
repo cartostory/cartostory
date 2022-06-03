@@ -8,6 +8,13 @@ class EntityMarker extends L.Marker {
 
   constructor(latLng: L.LatLngExpression, options?: L.MarkerOptions) {
     super(latLng, options)
+    this.feature = {
+      ...this.feature,
+      type: 'Feature',
+      properties: {
+        id: randomString(6),
+      },
+    }
   }
 }
 
