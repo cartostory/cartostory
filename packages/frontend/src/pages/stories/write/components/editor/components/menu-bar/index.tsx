@@ -102,6 +102,9 @@ function MenuBar({ editor }: { editor: ReturnType<typeof useEditor> }) {
       >
         <ListOrdered className={classes.icon} />
       </button>
+      <button form="story-form" className={classes.button}>
+        save me
+      </button>
     </div>
   )
 }
