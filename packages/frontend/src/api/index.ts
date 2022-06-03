@@ -9,16 +9,24 @@ const myAxios = axios.create({
 
 myAxios.interceptors.request.use(
   config => {
-    const token = window.localStorage.getItem('accessToken')
+    const auth = window.localStorage.getItem('auth')
 
-    if (token) {
-      config.headers = {
-        ...(config.headers ?? {}),
-        Authorization: `Bearer ${token}`,
-      }
+    if (!auth) {
+      return config
     }
 
-    return config
+    try {
+      const { accessToken } = JSON.parse(auth)
+      config.headers = {
+        ...(config.headers ?? {}),
+        Authorization: `Bearer ${accessToken}`,
+      }
+
+      return config
+    } catch (e) {
+      console.log('error')
+      return config
+    }
   },
   async error => Promise.reject(error),
 )

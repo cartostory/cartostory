@@ -8,29 +8,47 @@ import { useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { FeatureMark } from '../editor/feature-mark'
 import { content } from './content'
+import { useMutation } from 'react-query'
+import type { AxiosError, AxiosResponse } from 'axios'
+import { myAxios } from '../../../../../api'
+import { isEntityMarker } from '../../../../../lib/editor'
+
+type Payload = {
+  slug: string
+  story: {
+    title: string
+    text: Record<string, unknown>
+    map: Record<'features', unknown>
+  }
+}
 
 function Story() {
   const machine = useStoryContext()
+  const storyMutation = useSaveStory()
   const editor = useEditor({
     extensions: [StarterKit, FeatureMark],
     content,
   })
   const [slug, setSlug] = useSlug()
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = e => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (
+    e: React.FormEvent<HTMLFormElement> & {
+      target: { elements: Record<'slug' | 'title', HTMLInputElement> }
+    },
+  ) => {
     e.preventDefault()
     const { features } = machine.state.context
-    const payload = {
+    const payload: Payload = {
       slug: e.target.elements.slug.value,
       story: {
         title: e.target.elements.title.value,
         text: editor!.getJSON(),
         map: {
-          features: features.map(f => f.toGeoJSON()),
+          features: features.filter(isEntityMarker).map(f => f.toGeoJSON()),
         },
       },
     }
-    console.log('submit', payload)
+    storyMutation.mutate(payload)
   }
 
   return (
@@ -83,6 +101,16 @@ function useSlug(): [
   }
 
   return [slug ? `${slug}-${urlSuffix}` : undefined, handleChange]
+}
+
+function useSaveStory() {
+  const mutation = useMutation<
+    AxiosResponse<unknown>,
+    AxiosError<ApiError>,
+    Payload
+  >(async data => myAxios.post('/stories', data))
+
+  return mutation
 }
 
 export { Story }

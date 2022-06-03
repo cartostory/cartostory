@@ -91,6 +91,7 @@ function SignIn() {
 
 function useSignIn() {
   const { login } = useAuthContext()
+  // TODO check if useQuery wouldn't be enough
   const mutation = useMutation<
     AxiosResponse<AuthTokens>,
     AxiosError<ApiError>,
