@@ -6,12 +6,8 @@ import { Editor } from './components/editor'
 import { Map } from './components/map'
 import { ActionProvider, StoryProvider } from './providers/story-provider'
 
-const urlSuffix = randomString(6)
-
 function Write() {
-  const [title, setTitle] = useTitle()
-  const urlSlug = _deburr(_kebabCase(title))
-  const url = `${urlSlug}-${urlSuffix}`
+  const [slug, setSlug] = useSlug()
 
   return (
     <StoryProvider>
@@ -26,25 +22,38 @@ function Write() {
             />
           </div>
           <div className="w-1/2 p-5 px-10 flex flex-col h-[100vh]">
-            <form className="relative z-[2]">
+            <form
+              onSubmit={e => {
+                e.preventDefault()
+                console.log(e.target)
+              }}
+              id="story-form"
+              className="relative z-[2]"
+            >
               <input
-                value={title}
-                onChange={setTitle}
-                style={{ fontFamily: 'Phenomena' }}
                 className="w-full py-2 text-4xl bg-white border-0 border-b-2 text-gray-500 font-bold focus:outline-none"
-                type="text"
+                onChange={setSlug}
                 placeholder="Your story title"
+                required
+                style={{ fontFamily: 'Phenomena' }}
+                type="text"
               />
             </form>
             <p className="flex space-x-2 text-gray-500 py-3 bg-white z-[2] relative">
-              {title.length > 0 ? (
+              {slug ? (
                 <>
                   <Link />
-                  <small>your story URL: {url}</small>
+                  <small>your story URL: {slug}</small>
                 </>
               ) : null}
             </p>
             <Editor />
+            <button
+              form="story-form"
+              className="absolute shadow-md bottom-5 right-5 p-2 bg-white"
+            >
+              save me
+            </button>
           </div>
         </div>
       </ActionProvider>
@@ -52,14 +61,19 @@ function Write() {
   )
 }
 
-function useTitle(): [string, React.FormEventHandler<HTMLInputElement>] {
-  const [title, setTitle] = React.useState('')
+const urlSuffix = randomString(6)
+
+function useSlug(): [
+  string | undefined,
+  React.FormEventHandler<HTMLInputElement>,
+] {
+  const [slug, setSlug] = React.useState('')
 
   const handleChange: React.FormEventHandler<HTMLInputElement> = e => {
-    setTitle(e.currentTarget.value)
+    setSlug(_deburr(_kebabCase(e.currentTarget.value)))
   }
 
-  return [title, handleChange]
+  return [slug ? `${slug}-${urlSuffix}` : undefined, handleChange]
 }
 
 export { Write }
