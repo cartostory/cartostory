@@ -36,7 +36,7 @@ function useStoryContext() {
   const context = React.useContext(StoryContext)
 
   if (!context) {
-    throw new Error('WriteContext is only available inside WriteProvider.')
+    throw new Error('StoryContext is only available inside StoryProvider.')
   }
 
   return context
