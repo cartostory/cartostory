@@ -27,7 +27,7 @@ function Map() {
       ? state.context.feature?.feature
       : undefined
   const centerOnFeature = (f: typeof features[number]) => {
-    centerStory(f.options.id)
+    centerStory(f.feature.properties.id)
   }
 
   return (
@@ -38,7 +38,7 @@ function Map() {
       {isFeatureBeingAdded ? <EditLayer /> : null}
       {features.map(feature => (
         <Feature
-          key={feature.options.id}
+          key={feature.feature.properties.id}
           feature={feature}
           onClick={centerOnFeature}
         />
@@ -61,7 +61,7 @@ function Feature({
       eventHandlers={{
         click: () => onClick(feature),
       }}
-      key={feature.options.id}
+      key={feature.feature.properties.id}
       position={feature.getLatLng()}
     />
   )

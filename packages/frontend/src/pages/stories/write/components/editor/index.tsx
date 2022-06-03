@@ -133,7 +133,7 @@ function useHighlight(feature?: EntityMarker) {
       return
     }
 
-    const selector = `[data-feature-id="${feature.options.id}"]`
+    const selector = `[data-feature-id="${feature.feature!.properties.id}"]`
     const elm = document.querySelector(selector)
     const highlight = 'text-red-500'
 
