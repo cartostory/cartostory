@@ -41,9 +41,6 @@ export const FeatureMark = Mark.create<FeatureOptions>({
       'data-feature-id': {
         default: null,
       },
-      onclick: {
-        default: null,
-      },
     }
   },
 
