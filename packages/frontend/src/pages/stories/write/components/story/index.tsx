@@ -4,9 +4,17 @@ import { ReactComponent as Link } from '../../../../../assets/link.svg'
 import { randomString } from '../../../../../utils'
 import React from 'react'
 import { useStoryContext } from '../../providers/story-provider'
+import { useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import { FeatureMark } from '../editor/feature-mark'
+import { content } from './content'
 
 function Story() {
   const machine = useStoryContext()
+  const editor = useEditor({
+    extensions: [StarterKit, FeatureMark],
+    content,
+  })
   const [slug, setSlug] = useSlug()
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = e => {
@@ -16,7 +24,7 @@ function Story() {
       slug: e.target.elements.slug.value,
       story: {
         title: e.target.elements.title.value,
-        //text: editor.getJSON(),
+        text: editor!.getJSON(),
         map: {
           features: features.map(f => f.toGeoJSON()),
         },
@@ -56,7 +64,7 @@ function Story() {
           </>
         ) : null}
       </p>
-      <Editor />
+      <Editor editor={editor} />
     </>
   )
 }
