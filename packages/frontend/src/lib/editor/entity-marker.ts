@@ -2,10 +2,6 @@ import L from 'leaflet'
 import { randomString } from '../../utils'
 
 class EntityMarker extends L.Marker {
-  options: L.MarkerOptions & { id: string } = {
-    id: randomString(6),
-  }
-
   constructor(latLng: L.LatLngExpression, options?: L.MarkerOptions) {
     super(latLng, options)
     this.feature = {
@@ -18,15 +14,12 @@ class EntityMarker extends L.Marker {
   }
 }
 
-function entityMarker(
-  latLng: L.LatLngExpression,
-  options?: L.MarkerOptions & { id: string },
-) {
+function entityMarker(latLng: L.LatLngExpression, options?: L.MarkerOptions) {
   return new EntityMarker(latLng, options)
 }
 
 function isEntityMarker(obj: L.Marker | L.Rectangle): obj is EntityMarker {
-  return 'id' in obj.options
+  return 'id' in obj.feature!.properties
 }
 
 export { entityMarker, isEntityMarker }

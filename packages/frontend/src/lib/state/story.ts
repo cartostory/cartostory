@@ -192,7 +192,7 @@ const machine = createMachine<Context>(
         features: (context, event) =>
           context.features
             .filter(isEntityMarker)
-            .filter(feature => feature.options.id !== event.id),
+            .filter(feature => feature.feature!.properties.id !== event.id),
       }),
       setActiveFeature: assign({
         feature: (context, event) => {
@@ -201,7 +201,7 @@ const machine = createMachine<Context>(
           }
           const feature = context.features
             .filter(isEntityMarker)
-            .find(f => f.options.id === event.id)
+            .find(f => f.feature!.properties.id === event.id)
 
           if (!feature) {
             return
