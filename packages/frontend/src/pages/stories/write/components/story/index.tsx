@@ -54,6 +54,7 @@ function Story() {
             <small>
               your story URL:{' '}
               <input
+                className="focus:outline-none"
                 form="story-form"
                 name="slug"
                 readOnly
