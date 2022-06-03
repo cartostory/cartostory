@@ -32,7 +32,7 @@ function Map() {
 
   return (
     <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
-      {isCentered ? <OnMapMove callback={reset} /> : null}
+      {isCentered ? <OnMapMove onDone={reset} /> : null}
       {feature ? <FlyToFeature feature={feature} /> : null}
       <MapLayers />
       {isFeatureBeingAdded ? <EditLayer /> : null}
@@ -67,8 +67,8 @@ function Feature({
   )
 }
 
-function OnMapMove({ callback }: { callback: () => void }) {
-  useMapEvent('moveend', callback)
+function OnMapMove({ onDone }: { onDone: () => void }) {
+  useMapEvent('moveend', onDone)
 
   return null
 }
