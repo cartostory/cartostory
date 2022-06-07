@@ -12,6 +12,8 @@ import { useMutation } from 'react-query'
 import type { AxiosError, AxiosResponse } from 'axios'
 import { myAxios } from '../../../../../api'
 import { isEntityMarker } from '../../../../../lib/editor'
+import { useFormValidation } from '../../../../../hooks'
+import { Form, Message } from '../../../../../components'
 
 type Payload = {
   slug: string
@@ -30,16 +32,23 @@ function Story() {
     content,
   })
   const [slug, setSlug] = useSlug()
+  const [errors, validate] = useFormValidation<'title' | 'slug'>()
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (
     e: React.FormEvent<HTMLFormElement> & {
-      target: { elements: Record<'slug' | 'title', HTMLInputElement> }
+      target: { elements: Record<'title', HTMLInputElement> }
     },
   ) => {
     e.preventDefault()
+    const { title } = e.target.elements
+
+    if (!validate([title])) {
+      return
+    }
+
     const { features } = machine.state.context
     const payload: Payload = {
-      slug: e.target.elements.slug.value,
+      slug: slug!,
       story: {
         title: e.target.elements.title.value,
         text: editor!.getJSON(),
@@ -53,7 +62,11 @@ function Story() {
 
   return (
     <>
-      <form onSubmit={handleSubmit} id="story-form" className="relative z-[2]">
+      <Form
+        onSubmit={handleSubmit}
+        id="story-form"
+        className="relative z-[2] mt-0 mx-0 border-0 px-0"
+      >
         <input
           autoComplete="off"
           className="w-full py-2 text-4xl bg-white border-0 border-b-2 text-gray-500 font-bold focus:outline-none"
@@ -64,7 +77,12 @@ function Story() {
           style={{ fontFamily: 'Phenomena' }}
           type="text"
         />
-      </form>
+        {errors.title ? (
+          <Message mode="inline" level="error">
+            {errors.title}
+          </Message>
+        ) : null}
+      </Form>
       <p className="flex space-x-2 text-gray-500 py-3 bg-white z-[2] relative">
         {slug ? (
           <>
@@ -90,6 +108,7 @@ function Story() {
 
 const urlSuffix = randomString(6)
 
+// TODO drop this and get the random string from the backend instead
 function useSlug(): [
   string | undefined,
   React.FormEventHandler<HTMLInputElement>,
