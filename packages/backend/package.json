@@ -19,7 +19,7 @@
     "@rearguard/is-email": "^1.7.1",
     "amqplib": "^0.8.0",
     "bcrypt": "^5.0.1",
-    "fastify": "^3.19.2",
+    "fastify": "^3.29.4",
     "fastify-amqp": "^1.0.0",
     "fastify-jwt": "^3.0.0",
     "fastify-plugin": "^3.0.0",
