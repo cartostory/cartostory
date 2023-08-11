@@ -18,7 +18,7 @@ function Home() {
 function AppBar() {
   const auth = useAuthContext()
   return (
-    <nav className="sticky flex px-5 py-7 bg-green-200">
+    <nav className="fixed z-[1000] w-full flex px-5 py-7 bg-green-200">
       <Navigation />
       {auth.user ? <UserMenu user={auth.user} /> : <Buttons />}
     </nav>
@@ -83,4 +83,4 @@ function Buttons() {
   )
 }
 
-export { Home }
+export { Home, AppBar }

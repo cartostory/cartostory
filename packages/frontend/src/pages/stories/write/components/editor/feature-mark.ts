@@ -70,7 +70,7 @@ export const FeatureMark = Mark.create<FeatureOptions>({
         layer =>
         ({ commands }) => {
           const attributes = {
-            'data-feature-id': layer.feature.properties.id,
+            'data-feature-id': layer.feature?.properties.id,
           }
           return commands.setMark(this.name, attributes)
         },

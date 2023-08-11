@@ -27,18 +27,18 @@ function Map() {
       ? state.context.feature?.feature
       : undefined
   const centerOnFeature = (f: typeof features[number]) => {
-    centerStory(f.feature.properties.id)
+    centerStory(f.feature?.properties.id)
   }
 
   return (
-    <MapContainer className="h-screen" center={[51.505, -0.09]} zoom={13}>
+    <MapContainer className="my-map" center={[51.505, -0.09]} zoom={13}>
       {isCentered ? <OnMapMove onDone={reset} /> : null}
       {feature ? <FlyToFeature feature={feature} /> : null}
       <MapLayers />
       {isFeatureBeingAdded ? <EditLayer /> : null}
       {features.map(feature => (
         <Feature
-          key={feature.feature.properties.id}
+          key={feature.feature?.properties.id}
           feature={feature}
           onClick={centerOnFeature}
         />
@@ -61,7 +61,7 @@ function Feature({
       eventHandlers={{
         click: () => onClick(feature),
       }}
-      key={feature.feature.properties.id}
+      key={feature.feature?.properties.id}
       position={feature.getLatLng()}
     />
   )

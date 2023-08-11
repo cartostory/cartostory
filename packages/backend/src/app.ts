@@ -1,8 +1,9 @@
 import fastify from 'fastify'
 import fastifyAmqp from 'fastify-amqp'
 import type { FastifyRequest, FastifyReply } from 'fastify'
-import fastifyJwt from 'fastify-jwt'
-import fastifySwagger from 'fastify-swagger'
+import fastifyJwt from '@fastify/jwt'
+import fastifySwagger from '@fastify/swagger'
+import fastifySwaggerUi from '@fastify/swagger-ui'
 import { getStories, getStory } from './routes/stories/read'
 import { createStory } from './routes/stories/create'
 import { deleteStory } from './routes/stories/delete'
@@ -43,7 +44,6 @@ server.decorate(
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 server.register(fastifySwagger, {
-  routePrefix: '/openapi',
   swagger: {
     info: {
       title: 'Cartostory API',
@@ -66,12 +66,24 @@ server.register(fastifySwagger, {
       },
     },
   },
+})
+
+server.register(fastifySwaggerUi, {
+  routePrefix: '/openapi',
   uiConfig: {
-    docExpansion: 'list',
+    docExpansion: 'full',
     deepLinking: false,
   },
+  uiHooks: {
+    onRequest: function (request, reply, next) {
+      next()
+    },
+    preHandler: function (request, reply, next) {
+      next()
+    },
+  },
   staticCSP: true,
-  exposeRoute: true,
+  transformStaticCSP: header => header,
 })
 
 // auth
@@ -95,3 +107,7 @@ server.register(createStory)
 server.register(deleteStory)
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 server.register(updateStory)
+
+server.ready(() => {
+  server.swagger()
+})

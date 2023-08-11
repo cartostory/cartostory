@@ -68,19 +68,12 @@ const MyRoutes = (): React.ReactElement => (
     <Route
       path="/stories"
       element={
-        //<RequireAuthenticated>
-        <Outlet />
-        //</RequireAuthenticated>
+        <RequireAuthenticated>
+          <Outlet />
+        </RequireAuthenticated>
       }
     >
-      <Route
-        path="write"
-        element={
-          //<RequireAuthenticated>
-          <Write />
-          //</RequireAuthenticated>
-        }
-      />
+      <Route path="write" element={<Write />} />
       <Route path=":id" element={<>id</>} />
     </Route>
   </Routes>

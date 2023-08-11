@@ -1,4 +1,4 @@
-import type Knex from 'knex'
+import type { Knex } from 'knex'
 import type { User } from '../types'
 
 export class UserNotFoundError extends Error {

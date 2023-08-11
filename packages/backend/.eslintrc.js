@@ -5,6 +5,9 @@ module.exports = {
   extends: ['@rushstack/eslint-config/profile/node', 'prettier'],
   parserOptions: {
     tsconfigRootDir: __dirname,
+    ecmaVersion: '2020',
+    project: './tsconfig.json',
+    parser: '@typescript-eslint/parser',
   },
   rules: {
     'brace-style': 'off',
@@ -39,7 +42,6 @@ module.exports = {
     '@typescript-eslint/prefer-ts-expect-error': 'error',
     '@typescript-eslint/promise-function-async': 'error',
     '@typescript-eslint/require-await': 'error',
-    '@typescript-eslint/return-await': 'error',
     '@typescript-eslint/type-annotation-spacing': 'error',
     '@typescript-eslint/no-unused-vars': [
       'error',

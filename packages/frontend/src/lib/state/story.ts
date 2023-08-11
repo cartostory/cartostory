@@ -162,6 +162,7 @@ const machine = createMachine<Context>(
         onFeatureRemove: undefined,
       }),
       clearPreviousFeatureRemovalCallback: assign({
+        // @ts-expect-error error
         previousOnFeatureRemove: context => context.onFeatureRemove,
       }),
       addFeatureRemovalCallback: assign({
@@ -179,6 +180,7 @@ const machine = createMachine<Context>(
         onFeatureAdd: undefined,
       }),
       clearPreviousFeatureAdditionCallback: assign({
+        // @ts-expect-error error
         previousOnFeatureAdd: context => context.onFeatureAdd,
       }),
       addFeatureAdditionCallback: assign({
@@ -217,16 +219,19 @@ const machine = createMachine<Context>(
   },
 )
 
+// @ts-expect-error error
 function selectionHasFeature(state) {
   return state.matches('text.selected.withFeatureAlready')
 }
 
+// @ts-expect-error error
 function isAddingFeature(state) {
   return state.matches(
     'text.selected.withNoFeatureYet.featureAdditionInProgress',
   )
 }
 
+// @ts-expect-error error
 function isCenteredOnFeature(state) {
   return state.matches('feature.centered')
 }

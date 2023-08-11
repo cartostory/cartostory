@@ -1,5 +1,5 @@
 # builder
-FROM node:16-alpine as base
+FROM node:18-alpine as base
 RUN npm install -g pnpm@next-7
 ARG POSTGRES_DB
 ARG POSTGRES_PASS
