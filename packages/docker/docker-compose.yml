@@ -41,3 +41,8 @@ services:
     image: rabbitmq:3.9-management-alpine
     ports:
       - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 1s
+      timeout: 3s
+      retries: 30
