@@ -1,4 +1,4 @@
-import type Knex from 'knex'
+import type { Knex } from 'knex'
 import type { Story } from '../types'
 
 export const readOne = (db: Knex) => (userId: string, slug: string) =>

@@ -1,4 +1,4 @@
-import type Knex from 'knex'
+import type { Knex } from 'knex'
 import type { User, UserActivationCode } from '../types'
 
 export class ActivationCodeNotFoundError extends Error {

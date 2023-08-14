@@ -4,30 +4,69 @@ import { ReactComponent as Link } from '../../../../../assets/link.svg'
 import { randomString } from '../../../../../utils'
 import React from 'react'
 import { useStoryContext } from '../../providers/story-provider'
+import { useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import { FeatureMark } from '../editor/feature-mark'
+import { content } from './content'
+import { useMutation } from 'react-query'
+import type { AxiosError, AxiosResponse } from 'axios'
+import { myAxios } from '../../../../../api'
+import { isEntityMarker } from '../../../../../lib/editor'
+import { useFormValidation } from '../../../../../hooks'
+import { Form, Message } from '../../../../../components'
+
+type Payload = {
+  slug: string
+  story: {
+    title: string
+    text: Record<string, unknown>
+    map: Record<'features', unknown>
+  }
+}
 
 function Story() {
   const machine = useStoryContext()
+  const storyMutation = useSaveStory()
+  const editor = useEditor({
+    extensions: [StarterKit, FeatureMark],
+    content,
+  })
   const [slug, setSlug] = useSlug()
+  const [errors, validate] = useFormValidation<'title' | 'slug'>()
 
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = e => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (
+    e: React.FormEvent<HTMLFormElement> & {
+      target: { elements: Record<'title', HTMLInputElement> }
+    },
+  ) => {
     e.preventDefault()
+    const { title } = e.target.elements
+
+    if (!validate([title])) {
+      return
+    }
+
     const { features } = machine.state.context
-    const payload = {
-      slug: e.target.elements.slug.value,
+    const payload: Payload = {
+      slug: slug!,
       story: {
         title: e.target.elements.title.value,
-        //text: editor.getJSON(),
+        text: editor!.getJSON(),
         map: {
-          features: features.map(f => f.toGeoJSON()),
+          features: features.filter(isEntityMarker).map(f => f.toGeoJSON()),
         },
       },
     }
-    console.log('submit', payload)
+    storyMutation.mutate(payload)
   }
 
   return (
     <>
-      <form onSubmit={handleSubmit} id="story-form" className="relative z-[2]">
+      <Form
+        onSubmit={handleSubmit}
+        id="story-form"
+        className="relative z-[2] mt-0 mx-0 border-0 px-0"
+      >
         <input
           autoComplete="off"
           className="w-full py-2 text-4xl bg-white border-0 border-b-2 text-gray-500 font-bold focus:outline-none"
@@ -38,7 +77,12 @@ function Story() {
           style={{ fontFamily: 'Phenomena' }}
           type="text"
         />
-      </form>
+        {errors.title ? (
+          <Message mode="inline" level="error">
+            {errors.title}
+          </Message>
+        ) : null}
+      </Form>
       <p className="flex space-x-2 text-gray-500 py-3 bg-white z-[2] relative">
         {slug ? (
           <>
@@ -46,6 +90,7 @@ function Story() {
             <small>
               your story URL:{' '}
               <input
+                className="focus:outline-none"
                 form="story-form"
                 name="slug"
                 readOnly
@@ -56,13 +101,14 @@ function Story() {
           </>
         ) : null}
       </p>
-      <Editor />
+      <Editor editor={editor} />
     </>
   )
 }
 
 const urlSuffix = randomString(6)
 
+// TODO drop this and get the random string from the backend instead
 function useSlug(): [
   string | undefined,
   React.FormEventHandler<HTMLInputElement>,
@@ -74,6 +120,16 @@ function useSlug(): [
   }
 
   return [slug ? `${slug}-${urlSuffix}` : undefined, handleChange]
+}
+
+function useSaveStory() {
+  const mutation = useMutation<
+    AxiosResponse<unknown>,
+    AxiosError<ApiError>,
+    Payload
+  >(async data => myAxios.post('/stories', data))
+
+  return mutation
 }
 
 export { Story }

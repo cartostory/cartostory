@@ -1,4 +1,4 @@
-import type Knex from 'knex'
+import type { Knex } from 'knex'
 import knex from 'knex'
 
 const { POSTGRES_DB, POSTGRES_PASS, POSTGRES_USER } = process.env

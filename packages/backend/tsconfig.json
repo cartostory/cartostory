@@ -1,10 +1,17 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
+  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "outDir": "dist",
-    "target": "ES2019"
+    "project": "./tsconfig.json",
+    "target": "ES2022",
+    "lib": ["ES2022"]
   },
   "compileOnSave": true,
   "exclude": ["prod_node_modules"],
-  "include": ["./", "./@types/fastify.d.ts", "./@types/typings.d.ts"]
+  "include": [
+    "./",
+    "./@types/fastify.d.ts",
+    "./@types/typings.d.ts",
+    "./.eslintrc.js"
+  ]
 }

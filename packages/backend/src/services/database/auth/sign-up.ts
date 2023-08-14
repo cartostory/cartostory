@@ -1,4 +1,4 @@
-import type Knex from 'knex'
+import type { Knex } from 'knex'
 import { TABLE_USER, TABLE_USER_ACTIVATION_CODE } from '../config'
 import type { User, UserActivationCode } from '../types'
 
@@ -10,10 +10,8 @@ export const signUp =
   ) => {
     const { email, displayName, hash } = user
 
-    // otherwise undefined is returned instead of userId
-    // eslint-disable-next-line @typescript-eslint/return-await
     return await db.transaction(async trx => {
-      const [userId] = await db<User, Pick<User, 'id'>>(TABLE_USER)
+      const [user] = await db<User, Pick<User, 'id'>>(TABLE_USER)
         .insert({
           email,
           display_name: displayName,
@@ -24,11 +22,11 @@ export const signUp =
 
       await db<UserActivationCode>(TABLE_USER_ACTIVATION_CODE)
         .insert({
-          user_id: userId,
+          user_id: user.id,
           activation_code: activationCode,
         })
         .transacting(trx)
 
-      return userId
+      return user.id
     })
   }

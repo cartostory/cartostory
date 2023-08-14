@@ -1,13 +1,27 @@
 import superagent from 'superagent'
 import { advanceBy } from 'jest-date-mock'
-import { server } from '../../app'
+import { setup } from '../../app'
 import { shutdown } from '../../../scripts/query'
 import truncate from '../../../scripts/truncate-tables'
 import { createUser } from '../../../scripts/create-user'
+import type { FastifyInstance } from 'fastify'
+
+let server: FastifyInstance
 
 describe('refresh-token', () => {
-  beforeEach(truncate)
-  afterAll(shutdown)
+  beforeAll(async () => {
+    server = await setup()
+    await server.listen({ port: 3000, host: '0.0.0.0' })
+  })
+
+  beforeEach(async () => {
+    await truncate()
+  })
+
+  afterAll(async () => {
+    await server.close()
+    await shutdown()
+  })
 
   it('denies to refresh invalid token', async () => {
     const response = await server.inject({
@@ -33,7 +47,6 @@ describe('refresh-token', () => {
     let accessToken: string = 'Bearer '
 
     try {
-      await server.listen(3000, '0.0.0.0')
       const {
         body: { data },
       } = await superagent

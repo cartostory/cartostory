@@ -4,6 +4,7 @@ import { randomString } from '../../utils'
 class EntityMarker extends L.Marker {
   constructor(latLng: L.LatLngExpression, options?: L.MarkerOptions) {
     super(latLng, options)
+    // @ts-expect-error error
     this.feature = {
       ...this.feature,
       type: 'Feature',

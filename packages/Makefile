@@ -55,7 +55,7 @@ stop-ci: ## stops CI stack
 	cd ./docker && docker-compose $${DOCKER_COMPOSE_CI} stop
 
 rebuild: ## rebuilds services (useful when dependecies change), e.g. ENVIRONMENT=DEV SERVICE=frontend make rebuild
-	cd ./docker && docker-compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} rm --force --stop -v $(SERVICE) && docker-compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} build $(SERVICE) && docker-compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} up $(SERVICE)
+	cd ./docker && docker-compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} rm --force --stop -v $(SERVICE) && docker-compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} build $(SERVICE) && docker-compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} up -d $(SERVICE)
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

@@ -17,6 +17,7 @@ function SignUp() {
 
   return (
     <Form
+      className="w-max"
       onSubmit={e => {
         e.preventDefault()
         const { email, password } = e.target as typeof e.target &

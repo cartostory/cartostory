@@ -1,11 +1,24 @@
-import { server } from '../../app'
+import { setup } from '../../app'
 import truncate from '../../../scripts/truncate-tables'
 import { shutdown } from '../../../scripts/query'
+import type { FastifyInstance } from 'fastify'
+
+let server: FastifyInstance
 
 describe('sign-up', () => {
-  beforeEach(truncate)
+  beforeAll(async () => {
+    server = await setup()
+    await server.listen({ port: 3000, host: '0.0.0.0' })
+  })
 
-  afterAll(shutdown)
+  beforeEach(async () => {
+    await truncate()
+  })
+
+  afterAll(async () => {
+    await server.close()
+    await shutdown()
+  })
 
   test('does not accept invalid e-mail address', async () => {
     const response = await server.inject({

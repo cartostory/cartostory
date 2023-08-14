@@ -30,6 +30,10 @@
   @apply after:content-['*'] after:ml-0.5 after:text-rose-500;
 }
 
+.my-map {
+  height: calc(100% - 80px);
+}
+
 [data-feature-id] {
   cursor: pointer;
   text-decoration: underline;
