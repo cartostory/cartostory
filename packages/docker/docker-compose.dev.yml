@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 volumes:
   database-data-dev:
@@ -23,11 +23,18 @@ services:
       - ../backend:/app
       - /app/node_modules
     depends_on:
-      - database
-      - flyway
-      - rabbitmq
+      database:
+        condition: service_started
+      flyway:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     command: >
       sh -c "cd /app && npm run dev"
+  rabbitmq:
+    healthcheck:
+      # TODO use a real command to check queue is ready
+      test: ['CMD-SHELL', 'sleep 1; exit 0']
   mailer:
     build:
       context: ../mailer

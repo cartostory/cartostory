@@ -1,21 +1,25 @@
 import { createUser } from '../../../scripts/create-user'
 import { createStory } from '../../../scripts/create-story'
 import { getToken } from '../../../scripts/get-token'
-import { server } from '../../app'
+import { setup } from '../../app'
 import { shutdown } from '../../../scripts/query'
 import truncate from '../../../scripts/truncate-tables'
+import type { FastifyInstance } from 'fastify'
+
+let server: FastifyInstance
 
 describe('get-story/get-stories', () => {
   let accessToken: string
   let slug: string
 
   beforeAll(async () => {
-    await server.listen(3000, '0.0.0.0')
+    server = await setup()
+    await server.listen({ port: 3000, host: '0.0.0.0' })
   })
 
   afterAll(async () => {
-    await shutdown()
     await server.close()
+    await shutdown()
   })
 
   beforeEach(async () => {

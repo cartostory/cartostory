@@ -2,12 +2,25 @@ import { createUser } from '../../../scripts/create-user'
 import { getToken } from '../../../scripts/get-token'
 import truncate from '../../../scripts/truncate-tables'
 import { shutdown } from '../../../scripts/query'
-import { server } from '../../app'
+import { setup } from '../../app'
+import type { FastifyInstance } from 'fastify'
+
+let server: FastifyInstance
 
 describe('create-story', () => {
-  beforeEach(truncate)
+  beforeAll(async () => {
+    server = await setup()
+    await server.listen({ port: 3000, host: '0.0.0.0' })
+  })
 
-  afterAll(shutdown)
+  beforeEach(async () => {
+    await truncate()
+  })
+
+  afterAll(async () => {
+    await server.close()
+    await shutdown()
+  })
 
   it('does not accept anonymous request', async () => {
     const response = await server.inject({
@@ -29,7 +42,6 @@ describe('create-story', () => {
     const password = 'password'
 
     try {
-      await server.listen(3000, '0.0.0.0')
       await createUser(email, password)
       const { accessToken } = await getToken(email, password)
 

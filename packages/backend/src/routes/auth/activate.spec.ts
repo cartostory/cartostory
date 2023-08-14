@@ -1,17 +1,29 @@
 import { v4 as uuidv4 } from 'uuid'
-import { server } from '../../app'
+import { setup } from '../../app'
 import query, { shutdown } from '../../../scripts/query'
 import { generateHash } from './components/utils'
 import truncate from '../../../scripts/truncate-tables'
+import type { FastifyInstance } from 'fastify'
 
 const activationCode = 'activation-code'
 const email = 'hello@localhost.world'
 const hash = async () => generateHash('world')
+let server: FastifyInstance
 
 describe('activate', () => {
-  beforeEach(truncate)
+  beforeAll(async () => {
+    server = await setup()
+    await server.listen({ port: 3000, host: '0.0.0.0' })
+  })
 
-  afterAll(shutdown)
+  beforeEach(async () => {
+    await truncate()
+  })
+
+  afterAll(async () => {
+    await server.close()
+    await shutdown()
+  })
 
   it('does not activate user when invalid userId uuid is sent', async () => {
     const response = await server.inject({

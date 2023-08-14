@@ -18,11 +18,10 @@
     "leaflet-draw": "~1.0.4",
     "@xstate/react": "~3.0.0",
     "xstate": "~4.31.0",
-    "@tiptap/react": "~2.0.4",
-    "@tiptap/core": "~2.0.4",
     "@tiptap/pm": "~2.0.4",
+    "@tiptap/react": "~2.0.4",
     "@tiptap/starter-kit": "~2.0.4",
-    "@tiptap/extension-bubble-menu": "~2.0.4"
+    "@tiptap/core": "~2.0.4"
   },
   "scripts": {
     "preview": "vite preview",
