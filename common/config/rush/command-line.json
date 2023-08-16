@@ -10,6 +10,15 @@
       "shellCommand": "pretty-quick --staged"
     },
     {
+      "commandKind": "bulk",
+      "safeForSimultaneousRushProcesses": true,
+      "ignoreMissingScript": true,
+      "name": "typecheck",
+      "summary": "Typecheck packages.",
+      "description": "Run tsc compiler to check types.",
+      "enableParallelism": true
+    },
+    {
       "name": "lint-staged",
       "commandKind": "bulk",
       "summary": "Run lint-staged on each package",

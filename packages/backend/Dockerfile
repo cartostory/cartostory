@@ -4,7 +4,7 @@ RUN npm install -g pnpm@next-7
 ARG POSTGRES_DB
 ARG POSTGRES_PASS
 ARG POSTGRES_USER
-ENV NODE_ENV=development
+ENV NODE_ENV=dev
 ENV POSTGRES_DB=${POSTGRES_DB}
 ENV POSTGRES_PASS=${POSTGRES_PASS}
 ENV POSTGRES_USER=${POSTGRES_USER}
@@ -36,7 +36,7 @@ CMD ["pnpm", "test"]
 
 # development
 FROM base as development
-ENV NODE_ENV=development
+ENV NODE_ENV=dev
 COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
 USER node
 CMD ["pnpm", "dev"]

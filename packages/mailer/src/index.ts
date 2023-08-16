@@ -1,59 +1,34 @@
 #! /usr/bin/env node
-import amqp from 'amqplib'
-import { sendSignUp } from './services/mailer'
 
-const CONNECTION_STRING = 'amqp://rabbitmq:5672'
-const QUEUE = 'mailer'
+import type { AwilixContainer } from 'awilix'
+import { bootstrap } from './bootstrap'
+import type { Registrations } from './bootstrap'
+import { safeEnvironment } from './services/environment/environment'
 
-const setup = async () => {
-  try {
-    const connection = await amqp.connect(CONNECTION_STRING)
-    const channel = await connection.createChannel()
+const { NODE_ENV } = safeEnvironment(process.env)
 
-    await channel.assertQueue(QUEUE, {
-      durable: true,
-    })
+let container: AwilixContainer<Registrations> | undefined
 
-    await channel.consume(
-      QUEUE,
-      async msg => {
-        if (!msg) {
-          return
-        }
-
-        try {
-          const content = JSON.parse(msg.content.toString())
-          const { type, userId, email, activationCode } = content
-
-          if (!userId) {
-            throw new Error('user id is missing')
-          }
-
-          if (!email) {
-            throw new Error('e-mail is missing')
-          }
-
-          switch (type) {
-            case 'sign-up': {
-              await sendSignUp({
-                activation_code: activationCode,
-                user_id: userId,
-              })([email])
-            }
-          }
-        } catch (e) {
-          console.error('failed to send e-mail', e)
-        }
-      },
-      {
-        noAck: true,
-      },
-    )
-  } catch (e) {
-    // TODO handle error
-  }
+const main = async () => {
+  container = await bootstrap(NODE_ENV)
+  const signUp = container.resolve('signUpQueueConsumer')
+  await signUp.consume()
 }
 
-setup().catch(() => {
-  // TODO handle error
+main()
+  .then(() => {
+    container?.resolve('logger').info('mailer is ready')
+  })
+  .catch(e => {
+    container?.resolve('logger').error('mailer top level exception', e)
+  })
+
+const logUncaughtException = (e: Error) => {
+  container?.resolve('logger').error('unexpected error', e)
+}
+
+process.on('exit', async () => {
+  await container?.dispose()
 })
+process.on('uncaughtException', logUncaughtException)
+process.on('unhandledRejection', logUncaughtException)
