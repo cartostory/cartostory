@@ -2,6 +2,7 @@ version: '3.8'
 
 volumes:
   database-data-dev:
+  rabbitmq-data-dev:
 
 services:
   frontend:
@@ -35,9 +36,14 @@ services:
     build:
       context: ../mailer
       target: development
+    restart: always
     volumes:
       - ../mailer:/app
       - /app/node_modules
+  rabbitmq:
+    volumes:
+      - ./etc/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
+      - rabbitmq-data-dev:/var/lib/rabbitmq
   database:
     deploy:
       restart_policy:
