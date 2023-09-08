@@ -32,10 +32,10 @@ declare module '@fastify/jwt' {
       iat?: number
       id: string
       email: string
-      display_name: string
-      signup_date: Date
-      activation_date: Date | null
-      last_login_date: Date | null
+      displayName: string
+      signedUpAt: Date
+      activatedAt?: Date
+      lastLoggedInAt?: Date
       status: 'registered' | 'verified' | 'deleted'
     }
   }

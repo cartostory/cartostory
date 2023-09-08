@@ -2,7 +2,12 @@ import { setup } from '../../app'
 import truncate from '../../../scripts/truncate-tables'
 import { shutdown } from '../../../scripts/query'
 import { createUser } from '../../../scripts/create-user'
-import { FastifyInstance } from 'fastify'
+import type { FastifyInstance } from 'fastify'
+import {
+  BadPasswordError,
+  InvalidEmailError,
+  UserNotFoundError,
+} from '../../api/user/errors'
 
 const email = 'hello@localhost.world'
 const password = 'world'
@@ -39,8 +44,8 @@ describe('sign-in', () => {
 
     const json = JSON.parse(response.payload)
 
-    expect(response.statusCode).toEqual(400)
-    expect(json.message).toEqual('e-mail is not valid')
+    expect(response.statusCode).toEqual(422)
+    expect(json.message).toEqual(new InvalidEmailError().message)
   })
 
   test('does not login when user is not found', async () => {
@@ -52,10 +57,10 @@ describe('sign-in', () => {
     const json = JSON.parse(response.payload)
 
     expect(response.statusCode).toEqual(400)
-    expect(json.message).toEqual('user cannot log in')
+    expect(json.message).toEqual(new UserNotFoundError().message)
   })
 
-  test('does not log in when passwords do not match', async () => {
+  test('does not login when passwords do not match', async () => {
     await createUser(email, password)
 
     const response = await inject({
@@ -64,9 +69,10 @@ describe('sign-in', () => {
     })
 
     const json = JSON.parse(response.payload)
+    console.log(JSON.stringify(json))
 
     expect(response.statusCode).toEqual(401)
-    expect(json.message).toEqual('wrong password')
+    expect(json.message).toEqual(new BadPasswordError().message)
   })
 
   test('logs in', async () => {

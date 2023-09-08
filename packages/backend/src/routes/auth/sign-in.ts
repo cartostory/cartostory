@@ -1,10 +1,5 @@
 import type { FastifyInstance } from 'fastify'
-import { comparePasswordAndHash, isValidEmail } from './components/utils'
-import { auth } from '../../services/database/index'
-import {
-  UserNotFoundError,
-  WrongPasswordError,
-} from '../../services/database/auth/sign-in'
+import { container } from '../../bootstrap'
 
 const opts = {
   schema: {
@@ -31,52 +26,16 @@ const signIn = async (fastify: FastifyInstance) => {
     '/auth/sign-in',
     opts,
     async request => {
+      const controller = container.resolve('userController')
       const { email, password } = request.body
+      const user = await controller.signIn(email, password)
 
-      if (!isValidEmail(email)) {
-        // eslint-disable-next-line no-throw-literal
-        throw {
-          statusCode: 400,
-          status: 'error',
-          message: 'e-mail is not valid',
-        }
-      }
-
-      try {
-        const found = await auth.getUser(email)
-        const { password: hash, ...user } = found
-        const rightPassword = await comparePasswordAndHash(password, hash)
-
-        if (!rightPassword) {
-          throw new WrongPasswordError()
-        }
-
-        return {
-          status: 'success',
-          data: {
-            accessToken: fastify.jwt.sign(user, { expiresIn: '15m' }),
-            refreshToken: fastify.jwt.sign(user, { expiresIn: '24h' }),
-          },
-        }
-      } catch (e) {
-        request.log.error(e)
-
-        if (e instanceof UserNotFoundError) {
-          // eslint-disable-next-line no-throw-literal
-          throw {
-            statusCode: 400,
-            status: 'error',
-            message: 'user cannot log in',
-          }
-        }
-
-        if (e instanceof WrongPasswordError) {
-          // eslint-disable-next-line no-throw-literal
-          throw { statusCode: 401, status: 'error', message: 'wrong password' }
-        }
-
-        // eslint-disable-next-line no-throw-literal
-        throw { statusCode: 400, status: 'error', message: 'sign in failed' }
+      return {
+        status: 'success',
+        data: {
+          accessToken: fastify.jwt.sign(user, { expiresIn: '15m' }),
+          refreshToken: fastify.jwt.sign(user, { expiresIn: '24h' }),
+        },
       }
     },
   )

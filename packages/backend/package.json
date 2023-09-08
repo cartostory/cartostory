@@ -29,7 +29,10 @@
     "uuid": "^9.0.0",
     "@fastify/swagger": "^8.8.0",
     "@fastify/jwt": "~7.2.0",
-    "@fastify/swagger-ui": "~1.9.3"
+    "@fastify/swagger-ui": "~1.9.3",
+    "@mikro-orm/core": "~5.7.14",
+    "@mikro-orm/postgresql": "~5.7.14",
+    "awilix": "~8.0.1"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.0",
@@ -51,7 +54,8 @@
     "typescript": "^5.0.0",
     "@rushstack/eslint-config": "~3.3.3",
     "eslint": "~8.47.0",
-    "eslint-config-prettier": "~9.0.0"
+    "eslint-config-prettier": "~9.0.0",
+    "@mikro-orm/cli": "~5.7.14"
   },
   "lint-staged": {
     "*.ts": [

@@ -34,7 +34,7 @@ describe('sign-up', () => {
 
     expect(response.statusCode).toEqual(400)
     expect(json.status).toEqual('error')
-    expect(json.message).toEqual('e-mail is not valid')
+    expect(json.message).toEqual('invalid e-mail address')
   })
 
   test('creates new user', async () => {

@@ -16,7 +16,15 @@ services:
       - flyway
       - rabbitmq
     command: >
-      sh -c "cd /app && npm run test -- --watchAll"
+      sh -c "cd /app && npm run test"
+  mailer:
+    build:
+      context: ../mailer
+      target: development
+    restart: always
+    volumes:
+      - ../mailer:/app
+      - /app/node_modules
   database:
     volumes:
       - database-data-test:${PGDATA}

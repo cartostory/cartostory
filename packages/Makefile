@@ -8,17 +8,21 @@ DOCKER_COMPOSE_TEST = -f docker-compose.yml -f docker-compose.test.yml -p cartos
 
 .EXPORT_ALL_VARIABLES:
 
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
 run-dev: ## runs dev stack
 	cd ./docker && docker-compose $${DOCKER_COMPOSE_DEV} up
 
 run-prod: ## runs prod stack
 	cd ./docker && docker compose $${DOCKER_COMPOSE_PROD} up
 
-run-test: ## runs backend tests
+run-test: ## runs backend tests, you can filter them with OVERRIDE=put-your-jest-options here
 	@cd ./docker; \
-	docker compose $${DOCKER_COMPOSE_TEST} up --exit-code-from backend --renew-anon-volumes backend; \
+	docker compose $${DOCKER_COMPOSE_TEST} run backend sh -c "cd /app && npm run test -- $(OVERRIDE)"; \
+	docker compose $${DOCKER_COMPOSE_TEST} stop database; \
+	docker compose $${DOCKER_COMPOSE_TEST} stop rabbitmq; \
 	EXIT_CODE=$$?; \
-	docker compose $${DOCKER_COMPOSE_TEST} kill database; \
 	exit $$EXIT_CODE
 
 run-ci: ## runs CI tests
@@ -37,5 +41,3 @@ stop-ci: ## stops CI stack
 rebuild: ## rebuilds services (useful when dependecies change), e.g. ENVIRONMENT=DEV SERVICE=frontend make rebuild
 	cd ./docker && docker compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} rm --force --stop -v $(SERVICE) && docker compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} build $(SERVICE) && docker compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} up -d $(SERVICE)
 
-help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

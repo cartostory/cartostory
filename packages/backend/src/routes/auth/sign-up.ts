@@ -1,10 +1,7 @@
 import type { FastifyInstance } from 'fastify'
-import {
-  generateActivationCode,
-  generateHash,
-  isValidEmail,
-} from './components/utils'
-import { auth } from '../../services/database/index'
+import { generateActivationCode } from './components/utils'
+import { container } from '../../bootstrap'
+import { InvalidEmailError } from '../../api/user/errors'
 
 const opts = {
   schema: {
@@ -32,49 +29,50 @@ const signUp = async (fastify: FastifyInstance) => {
     opts,
     async request => {
       const { email, password } = request.body
-
-      if (!isValidEmail(email)) {
-        // eslint-disable-next-line no-throw-literal
-        throw {
-          status: 'error',
-          statusCode: 400,
-          message: 'e-mail is not valid',
-        }
-      }
-
-      const hash = await generateHash(password)
-      const activationCode = generateActivationCode()
-      const user = {
-        email,
-        displayName: email,
-        hash,
-      }
+      const controller = container.resolve('userController')
+      const verificationCode = generateActivationCode()
 
       try {
-        const userId = await auth.signUp(user, activationCode)
+        const user = await controller.signUp(email, password, verificationCode)
 
         const { channel } = fastify.amqp
-        const queue = 'mailer'
+        const queue = 'mailer_sign_up_q'
 
-        await channel.assertQueue(queue, {
+        await channel.assertExchange('mailer_sign_up_x', 'direct', {
           durable: true,
         })
+        await channel.assertQueue(queue, {
+          durable: true,
+          deadLetterExchange: 'mailer_sign_up_dlx',
+          deadLetterRoutingKey: 'mailer_sign_up_dlq',
+        })
+        await channel.bindQueue(
+          'mailer_sign_up_q',
+          'mailer_sign_up_x',
+          'mailer_sign_up_q',
+        )
 
         channel.sendToQueue(
           queue,
           Buffer.from(
             JSON.stringify({
-              userId,
+              userId: user.id,
               email,
-              activationCode,
+              activationCode: verificationCode,
               type: 'sign-up',
             }),
           ),
+          {
+            persistent: true,
+          },
         )
 
         return { status: 'success', message: 'user succesfully registered' }
       } catch (e) {
-        request.log.error(e)
+        if (e instanceof InvalidEmailError) {
+          throw e
+        }
+        request.log.error({ err: e, ...request.body }, 'user sign up failed')
         // Do not let anyone know an e-mail is already taken.
         return { status: 'success', message: 'user succesfully registered' }
       }

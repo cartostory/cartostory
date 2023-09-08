@@ -4,6 +4,7 @@ import type { AwilixContainer } from 'awilix'
 import { bootstrap } from './bootstrap'
 import type { Registrations } from './bootstrap'
 import { safeEnvironment } from './services/environment/environment'
+import invariant from 'tiny-invariant'
 
 const { NODE_ENV } = safeEnvironment(process.env)
 
@@ -24,6 +25,7 @@ main()
   })
 
 const logUncaughtException = (e: Error) => {
+  invariant(container, 'container is really needed')
   container?.resolve('logger').error('unexpected error', e)
 }
 
