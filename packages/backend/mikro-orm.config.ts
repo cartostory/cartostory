@@ -8,12 +8,12 @@ const options = defineConfig({
   migrations: {
     emit: 'js',
     tableName: 'mikro_orm_migrations',
-    path: './db/migrations-mikro-orm',
+    path: './db/migrations',
     allOrNothing: true,
     transactional: true,
   },
   schemaGenerator: {
-    ignoreSchema: ['cartostory_old', 'cron'],
+    ignoreSchema: ['cron'],
   },
   entities: [Story, User, UserStatus, UserVerificationCode],
   entitiesTs: [Story, User, UserStatus, UserVerificationCode],
