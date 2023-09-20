@@ -55,11 +55,17 @@
     "@rushstack/eslint-config": "~3.3.3",
     "eslint": "~8.47.0",
     "eslint-config-prettier": "~9.0.0",
-    "@mikro-orm/cli": "~5.7.14"
+    "@mikro-orm/cli": "~5.7.14",
+    "@mikro-orm/migrations": "~5.7.14"
   },
   "lint-staged": {
     "*.ts": [
       "npm run lint"
+    ]
+  },
+  "mikro-orm": {
+    "configPaths": [
+      "./dist/mikro-orm.config.js"
     ]
   }
 }

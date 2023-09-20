@@ -10,7 +10,7 @@
     "lib": ["ES2022"]
   },
   "compileOnSave": true,
-  "exclude": ["prod_node_modules"],
+  "exclude": ["prod_node_modules", "db/**/*"],
   "include": [
     "./",
     "./@types/fastify.d.ts",

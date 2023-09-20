@@ -40,7 +40,7 @@ class UserController {
     const { status } = user
     return {
       ...user,
-      status: status.id,
+      status,
     }
   }
 
@@ -103,7 +103,7 @@ class UserController {
       throw new UserVerificationError()
     }
 
-    user.status.id = 'verified'
+    user.status = 'verified'
     user.verificationCode[0].usedAt = new Date()
 
     await this.userRepository.getEntityManager().persistAndFlush(user)

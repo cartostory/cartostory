@@ -26,17 +26,15 @@ services:
     depends_on:
       database:
         condition: service_started
-      flyway:
-        condition: service_started
       rabbitmq:
         condition: service_healthy
     command: >
-      sh -c "cd /app && npm run dev"
+      sh -c "cd /app && npx mikro-orm migration:up && npm run dev"
   mailer:
     build:
       context: ../mailer
       target: development
-    restart: always
+    restart: on-failure
     volumes:
       - ../mailer:/app
       - /app/node_modules

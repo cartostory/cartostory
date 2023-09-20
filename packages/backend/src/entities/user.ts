@@ -7,20 +7,21 @@ import {
   Unique,
 } from '@mikro-orm/core'
 import { BaseEntity } from './base-entity'
-import { UserStatus } from './user-status'
 import { UserRepository } from '../services/repositories/user'
 import { UserVerificationCode } from './user-verification-code'
+import { Story } from './story'
+import { UserStatus } from './user-status'
 
-@Entity({ customRepository: () => UserRepository })
+@Entity({ schema: 'cartostory', customRepository: () => UserRepository })
 class User extends BaseEntity {
-  @Property()
+  @Property({ columnType: 'text' })
   displayName!: string
 
-  @Property()
+  @Property({ columnType: 'text' })
   @Unique()
   email!: string
 
-  @Property({ hidden: true })
+  @Property({ columnType: 'text', hidden: true })
   password!: string
 
   @Property({ onCreate: () => new Date() })
@@ -32,13 +33,21 @@ class User extends BaseEntity {
   @Property({ nullable: true })
   lastLoggedInAt?: Date
 
-  @OneToOne({ onCreate: () => 'registered', fieldName: 'status' })
-  status!: UserStatus
+  @OneToOne({
+    entity: () => UserStatus,
+    mapToPk: true,
+    fieldName: 'status',
+    unique: false,
+  })
+  status!: 'deleted' | 'registered' | 'verified'
 
   @OneToMany({ entity: () => UserVerificationCode, mappedBy: 'user' })
   verificationCode: Collection<UserVerificationCode> = new Collection<UserVerificationCode>(
     this,
   )
+
+  @OneToMany({ entity: () => Story, mappedBy: 'user' })
+  stories: Collection<Story> = new Collection<Story>(this)
 }
 
 export { User }

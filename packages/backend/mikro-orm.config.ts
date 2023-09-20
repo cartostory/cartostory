@@ -1,11 +1,22 @@
 import { LoadStrategy, defineConfig } from '@mikro-orm/core'
 import { User } from './src/entities/user'
-import { UserStatus } from './src/entities/user-status'
 import { UserVerificationCode } from './src/entities/user-verification-code'
+import { Story } from './src/entities/story'
+import { UserStatus } from './src/entities/user-status'
 
-export default defineConfig({
-  entities: [User, UserStatus, UserVerificationCode],
-  entitiesTs: [User, UserStatus, UserVerificationCode],
+const options = defineConfig({
+  migrations: {
+    emit: 'js',
+    tableName: 'mikro_orm_migrations',
+    path: './db/migrations-mikro-orm',
+    allOrNothing: true,
+    transactional: true,
+  },
+  schemaGenerator: {
+    ignoreSchema: ['cartostory_old', 'cron'],
+  },
+  entities: [Story, User, UserStatus, UserVerificationCode],
+  entitiesTs: [Story, User, UserStatus, UserVerificationCode],
   debug: process.env.NODE_ENV !== 'prod',
   host: 'database',
   dbName: process.env.POSTGRES_DB,
@@ -14,3 +25,5 @@ export default defineConfig({
   type: 'postgresql',
   loadStrategy: LoadStrategy.JOINED,
 })
+
+export default options

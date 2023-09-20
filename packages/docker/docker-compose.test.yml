@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 volumes:
   database-data-test:
@@ -13,15 +13,14 @@ services:
       - /app/node_modules
     depends_on:
       - database
-      - flyway
       - rabbitmq
     command: >
-      sh -c "cd /app && npm run test"
+      sh -c "cd /app && npx mikro-orm migration:up && npm run test"
   mailer:
     build:
       context: ../mailer
       target: development
-    restart: always
+    restart: on-failure
     volumes:
       - ../mailer:/app
       - /app/node_modules

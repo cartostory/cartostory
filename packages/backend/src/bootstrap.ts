@@ -1,10 +1,10 @@
 import { MikroORM } from '@mikro-orm/core'
-import type { PostgreSqlDriver } from '@mikro-orm/postgresql'
 import { InjectionMode, asClass, asValue, createContainer } from 'awilix'
 import { User } from './entities/user'
 import { UserController } from './api/user/controller'
 import type { UserRepository } from './services/repositories/user'
 import { UserUtils } from './services/utils/user'
+import options from '../mikro-orm.config'
 
 type Registrations = {
   orm: Awaited<ReturnType<typeof createEntityManager>>
@@ -18,7 +18,7 @@ const container = createContainer<Registrations>({
 })
 
 const createEntityManager = async () => {
-  return await MikroORM.init<PostgreSqlDriver>()
+  return await MikroORM.init(options)
 }
 
 const _bootstrap = async (mode: 'prod' | 'dev') => {

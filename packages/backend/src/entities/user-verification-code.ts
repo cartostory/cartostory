@@ -7,7 +7,7 @@ import {
 } from '@mikro-orm/core'
 import { User } from './user'
 
-@Entity()
+@Entity({ schema: 'cartostory' })
 class UserVerificationCode {
   @ManyToOne({ entity: () => User, primary: true })
   user!: User

@@ -1,13 +1,16 @@
-import { Entity, OneToOne, PrimaryKey } from '@mikro-orm/core'
-import { User } from './user'
+import { Entity, Enum, PrimaryKey } from '@mikro-orm/core'
+
+enum Status {
+  Registered = 'registered',
+  Verified = 'verified',
+  Deleted = 'deleted',
+}
 
 @Entity()
 class UserStatus {
-  @PrimaryKey()
-  id!: 'registered' | 'verified' | 'deleted'
-
-  @OneToOne({ entity: () => User })
-  user!: User
+  @PrimaryKey({ type: 'text' })
+  @Enum(() => Status)
+  status!: string
 }
 
 export { UserStatus }
