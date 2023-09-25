@@ -22,8 +22,8 @@ class UserNotFoundError extends ApiError {
 }
 
 class UserVerificationError extends ApiError {
-  constructor() {
-    super('user cannot be verified', 422)
+  constructor(message: string = 'user cannot be verified') {
+    super(message, 400)
     this.name = 'UserVerificationError'
   }
 }

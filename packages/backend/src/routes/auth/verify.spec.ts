@@ -70,7 +70,7 @@ describe('verify', () => {
     const json = JSON.parse(response.payload)
 
     expect(response.statusCode).toEqual(400)
-    expect(json.message).toEqual('user not found')
+    expect(json.message).toEqual('user already verified')
   })
 
   it('does not verify user with expired verification code', async () => {

@@ -99,6 +99,10 @@ class UserController {
       throw new UserNotFoundError()
     }
 
+    if (user.status === 'verified') {
+      throw new UserVerificationError('user already verified')
+    }
+
     if (user.verificationCode.length !== 1) {
       throw new UserVerificationError()
     }

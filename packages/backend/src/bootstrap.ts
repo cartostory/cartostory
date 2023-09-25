@@ -21,7 +21,7 @@ const createEntityManager = async () => {
   return await MikroORM.init(options)
 }
 
-const _bootstrap = async (mode: 'prod' | 'dev') => {
+const bootstrap = async (mode: 'prod' | 'dev') => {
   const orm = await createEntityManager()
   container
     .register({
@@ -40,4 +40,4 @@ const _bootstrap = async (mode: 'prod' | 'dev') => {
   return container
 }
 
-export { _bootstrap, container }
+export { bootstrap, container }

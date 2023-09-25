@@ -17,14 +17,14 @@ import {
   config as swaggerConfig,
   uiConfig as swaggerUiConfig,
 } from './config/swagger'
-import { _bootstrap, container } from './bootstrap'
+import { bootstrap, container } from './bootstrap'
 import { RequestContext } from '@mikro-orm/core'
 import { ApiError } from './api/user/errors'
 
 const { NODE_JWT_SECRET } = process.env
 
 const setup = async () => {
-  await _bootstrap('dev')
+  await bootstrap('dev')
   const orm = container.resolve('orm')
   const server = fastify({
     logger: true,
