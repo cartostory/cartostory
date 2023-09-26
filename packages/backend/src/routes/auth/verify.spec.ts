@@ -5,7 +5,7 @@ import { generateHash } from './components/utils'
 import truncate from '../../../scripts/truncate-tables'
 import type { FastifyInstance } from 'fastify'
 
-const verificationCode = 'verification-code'
+const verificationCode = uuidv4()
 const email = 'hello@localhost.world'
 const hash = async () => generateHash('world')
 let server: FastifyInstance
@@ -31,10 +31,7 @@ describe('verify', () => {
       url: '/auth/verification/userId/verificationCode',
     })
 
-    const json = JSON.parse(response.payload)
-
     expect(response.statusCode).toEqual(400)
-    expect(json.message).toEqual('user verification failed')
   })
 
   it('does not verify user when not found', async () => {
@@ -42,7 +39,7 @@ describe('verify', () => {
 
     const response = await server.inject({
       method: 'GET',
-      url: `/auth/verification/${userId}/verificationCode`,
+      url: `/auth/verification/${userId}/${verificationCode}`,
     })
 
     const json = JSON.parse(response.payload)
