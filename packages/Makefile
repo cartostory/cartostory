@@ -25,13 +25,6 @@ run-test: ## runs backend tests, you can filter them with OVERRIDE=put-your-jest
 	EXIT_CODE=$$?; \
 	exit $$EXIT_CODE
 
-run-ci: ## runs CI tests
-	@cd ./docker; \
-	docker compose $${DOCKER_COMPOSE_CI} up --build --exit-code-from backend --renew-anon-volumes backend; \
-	EXIT_CODE=$$?; \
-	docker compose $${DOCKER_COMPOSE_CI} kill database; \
-	exit $$EXIT_CODE
-
 stop-dev: ## stops dev stack
 	cd ./docker && docker-compose $${DOCKER_COMPOSE_DEV} stop
 
@@ -40,4 +33,3 @@ stop-ci: ## stops CI stack
 
 rebuild: ## rebuilds services (useful when dependecies change), e.g. ENVIRONMENT=DEV SERVICE=frontend make rebuild
 	cd ./docker && docker compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} rm --force --stop -v $(SERVICE) && docker compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} build $(SERVICE) && docker compose $${DOCKER_COMPOSE_$(ENVIRONMENT)} up -d $(SERVICE)
-
