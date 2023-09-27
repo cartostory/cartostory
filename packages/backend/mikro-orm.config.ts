@@ -17,7 +17,7 @@ const options = defineConfig({
   },
   entities: [Story, User, UserStatus, UserVerificationCode],
   entitiesTs: [Story, User, UserStatus, UserVerificationCode],
-  debug: process.env.NODE_ENV !== 'prod',
+  debug: process.env.NODE_ENV === 'dev',
   host: 'database',
   dbName: process.env.POSTGRES_DB,
   password: process.env.POSTGRES_PASS,
