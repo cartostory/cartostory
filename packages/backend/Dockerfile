@@ -19,15 +19,16 @@ RUN pnpm install #--frozen-lockfile
 FROM dependencies as builder
 COPY @types ./@types
 COPY tsconfig.json ./
+COPY mikro-orm.config.ts ./
 COPY src ./src
 COPY scripts ./scripts
 RUN pnpm build
 
-# ci
-FROM builder as ci
-WORKDIR /ci
+# test
+FROM builder as test
+WORKDIR /test
 ENV CI=true
-ENV NODE_ENV=production
+ENV NODE_ENV=test
 COPY --from=dependencies /app/node_modules ./node_modules
 RUN true
 COPY --from=builder /app/dist ./

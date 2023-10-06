@@ -9,7 +9,7 @@
     "dev": "concurrently \"tsc -w\" \"nodemon dist/src/index.js\"",
     "lint": "npx eslint . --ext .ts",
     "lint:fix": "npx eslint . --ext .ts --fix",
-    "test": "CI=true FORCE_COLOR=true jest --forceExit --runInBand --detectOpenHandles --ci",
+    "test": "FORCE_COLOR=true jest --forceExit --runInBand --detectOpenHandles --ci",
     "check:database": "node scripts/is-database-ready.js"
   },
   "engines": {
@@ -29,7 +29,10 @@
     "uuid": "^9.0.0",
     "@fastify/swagger": "^8.8.0",
     "@fastify/jwt": "~7.2.0",
-    "@fastify/swagger-ui": "~1.9.3"
+    "@fastify/swagger-ui": "~1.9.3",
+    "@mikro-orm/core": "~5.7.14",
+    "@mikro-orm/postgresql": "~5.7.14",
+    "awilix": "~8.0.1"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.0",
@@ -51,11 +54,18 @@
     "typescript": "^5.0.0",
     "@rushstack/eslint-config": "~3.3.3",
     "eslint": "~8.47.0",
-    "eslint-config-prettier": "~9.0.0"
+    "eslint-config-prettier": "~9.0.0",
+    "@mikro-orm/cli": "~5.7.14",
+    "@mikro-orm/migrations": "~5.7.14"
   },
   "lint-staged": {
     "*.ts": [
       "npm run lint"
+    ]
+  },
+  "mikro-orm": {
+    "configPaths": [
+      "./dist/mikro-orm.config.js"
     ]
   }
 }

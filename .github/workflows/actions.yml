@@ -8,4 +8,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Run tests
         run: |
-          make run-ci
+          cd packages/docker
+          cp .env.example .env
+          cd ..
+          make run-test

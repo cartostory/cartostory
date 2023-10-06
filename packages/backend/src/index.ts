@@ -24,8 +24,9 @@ setup()
         host: '0.0.0.0',
         port: 3000,
       })
-      .then(address => {
-        server.log.info(`server is listening on ${address}`)
+      .catch(e => {
+        process.stderr.write('Backend failed with an error', e)
+        process.exit(1)
       })
   })
   .catch(e => {

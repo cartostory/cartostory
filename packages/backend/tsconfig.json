@@ -1,13 +1,16 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
     "outDir": "dist",
     "project": "./tsconfig.json",
     "target": "ES2022",
     "lib": ["ES2022"]
   },
   "compileOnSave": true,
-  "exclude": ["prod_node_modules"],
+  "exclude": ["prod_node_modules", "db/**/*"],
   "include": [
     "./",
     "./@types/fastify.d.ts",

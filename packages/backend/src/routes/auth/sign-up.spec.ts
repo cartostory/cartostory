@@ -2,6 +2,7 @@ import { setup } from '../../app'
 import truncate from '../../../scripts/truncate-tables'
 import { shutdown } from '../../../scripts/query'
 import type { FastifyInstance } from 'fastify'
+import { InvalidEmailError } from '../../api/user/errors'
 
 let server: FastifyInstance
 
@@ -32,9 +33,9 @@ describe('sign-up', () => {
 
     const json = JSON.parse(response.payload)
 
-    expect(response.statusCode).toEqual(400)
+    expect(response.statusCode).toEqual(422)
     expect(json.status).toEqual('error')
-    expect(json.message).toEqual('e-mail is not valid')
+    expect(json.message).toEqual(new InvalidEmailError().message)
   })
 
   test('creates new user', async () => {
